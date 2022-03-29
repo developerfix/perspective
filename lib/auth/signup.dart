@@ -1,0 +1,254 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:perspective/res.dart';
+
+class SignUp extends StatefulWidget {
+  const SignUp({Key? key}) : super(key: key);
+
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  bool? termsChecked;
+  bool? isVisible;
+  final TextEditingController _emailcontroller = TextEditingController();
+  final TextEditingController _passwordcontroller = TextEditingController();
+  final TextEditingController _confirmPasswordcontroller =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    termsChecked = false;
+    isVisible = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: SizedBox(
+            height: screenHeight(context) * 0.95,
+            width: screenWidth(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: screenHeight(context) * 0.425,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        bottom: 0,
+                        left: 20,
+                        child: SvgPicture.string(
+                          // Polygon
+                          '<svg viewBox="60.0 386.0 33.0 17.0" ><path transform="matrix(-1.0, 0.0, 0.0, -1.0, 93.0, 403.0)" d="M 16.49999237060547 0 L 33 17 L 0 17 Z" fill="#1d1a2f" stroke="none" stroke-width="1" stroke-miterlimit="4" stroke-linecap="butt" /></svg>',
+                          width: 33.0,
+                          height: screenHeight(context) * 0.025,
+                        ),
+                      ),
+                      Container(
+                        height: screenHeight(context) * 0.4,
+                        color: const Color(0xFF1D1A2F),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/svgs/logo.svg',
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              height: screenHeight(context) * 0.02,
+                            ),
+                            txt(
+                                txt:
+                                    'Hear and Be heard! Your Perspective matters',
+                                fontColor: Colors.white,
+                                fontSize: 14)
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      txt(
+                          txt: 'Signup',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
+                      textField(
+                        context: context,
+                        prefixIcon: const Icon(
+                          Icons.email_outlined,
+                        ),
+                        controller: _emailcontroller,
+                        onChanged: (value) {},
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
+                      textField(
+                        context: context,
+                        prefixIcon: const Icon(
+                          Icons.lock_outline,
+                        ),
+                        controller: _passwordcontroller,
+                        isobscuretext: isVisible! ? false : true,
+                        hinttext: 'Password',
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            setState(() {
+                              isVisible = !isVisible!;
+                            });
+                          },
+                          child: Icon(
+                            isVisible!
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off,
+                          ),
+                        ),
+                        onChanged: (value) {},
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
+                      textField(
+                        context: context,
+                        prefixIcon: const Icon(
+                          Icons.lock_outline,
+                        ),
+                        controller: _confirmPasswordcontroller,
+                        isobscuretext: isVisible! ? false : true,
+                        hinttext: 'Confirm Password',
+                        suffixIcon: InkWell(
+                          onTap: () {
+                            setState(() {
+                              isVisible = !isVisible!;
+                            });
+                          },
+                          child: Icon(
+                            isVisible!
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off,
+                          ),
+                        ),
+                        onChanged: (value) {},
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: screenWidth(context) * 0.03,
+                          ),
+                          InkWell(
+                              onTap: () {
+                                setState(() {
+                                  termsChecked = !termsChecked!;
+                                });
+                              },
+                              child: Icon(
+                                  termsChecked!
+                                      ? Icons.check_circle
+                                      : Icons.circle_outlined,
+                                  size: 18)),
+                          SizedBox(
+                            width: screenWidth(context) * 0.02,
+                          ),
+                          txt(txt: 'Terms and Conditions', fontSize: 12),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              width: 0.1,
+                              color: const Color(0xff8A9EAD),
+                            ),
+                          ),
+                          height: screenHeight(context) * 0.088,
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/svgs/arrowForward.svg',
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  width: screenWidth(context) * 0.03,
+                                ),
+                                txt(
+                                  txt: 'BACK',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        height: screenHeight(context) * 0.088,
+                        color: const Color(0xFF1D1A2F),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              txt(
+                                  txt: 'PROCEED',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontColor: Colors.white),
+                              SizedBox(
+                                width: screenWidth(context) * 0.03,
+                              ),
+                              Transform.rotate(
+                                angle: pi,
+                                child: SvgPicture.asset(
+                                  'assets/svgs/arrowForward.svg',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
