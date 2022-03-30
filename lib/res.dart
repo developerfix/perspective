@@ -1,6 +1,5 @@
 import 'package:adobe_xd/page_link.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 const int blueColor = 0xff3B5998;
 const int redColor = 0xffEE6C4D;

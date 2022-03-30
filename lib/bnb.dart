@@ -34,10 +34,10 @@ class _BNBState extends State<BNB> {
         case 2:
           _scrn = const MakeVideo();
           break;
-        case 4:
+        case 3:
           _scrn = const Favourites();
           break;
-        case 5:
+        case 4:
           _scrn = const Profile();
           break;
         default:
