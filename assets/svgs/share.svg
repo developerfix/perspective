@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="75" height="24" viewBox="0 0 75 24">
+  <g id="share" transform="translate(1899.225 3151)">
+    <rect id="Rectangle_4708" data-name="Rectangle 4708" width="75" height="24" rx="4" transform="translate(-1899.225 -3151)" fill="#3b5998"/>
+    <path id="Icon_ionic-ios-share-alt" data-name="Icon ionic-ios-share-alt" d="M20.176,12.284l-5.81-5.435a.3.3,0,0,0-.231-.1c-.181.008-.412.136-.412.329V9.805a.176.176,0,0,1-.148.169c-5.777.885-8.21,5.209-9.071,9.7-.033.177.206.342.317.2a10.5,10.5,0,0,1,8.729-4.422.2.2,0,0,1,.173.2v2.676a.353.353,0,0,0,.6.218l5.851-5.53a.455.455,0,0,0,.144-.346A.552.552,0,0,0,20.176,12.284Z" transform="translate(-1889.563 -3152.337)" fill="#fff"/>
+    <text id="Share-2" data-name="Share" transform="translate(-1864.225 -3135)" fill="#fff" font-size="10" font-family="OpenSans-Bold, Open Sans" font-weight="700"><tspan x="0" y="0">Share</tspan></text>
+  </g>
+</svg>

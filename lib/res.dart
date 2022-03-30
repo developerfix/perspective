@@ -71,7 +71,7 @@ Widget textField(
 
           decoration: InputDecoration(
             prefixIcon: prefixIcon ?? const Icon(Icons.password),
-            suffixIcon: suffixIcon ?? Container(),
+            suffixIcon: suffixIcon ?? const Text(''),
             filled: true,
             fillColor: Colors.white,
             enabledBorder: OutlineInputBorder(

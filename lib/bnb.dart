@@ -1,14 +1,15 @@
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:diamond_bottom_bar/diamond_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:perspective/auth/login.dart';
 import 'package:perspective/res.dart';
-import 'package:perspective/screens/Discover.dart';
 import 'package:perspective/screens/Favourites.dart';
 import 'package:perspective/screens/HomeScreen.dart';
 import 'package:perspective/screens/MakeVideo.dart';
 import 'package:perspective/screens/Profile.dart';
+import 'package:perspective/screens/discover/discover.dart';
 
 class BNB extends StatefulWidget {
   const BNB({Key? key}) : super(key: key);
@@ -58,27 +59,25 @@ class _BNBState extends State<BNB> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: SizedBox(
-              height: screenHeight(context) * 0.95,
-              width: screenWidth(context),
-              child: _scrn),
-        ),
+        backgroundColor: Colors.white,
+        body: _scrn,
         bottomNavigationBar: DiamondBottomNavigation(
-            selectedColor: const Color(blueColor),
-            itemIcons: const [
-              Icons.home,
-              Icons.search,
-              Icons.favorite,
-              Icons.person,
-            ],
-            selectedLightColor: const Color(blueColor),
-            centerIcon: Icons.add,
-            selectedIndex: _selectedIndex!,
-            onItemPressed: (_) {
-              _selectedIndex = _;
-              screen(_);
-            }),
+          height: screenHeight(context) * 0.075,
+          selectedColor: const Color(blueColor),
+          itemIcons: const [
+            Icons.home,
+            Icons.search,
+            Icons.favorite,
+            Icons.person,
+          ],
+          selectedLightColor: const Color(blueColor),
+          centerIcon: Icons.add,
+          selectedIndex: _selectedIndex!,
+          onItemPressed: (_) {
+            _selectedIndex = _;
+            screen(_);
+          },
+        ),
       ),
     );
   }
