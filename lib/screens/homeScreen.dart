@@ -110,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const Spacer(),
                   PopupMenuButton(
-                      offset: Offset(0.5, 0.5),
-                      color: Color(blueColor).withOpacity(0.5),
+                      offset: const Offset(0, -250),
+                      color: const Color(blueColor),
                       onSelected: (value) {
                         // selectedValue(value);
                       },
@@ -124,37 +124,37 @@ class _HomeScreenState extends State<HomeScreen> {
                             PopupMenuItem(
                               child: GestureDetector(
                                 onTap: () {},
-                                child: popupmenuItem('Conservative', '3%'),
+                                child: popupmenuItem('Very Conservative', '3%'),
                               ),
                               value: 1,
+                            ),
+                            PopupMenuItem(
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: popupmenuItem('Conservative', '3%'),
+                              ),
+                              value: 2,
                             ),
                             PopupMenuItem(
                               child: GestureDetector(
                                 onTap: () {},
                                 child: popupmenuItem('Neutral', '3%'),
                               ),
-                              value: 1,
+                              value: 3,
                             ),
                             PopupMenuItem(
                               child: GestureDetector(
                                 onTap: () {},
                                 child: popupmenuItem('Liberal', '3%'),
                               ),
-                              value: 1,
+                              value: 4,
                             ),
                             PopupMenuItem(
                               child: GestureDetector(
                                 onTap: () {},
                                 child: popupmenuItem('Very Liberal', '3%'),
                               ),
-                              value: 1,
-                            ),
-                            PopupMenuItem(
-                              child: GestureDetector(
-                                onTap: () {},
-                                child: popupmenuItem('Very Conservative', '3%'),
-                              ),
-                              value: 1,
+                              value: 5,
                             ),
                           ]),
                 ],
@@ -164,14 +164,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(15, 0, 0, 120),
-              child: Container(
+              padding: const EdgeInsets.fromLTRB(15, 10, 0, 120),
+              child: SizedBox(
                 width: screenWidth(context) * 0.13,
                 height: screenHeight(context) * 0.08,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF3B5998),
-                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

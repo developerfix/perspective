@@ -33,7 +33,11 @@ class _BNBState extends State<BNB> {
           _scrn = const Discover();
           break;
         case 2:
-          _scrn = const MakeVideo();
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (_) => const MakeVideo(),
+            ),
+          );
           break;
         case 3:
           _scrn = const Favourites();

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:perspective/auth/interested.dart';
 import 'package:perspective/res.dart';
 
 class SignUp extends StatefulWidget {
@@ -216,28 +217,31 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        height: screenHeight(context) * 0.088,
-                        color: const Color(0xFF1D1A2F),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              txt(
-                                  txt: 'PROCEED',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  fontColor: Colors.white),
-                              SizedBox(
-                                width: screenWidth(context) * 0.03,
-                              ),
-                              Transform.rotate(
-                                angle: pi,
-                                child: SvgPicture.asset(
-                                  'assets/svgs/arrowForward.svg',
+                      child: navigator(
+                        function: const Interested(),
+                        child: Container(
+                          height: screenHeight(context) * 0.088,
+                          color: const Color(0xFF1D1A2F),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                txt(
+                                    txt: 'PROCEED',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontColor: Colors.white),
+                                SizedBox(
+                                  width: screenWidth(context) * 0.03,
                                 ),
-                              ),
-                            ],
+                                Transform.rotate(
+                                  angle: pi,
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/arrowForward.svg',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

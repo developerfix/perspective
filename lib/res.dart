@@ -1,4 +1,5 @@
 import 'package:adobe_xd/page_link.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 const int blueColor = 0xff3B5998;
@@ -8,8 +9,9 @@ const int blackColor = 0xff1D1A2F;
 //for all the text in the app
 Widget txt(
     {String? txt, FontWeight? fontWeight, double? fontSize, Color? fontColor}) {
-  return Text(
+  return AutoSizeText(
     txt!,
+    maxLines: 2,
     style: TextStyle(
       fontFamily: 'OpenSans',
       fontSize: fontSize,
@@ -44,6 +46,7 @@ Widget textField(
     Widget? prefixIcon,
     Widget? suffixIcon,
     Function(String)? onChanged,
+    int? maxlines,
     String? hinttext}) {
   return Theme(
       data: Theme.of(context!).copyWith(
@@ -61,6 +64,7 @@ Widget textField(
           controller: controller,
           obscureText: isobscuretext ?? false,
           onChanged: onChanged,
+          maxLines: maxlines ?? 1,
           // validator: widget.validator as String? Function(String?)? ?? null,
           style: const TextStyle(
             fontFamily: 'OpenSans',
@@ -70,7 +74,7 @@ Widget textField(
           ),
 
           decoration: InputDecoration(
-            prefixIcon: prefixIcon ?? const Icon(Icons.password),
+            prefixIcon: prefixIcon,
             suffixIcon: suffixIcon ?? const Text(''),
             filled: true,
             fillColor: Colors.white,
