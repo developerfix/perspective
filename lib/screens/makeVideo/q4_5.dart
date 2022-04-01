@@ -24,6 +24,7 @@ class Question4And5 extends StatefulWidget {
 
 class _Question4And5State extends State<Question4And5> {
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _hashtagController = TextEditingController();
 
   bool? p1 = false;
   bool? p2 = false;
@@ -78,13 +79,16 @@ class _Question4And5State extends State<Question4And5> {
                           hinttext: '...',
                           controller: _titleController,
                           context: context),
+                      SizedBox(
+                        height: screenHeight(context) * 0.05,
+                      ),
                       txt(txt: 'Hastags', fontSize: 14),
                       SizedBox(
                         height: screenHeight(context) * 0.02,
                       ),
                       textField(
                           hinttext: '...',
-                          controller: _titleController,
+                          controller: _hashtagController,
                           context: context),
                       SizedBox(
                         height: screenHeight(context) * 0.02,
@@ -93,30 +97,28 @@ class _Question4And5State extends State<Question4And5> {
                   ),
                 ),
                 const Spacer(),
-                navigator(
-                  child: Container(
-                    height: screenHeight(context) * 0.088,
-                    color: Colors.black,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          txt(
-                              txt: 'MAKE VIDEO',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontColor: Colors.white),
-                          SizedBox(
-                            width: screenWidth(context) * 0.03,
+                Container(
+                  height: screenHeight(context) * 0.088,
+                  color: Colors.black,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        txt(
+                            txt: 'MAKE VIDEO',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontColor: Colors.white),
+                        SizedBox(
+                          width: screenWidth(context) * 0.03,
+                        ),
+                        Transform.rotate(
+                          angle: pi,
+                          child: SvgPicture.asset(
+                            'assets/svgs/arrowForward.svg',
                           ),
-                          Transform.rotate(
-                            angle: pi,
-                            child: SvgPicture.asset(
-                              'assets/svgs/arrowForward.svg',
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
