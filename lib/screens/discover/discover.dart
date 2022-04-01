@@ -22,8 +22,8 @@ class _DiscoverState extends State<Discover> {
           color: const Color(0xFF080808),
           child: Padding(
             padding: isSearching
-                ? EdgeInsets.only(left: 20)
-                : EdgeInsets.fromLTRB(20, 0, 20, 0),
+                ? const EdgeInsets.only(left: 20)
+                : const EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

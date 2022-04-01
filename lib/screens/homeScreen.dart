@@ -271,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       children: [
         txt(txt: itemText, fontSize: 12, fontColor: Colors.white),
-        Spacer(),
+        const Spacer(),
         Container(
           width: 24.0,
           height: 24.0,
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 txt: itemPercentage,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                fontColor: Color(blueColor)),
+                fontColor: const Color(blueColor)),
           ),
         )
       ],

@@ -1,21 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:group_button/group_button.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:perspective/res.dart';
-import 'dart:math' as math;
 
 import 'package:page_transition/page_transition.dart';
 
 import 'package:perspective/screens/makeVideo/q2_3.dart';
-// // List<CameraDescription> cameras;
-
-//   Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-
-//   // cameras = await availableCameras();
-//   runApp(const MakeVideo());
-// }
 
 class Question1 extends StatefulWidget {
   const Question1({Key? key}) : super(key: key);

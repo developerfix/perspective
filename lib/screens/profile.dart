@@ -210,9 +210,9 @@ class _ProfileState extends State<Profile> {
                                         child: Container(
                                           width: 56.0,
                                           height: 56.0,
-                                          decoration: BoxDecoration(
+                                          decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
-                                            color: const Color(0xFF3B5998),
+                                            color: Color(0xFF3B5998),
                                           ),
                                           child: Center(
                                             child: SvgPicture.asset(

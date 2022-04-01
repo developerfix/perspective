@@ -53,7 +53,7 @@ class _InterestedState extends State<Interested> {
                     SizedBox(height: screenHeight(context) * 0.05),
                     SizedBox(
                       width: screenWidth(context) * 0.8,
-                      child: Text(
+                      child: const Text(
                         'In which of these areas you would like to share and gain perspective ?',
                         style: TextStyle(
                           fontFamily: 'OpenSans',
