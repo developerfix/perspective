@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:perspective/splash.dart';
+import 'package:slant/splash.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

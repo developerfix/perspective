@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:perspective/auth/login.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/auth/login.dart';
+import 'package:slant/res.dart';
 
 class Splash extends StatelessWidget {
   const Splash({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class Splash extends StatelessWidget {
           SizedBox(
             height: screenHeight(context) * 0.02,
           ),
-          txt(fontWeight: FontWeight.bold, txt: 'Perspective', fontSize: 24)
+          txt(fontWeight: FontWeight.bold, txt: 'Slant', fontSize: 24)
         ],
       ),
     );

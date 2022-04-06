@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:perspective/bnb.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/bnb.dart';
+import 'package:slant/res.dart';
 import 'dart:math';
 
 class Interested extends StatefulWidget {
@@ -54,7 +54,7 @@ class _InterestedState extends State<Interested> {
                     SizedBox(
                       width: screenWidth(context) * 0.8,
                       child: const Text(
-                        'In which of these areas you would like to share and gain perspective ?',
+                        'In which of these areas you would like to share and gain slant ?',
                         style: TextStyle(
                           fontFamily: 'OpenSans',
                           fontSize: 18,
@@ -66,7 +66,7 @@ class _InterestedState extends State<Interested> {
                     ),
                     // txt(
                     //     txt:
-                    //         'In which of these areas you would like to share and gain perspective ?',
+                    //         'In which of these areas you would like to share and gain slant ?',
                     //     fontSize: 18,
                     //     fontColor: Colors.white),
                     SizedBox(height: screenHeight(context) * 0.01),

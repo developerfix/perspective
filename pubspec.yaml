@@ -1,4 +1,4 @@
-name: perspective
+name: slant
 description: A new Flutter project.
 publish_to: 'none' 
 version: 1.0.0+1
@@ -20,6 +20,23 @@ dependencies:
   auto_size_text: ^3.0.0
   percent_indicator: ^4.0.0
   page_transition: ^2.0.5
+
+  cached_network_image: ^3.2.0
+  cloud_firestore: ^3.1.11
+  firebase_auth: ^3.3.12
+  firebase_core: ^1.14.0
+  firebase_storage: ^10.2.10
+  get: ^4.6.1
+  image_picker: ^0.8.4+11
+  timeago: ^3.2.2
+  # video_compress: ^3.1.0
+  video_compress:
+      git:
+        url: https://github.com/jonataslaw/VideoCompress.git
+        ref: master
+  video_player: ^2.3.0
+  rename: ^2.0.1
+
 
 dev_dependencies:
   flutter_test:

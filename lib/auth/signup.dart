@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:perspective/auth/interested.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/auth/interested.dart';
+import 'package:slant/res.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -70,8 +70,7 @@ class _SignUpState extends State<SignUp> {
                               height: screenHeight(context) * 0.02,
                             ),
                             txt(
-                                txt:
-                                    'Hear and Be heard! Your Perspective matters',
+                                txt: 'Hear and Be heard! Your slant matters',
                                 fontColor: Colors.white,
                                 fontSize: 14)
                           ],

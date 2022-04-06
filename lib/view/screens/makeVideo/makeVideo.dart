@@ -1,6 +1,5 @@
+import 'package:slant/view/screens/makeVideo/q1.dart';
 import 'package:flutter/material.dart';
-
-import 'package:perspective/screens/makeVideo/q1.dart';
 
 class MakeVideo extends StatefulWidget {
   const MakeVideo({Key? key}) : super(key: key);

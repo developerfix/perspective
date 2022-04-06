@@ -1,6 +1,6 @@
 {
-    "name": "perspective",
-    "short_name": "perspective",
+    "name": "slant",
+    "short_name": "slant",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

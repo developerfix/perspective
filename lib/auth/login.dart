@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:perspective/bnb.dart';
-import 'package:perspective/auth/signup.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/bnb.dart';
+import 'package:slant/auth/signup.dart';
+import 'package:slant/res.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -70,8 +70,7 @@ class _LoginState extends State<Login> {
                               height: screenHeight(context) * 0.02,
                             ),
                             txt(
-                                txt:
-                                    'Hear and Be heard! Your Perspective matters',
+                                txt: 'Hear and Be heard! Your slant matters',
                                 fontColor: Colors.white,
                                 fontSize: 14)
                           ],

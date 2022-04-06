@@ -1,4 +1,4 @@
-package com.example.perspective
+package com.example.slant
 
 import io.flutter.embedding.android.FlutterActivity
 

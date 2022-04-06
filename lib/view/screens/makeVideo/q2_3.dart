@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:perspective/res.dart';
-
+import 'package:slant/res.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:slant/view/screens/makeVideo/q4_5.dart';
 
-import 'package:perspective/screens/makeVideo/q2_3.dart';
-
-class Question1 extends StatefulWidget {
-  const Question1({Key? key}) : super(key: key);
+class Question2And3 extends StatefulWidget {
+  const Question2And3({Key? key}) : super(key: key);
 
   @override
-  State<Question1> createState() => _Question1State();
+  State<Question2And3> createState() => _Question2And3State();
 }
 
-class _Question1State extends State<Question1> {
+class _Question2And3State extends State<Question2And3> {
+  final TextEditingController _titleController = TextEditingController();
+
   bool? p1 = false;
   bool? p2 = false;
   bool? p3 = false;
   bool? p4 = false;
   bool? p5 = false;
-  bool? p6 = false;
-  bool? p7 = false;
-  bool? p8 = false;
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,7 +40,7 @@ class _Question1State extends State<Question1> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       txt(
-                          txt: 'Lets Start',
+                          txt: '2 more to go...',
                           fontWeight: FontWeight.bold,
                           fontSize: 18),
                       SizedBox(
@@ -54,16 +50,25 @@ class _Question1State extends State<Question1> {
                         barRadius: const Radius.circular(8),
                         // width: screenWidth(context),
                         lineHeight: screenHeight(context) * 0.015,
-                        percent: 0.2,
+                        percent: 0.5,
                         backgroundColor: Colors.black.withOpacity(0.2),
                         progressColor: const Color(blueColor),
                       ),
                       SizedBox(
                         height: screenHeight(context) * 0.05,
                       ),
-                      txt(
-                          txt: 'What do you want to share\nperspective on',
-                          fontSize: 14),
+                      txt(txt: 'Please give it a title', fontSize: 14),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
+                      textField(
+                          hinttext: 'Title',
+                          controller: _titleController,
+                          context: context),
+                      SizedBox(
+                        height: screenHeight(context) * 0.05,
+                      ),
+                      txt(txt: 'Is your Persective', fontSize: 14),
                       SizedBox(
                         height: screenHeight(context) * 0.02,
                       ),
@@ -76,15 +81,11 @@ class _Question1State extends State<Question1> {
                               p3 == false;
                               p4 == false;
                               p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
                             }
                           });
                         },
                         child: topicWidget(context,
-                            text:
-                                'My sense of belonging and it’s representation',
+                            text: 'Very Conservative',
                             topic: p1 == true ? 1 : 0),
                       ),
                       InkWell(
@@ -96,15 +97,11 @@ class _Question1State extends State<Question1> {
                               p3 == false;
                               p4 == false;
                               p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
                             }
                           });
                         },
                         child: topicWidget(context,
-                            text: 'What’s happening around the world',
-                            topic: p2 == true ? 1 : 0),
+                            text: 'Conservative', topic: p2 == true ? 1 : 0),
                       ),
                       InkWell(
                         onTap: () {
@@ -115,15 +112,11 @@ class _Question1State extends State<Question1> {
                               p2 == false;
                               p4 == false;
                               p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
                             }
                           });
                         },
                         child: topicWidget(context,
-                            text: 'How society around me functions',
-                            topic: p3 == true ? 1 : 0),
+                            text: 'Neutral', topic: p3 == true ? 1 : 0),
                       ),
                       InkWell(
                         onTap: () {
@@ -134,14 +127,11 @@ class _Question1State extends State<Question1> {
                               p3 == false;
                               p2 == false;
                               p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
                             }
                           });
                         },
                         child: topicWidget(context,
-                            text: 'My Lifestyle', topic: p4 == true ? 1 : 0),
+                            text: 'Liberal', topic: p4 == true ? 1 : 0),
                       ),
                       InkWell(
                         onTap: () {
@@ -152,70 +142,11 @@ class _Question1State extends State<Question1> {
                               p3 == false;
                               p4 == false;
                               p2 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
                             }
                           });
                         },
                         child: topicWidget(context,
-                            text: 'My Religion', topic: p5 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p6 = true;
-                            if (p6 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p2 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'What I see online/on my TV',
-                            topic: p6 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p7 = true;
-                            if (p7 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p2 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'My identity', topic: p7 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p8 = true;
-                            if (p8 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p2 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'Money and finances',
-                            topic: p8 == true ? 1 : 0),
+                            text: 'Conservative', topic: p5 == true ? 1 : 0),
                       ),
                     ],
                   ),
@@ -224,7 +155,7 @@ class _Question1State extends State<Question1> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       txt(
-                          txt: 'Please give it a title',
+                          txt: 'Add description',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           fontColor: Colors.black.withOpacity(0.3)),
@@ -232,45 +163,44 @@ class _Question1State extends State<Question1> {
                         width: screenWidth(context) * 0.03,
                       ),
                       InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.bottomToTop,
-                                  child: const Question2And3()));
-                        },
-                        child: Container(
-                          width: screenWidth(context) * 0.08,
-                          height: screenHeight(context) * 0.05,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF3B5998),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.16),
-                                offset: const Offset(0, 3.0),
-                                blurRadius: 6.0,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const RotatedBox(
-                                quarterTurns: 3,
-                                child: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
-                                  size: 15,
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.bottomToTop,
+                                    child: const Question4And5()));
+                          },
+                          child: Container(
+                            width: screenWidth(context) * 0.08,
+                            height: screenHeight(context) * 0.05,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF3B5998),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.16),
+                                  offset: const Offset(0, 3.0),
+                                  blurRadius: 6.0,
                                 ),
-                              ),
-                              SizedBox(
-                                height: screenHeight(context) * 0.005,
-                              )
-                            ],
-                          ),
-                        ),
-                      )
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const RotatedBox(
+                                  quarterTurns: 3,
+                                  child: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenHeight(context) * 0.005,
+                                )
+                              ],
+                            ),
+                          ))
                     ],
                   ),
                 ],
@@ -287,6 +217,7 @@ class _Question1State extends State<Question1> {
       padding: const EdgeInsets.only(bottom: 15),
       child: Container(
         height: screenHeight(context) * 0.04,
+        width: screenWidth(context) * 0.4,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
           color: topic == 0 ? Colors.white : const Color(blueColor),

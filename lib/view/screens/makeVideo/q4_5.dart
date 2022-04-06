@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/controller/video_controller.dart';
+import 'package:slant/res.dart';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:slant/bnb.dart';
+import 'package:slant/res.dart';
+import 'package:slant/view/screens/homeScreen.dart';
+import 'package:video_player/video_player.dart';
 import 'dart:math';
+import 'package:image_picker/image_picker.dart';
 
 class Question4And5 extends StatefulWidget {
   const Question4And5({Key? key}) : super(key: key);
@@ -21,10 +30,16 @@ class _Question4And5State extends State<Question4And5> {
   bool? p4 = false;
   bool? p5 = false;
 
+  final ImagePicker _picker = ImagePicker();
+  VideoPlayerController? _controller;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: SizedBox(
@@ -86,28 +101,48 @@ class _Question4And5State extends State<Question4And5> {
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  height: screenHeight(context) * 0.088,
-                  color: Colors.black,
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        txt(
-                            txt: 'MAKE VIDEO',
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontColor: Colors.white),
-                        SizedBox(
-                          width: screenWidth(context) * 0.03,
-                        ),
-                        Transform.rotate(
-                          angle: pi,
-                          child: SvgPicture.asset(
-                            'assets/svgs/arrowForward.svg',
+                InkWell(
+                  onTap: () async {
+                    final XFile? file = await _picker.pickVideo(
+                        source: ImageSource.camera,
+                        maxDuration: const Duration(minutes: 2));
+
+                    if (file != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => BNB(
+                            file: file,
                           ),
                         ),
-                      ],
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Video published successfully')));
+                    }
+                  },
+                  child: Container(
+                    height: screenHeight(context) * 0.088,
+                    color: Colors.black,
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          txt(
+                              txt: 'MAKE VIDEO',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontColor: Colors.white),
+                          SizedBox(
+                            width: screenWidth(context) * 0.03,
+                          ),
+                          Transform.rotate(
+                            angle: pi,
+                            child: SvgPicture.asset(
+                              'assets/svgs/arrowForward.svg',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

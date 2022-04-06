@@ -1,14 +1,18 @@
+import 'package:camera/camera.dart';
 import 'package:diamond_bottom_bar/diamond_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:perspective/res.dart';
-import 'package:perspective/screens/Favourites.dart';
-import 'package:perspective/screens/HomeScreen.dart';
-import 'package:perspective/screens/Profile.dart';
-import 'package:perspective/screens/discover/discover.dart';
-import 'package:perspective/screens/makeVideo/makeVideo.dart';
+import 'package:flutter/services.dart';
+import 'package:slant/res.dart';
+import 'package:slant/view/screens/HomeScreen.dart';
+import 'package:slant/view/screens/Profile.dart';
+import 'package:slant/view/screens/discover/discover.dart';
+import 'package:slant/view/screens/favourites.dart';
+import 'package:slant/view/screens/makeVideo/makeVideo.dart';
+import 'package:video_player/video_player.dart';
 
 class BNB extends StatefulWidget {
-  const BNB({Key? key}) : super(key: key);
+  final XFile? file;
+  const BNB({Key? key, this.file}) : super(key: key);
 
   @override
   State<BNB> createState() => _BNBState();
@@ -23,7 +27,11 @@ class _BNBState extends State<BNB> {
       _selectedIndex = index;
       switch (index) {
         case 0:
-          _scrn = const HomeScreen();
+          _scrn = widget.file != null
+              ? HomeScreen(
+                  file: widget.file,
+                )
+              : const HomeScreen();
           break;
         case 1:
           _scrn = const Discover();
@@ -52,31 +60,54 @@ class _BNBState extends State<BNB> {
   void initState() {
     super.initState();
 
-    _scrn = const HomeScreen();
+    _scrn = widget.file != null
+        ? HomeScreen(
+            file: widget.file,
+          )
+        : const HomeScreen();
   }
 
   @override
   Widget build(BuildContext context) {
+    DateTime timeBackPressed = DateTime.now();
+
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: _scrn,
-        bottomNavigationBar: DiamondBottomNavigation(
-          height: screenHeight(context) * 0.075,
-          selectedColor: const Color(blueColor),
-          itemIcons: const [
-            Icons.home,
-            Icons.search,
-            Icons.favorite,
-            Icons.person,
-          ],
-          selectedLightColor: const Color(blueColor),
-          centerIcon: Icons.add,
-          selectedIndex: _selectedIndex!,
-          onItemPressed: (_) {
-            _selectedIndex = _;
-            screen(_);
-          },
+      child: WillPopScope(
+        onWillPop: () async {
+          final differeance = DateTime.now().difference(timeBackPressed);
+          timeBackPressed = DateTime.now();
+          if (differeance >= const Duration(seconds: 2)) {
+            const String msg = 'Press the back button to exit';
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(msg),
+            ));
+
+            return false;
+          } else {
+            SystemNavigator.pop();
+            return true;
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: _scrn,
+          bottomNavigationBar: DiamondBottomNavigation(
+            height: screenHeight(context) * 0.075,
+            selectedColor: const Color(blueColor),
+            itemIcons: const [
+              Icons.home,
+              Icons.search,
+              Icons.favorite,
+              Icons.person,
+            ],
+            selectedLightColor: const Color(blueColor),
+            centerIcon: Icons.add,
+            selectedIndex: _selectedIndex!,
+            onItemPressed: (_) {
+              _selectedIndex = _;
+              screen(_);
+            },
+          ),
         ),
       ),
     );

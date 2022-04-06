@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:perspective/res.dart';
+import 'package:slant/res.dart';
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);

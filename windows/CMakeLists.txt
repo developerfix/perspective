@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(perspective LANGUAGES CXX)
+project(slant LANGUAGES CXX)
 
-set(BINARY_NAME "perspective")
+set(BINARY_NAME "slant")
 
 cmake_policy(SET CMP0063 NEW)
 

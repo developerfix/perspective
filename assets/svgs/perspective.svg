@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="97" height="24" viewBox="0 0 97 24">
-  <g id="perspective" transform="translate(1916.935 3151)">
+  <g id="slant" transform="translate(1916.935 3151)">
     <rect id="Rectangle_4708" data-name="Rectangle 4708" width="97" height="24" rx="4" transform="translate(-1916.935 -3151)" fill="#3b5998"/>
-    <text id="Perspective-2" data-name="Perspective" transform="translate(-1886.935 -3136)" fill="#fff" font-size="10" font-family="OpenSans-Bold, Open Sans" font-weight="700"><tspan x="0" y="0">Perspective</tspan></text>
+    <text id="slant-2" data-name="slant" transform="translate(-1886.935 -3136)" fill="#fff" font-size="10" font-family="OpenSans-Bold, Open Sans" font-weight="700"><tspan x="0" y="0">slant</tspan></text>
     <path id="add-to-favorites" d="M19.8,11.162a2.9,2.9,0,1,1-2.9,2.9,2.9,2.9,0,0,1,2.9-2.9Zm-.428,1.674a.415.415,0,0,1,.033-.163v-.006a.422.422,0,0,1,.089-.133.429.429,0,0,1,.3-.125h0a.456.456,0,0,1,.163.032.448.448,0,0,1,.139.093.417.417,0,0,1,.091.138v.009a.45.45,0,0,1,.039.156V13.7h.854a.429.429,0,0,1,.163.032.425.425,0,0,1,.139.093.429.429,0,0,1,.091.138v.007a.429.429,0,0,1,.03.149v.013a.411.411,0,0,1-.032.155.429.429,0,0,1-.093.139.418.418,0,0,1-.137.091h-.008a.456.456,0,0,1-.154.03h-.863V15.4a.429.429,0,0,1-.032.163.443.443,0,0,1-.093.139l-.009.008a.418.418,0,0,1-.129.086h-.007a.45.45,0,0,1-.154.03h0a.429.429,0,0,1-.163-.032A.425.425,0,0,1,19.5,15.7a.4.4,0,0,1-.091-.137.436.436,0,0,1-.033-.161v-.85h-.85a.415.415,0,0,1-.163-.033h-.006a.422.422,0,0,1-.133-.089.417.417,0,0,1-.091-.138v-.008a.455.455,0,0,1-.033-.152h0a.41.41,0,0,1,.032-.163.425.425,0,0,1,.391-.268h.862v-.865Z" transform="translate(-1915.41 -3148.848)" fill="#fff" fill-rule="evenodd"/>
     <g id="_139f6011a75ca4ec5b5090bca414471e" data-name="139f6011a75ca4ec5b5090bca414471e" transform="translate(-1908.632 -3146)">
       <g id="Group_9062" data-name="Group 9062" transform="translate(0 0)">
