@@ -7,8 +7,12 @@ const int redColor = 0xffEE6C4D;
 const int blackColor = 0xff1D1A2F;
 
 //for all the text in the app
-Widget txt(
-    {String? txt, FontWeight? fontWeight, double? fontSize, Color? fontColor}) {
+Widget txt({
+  String? txt,
+  FontWeight? fontWeight,
+  double? fontSize,
+  Color? fontColor,
+}) {
   return AutoSizeText(
     txt!,
     maxLines: 2,
@@ -46,6 +50,7 @@ Widget textField(
     Widget? prefixIcon,
     Widget? suffixIcon,
     Function(String)? onChanged,
+    String? Function(String?)? validator,
     int? maxlines,
     String? hinttext}) {
   return Theme(
@@ -64,6 +69,7 @@ Widget textField(
           controller: controller,
           obscureText: isobscuretext ?? false,
           onChanged: onChanged,
+          validator: validator,
           maxLines: maxlines ?? 1,
           // validator: widget.validator as String? Function(String?)? ?? null,
           style: const TextStyle(

@@ -1,3 +1,8 @@
+import 'dart:ffi';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:slant/bnb.dart';
@@ -21,6 +26,53 @@ class _InterestedState extends State<Interested> {
   bool? topic7Selected = false;
   bool? topic8Selected = false;
   bool? topic9Selected = false;
+
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  final List<String> topicsOfInterest = [];
+
+  topichecker() async {
+    try {
+      await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          if (documentSnapshot.data() != null) {
+            if (documentSnapshot.get(FieldPath(const ['topicsOfInterest'])) !=
+                [0]) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: ((context) => const BNB())));
+            }
+          }
+        }
+      });
+    } catch (e) {
+      print('topic Checker has an error');
+    }
+  }
+
+  Future<void> updateUser() async {
+    return await users
+        .doc(userId)
+        .update({'topicsOfInterest': topicsOfInterest})
+        .then(
+          (value) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: ((context) => const BNB()),
+            ),
+          ),
+        )
+        .catchError((error) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('something went wrong, Please restart the app'))));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    topichecker();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -54,7 +106,7 @@ class _InterestedState extends State<Interested> {
                     SizedBox(
                       width: screenWidth(context) * 0.8,
                       child: const Text(
-                        'In which of these areas you would like to share and gain slant ?',
+                        'In which of these areas you would like to share and gain perspective ?',
                         style: TextStyle(
                           fontFamily: 'OpenSans',
                           fontSize: 18,
@@ -64,11 +116,6 @@ class _InterestedState extends State<Interested> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    // txt(
-                    //     txt:
-                    //         'In which of these areas you would like to share and gain slant ?',
-                    //     fontSize: 18,
-                    //     fontColor: Colors.white),
                     SizedBox(height: screenHeight(context) * 0.01),
                     Text(
                       'Choose 3 or more topics from\nthe following list',
@@ -87,6 +134,13 @@ class _InterestedState extends State<Interested> {
                           onTap: () {
                             setState(() {
                               topic1Selected = !topic1Selected!;
+                              if (topic1Selected!) {
+                                topicsOfInterest
+                                    .add('What’s happening in my country');
+                              } else {
+                                topicsOfInterest
+                                    .remove('What’s happening in my country');
+                              }
                             });
                           },
                           child: interestedItems(context,
@@ -100,6 +154,13 @@ class _InterestedState extends State<Interested> {
                           onTap: () {
                             setState(() {
                               topic2Selected = !topic2Selected!;
+                              if (topic2Selected!) {
+                                topicsOfInterest
+                                    .add('What’s happening around the world');
+                              } else {
+                                topicsOfInterest.remove(
+                                    'What’s happening around the world');
+                              }
                             });
                           },
                           child: interestedItems(context,
@@ -113,6 +174,13 @@ class _InterestedState extends State<Interested> {
                           onTap: () {
                             setState(() {
                               topic3Selected = !topic3Selected!;
+                              if (topic3Selected!) {
+                                topicsOfInterest.add(
+                                    'My sense of belonging and it’s representation');
+                              } else {
+                                topicsOfInterest.remove(
+                                    'My sense of belonging and it’s representation');
+                              }
                             });
                           },
                           child: interestedItems(context,
@@ -127,6 +195,13 @@ class _InterestedState extends State<Interested> {
                           onTap: () {
                             setState(() {
                               topic4Selected = !topic4Selected!;
+                              if (topic4Selected!) {
+                                topicsOfInterest
+                                    .add('How society around me functions');
+                              } else {
+                                topicsOfInterest
+                                    .remove('How society around me functions');
+                              }
                             });
                           },
                           child: interestedItems(context,
@@ -143,6 +218,11 @@ class _InterestedState extends State<Interested> {
                               onTap: () {
                                 setState(() {
                                   topic5Selected = !topic5Selected!;
+                                  if (topic5Selected!) {
+                                    topicsOfInterest.add('My Lifestyle');
+                                  } else {
+                                    topicsOfInterest.remove('My Lifestyle');
+                                  }
                                 });
                               },
                               child: interestedItems(context,
@@ -159,6 +239,11 @@ class _InterestedState extends State<Interested> {
                               onTap: () {
                                 setState(() {
                                   topic6Selected = !topic6Selected!;
+                                  if (topic6Selected!) {
+                                    topicsOfInterest.add('My Religion');
+                                  } else {
+                                    topicsOfInterest.remove('My Religion');
+                                  }
                                 });
                               },
                               child: interestedItems(context,
@@ -174,6 +259,13 @@ class _InterestedState extends State<Interested> {
                           onTap: () {
                             setState(() {
                               topic7Selected = !topic7Selected!;
+                              if (topic7Selected!) {
+                                topicsOfInterest
+                                    .add('What I see online/on my TV');
+                              } else {
+                                topicsOfInterest
+                                    .remove('What I see online/on my TV');
+                              }
                             });
                           },
                           child: interestedItems(context,
@@ -190,6 +282,11 @@ class _InterestedState extends State<Interested> {
                               onTap: () {
                                 setState(() {
                                   topic8Selected = !topic8Selected!;
+                                  if (topic8Selected!) {
+                                    topicsOfInterest.add('My identity');
+                                  } else {
+                                    topicsOfInterest.remove('My identity');
+                                  }
                                 });
                               },
                               child: interestedItems(context,
@@ -206,6 +303,12 @@ class _InterestedState extends State<Interested> {
                               onTap: () {
                                 setState(() {
                                   topic9Selected = !topic9Selected!;
+                                  if (topic9Selected!) {
+                                    topicsOfInterest.add('Money and finances');
+                                  } else {
+                                    topicsOfInterest
+                                        .remove('Money and finances');
+                                  }
                                 });
                               },
                               child: interestedItems(context,
@@ -222,8 +325,17 @@ class _InterestedState extends State<Interested> {
                   ],
                 ),
                 const Spacer(),
-                navigator(
-                  function: const BNB(),
+                InkWell(
+                  onTap: () {
+                    if (topicsOfInterest.length < 3) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Please select at least 3 topics')),
+                      );
+                    } else {
+                      updateUser();
+                    }
+                  },
                   child: Container(
                     height: screenHeight(context) * 0.088,
                     color: Colors.black,
@@ -276,10 +388,20 @@ class _InterestedState extends State<Interested> {
               : Border.all(width: 0, color: Colors.transparent),
         ),
         child: Center(
-          child: txt(
-              txt: itemText,
-              fontSize: 12,
-              fontColor: Colors.white.withOpacity(0.8)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: AutoSizeText(
+              itemText!,
+              maxLines: 1,
+              maxFontSize: 12,
+              minFontSize: 5,
+              style: TextStyle(
+                fontFamily: 'OpenSans',
+                color: Colors.white.withOpacity(0.8),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -272,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               txt(
-                                txt: 'Alexa A. Williams slant on',
+                                txt: 'Alexa A. Williams perspective on',
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),

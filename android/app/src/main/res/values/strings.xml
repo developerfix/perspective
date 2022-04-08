@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">slant</string>
+<string name="facebook_app_id">533794798460355</string>
+<string name="fb_login_protocol_scheme">fb533794798460355</string>
+<string name="facebook_client_token">17d3df89bde276260f76a271cecdfe60</string>
+
+</resources> 

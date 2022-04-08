@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "643585796669",
+    "project_id": "slant-ab0ff",
+    "storage_bucket": "slant-ab0ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643585796669:android:2807779bd0a29debd6d854",
+        "android_client_info": {
+          "package_name": "com.example.slant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643585796669-e1p040va2j9efujb88ir8mssjud8au5p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQ_8RryPYztbeznnmhxQtYrginzEQJIJY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643585796669-e1p040va2j9efujb88ir8mssjud8au5p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
