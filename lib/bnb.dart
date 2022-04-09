@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/HomeScreen.dart';
-import 'package:slant/view/screens/Profile.dart';
 import 'package:slant/view/screens/discover/discover.dart';
 import 'package:slant/view/screens/favourites.dart';
 import 'package:slant/view/screens/makeVideo/makeVideo.dart';
+import 'package:slant/view/screens/profile/profile.dart';
 import 'package:video_player/video_player.dart';
 
 class BNB extends StatefulWidget {

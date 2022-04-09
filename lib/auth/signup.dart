@@ -66,8 +66,9 @@ class _SignUpState extends State<SignUp> {
       'followers': 0,
       'following': 0,
       'noOfVids': 0,
-      'address': '',
-      'status': '',
+      'profilePic': null,
+      'address': 'your address here',
+      'bio': 'your Bio here',
       'perspectiveRequests': 0
     }).catchError(
       (error) {
