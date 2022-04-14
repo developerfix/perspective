@@ -30,6 +30,8 @@
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
     <string>Camera permission required</string>
+	<key>UIBackgroundModes</key>
+    <string>location</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Microphone permission required</string>
 	<key>UISupportedInterfaceOrientations</key>
@@ -47,5 +49,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires access to your location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires access to your location</string>
+	
+	
 </dict>
 </plist>

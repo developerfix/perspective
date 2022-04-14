@@ -11,8 +11,9 @@ import 'package:slant/view/screens/profile/profile.dart';
 import 'package:video_player/video_player.dart';
 
 class BNB extends StatefulWidget {
+  final bool? isProfile;
   final XFile? file;
-  const BNB({Key? key, this.file}) : super(key: key);
+  const BNB({Key? key, this.file, this.isProfile}) : super(key: key);
 
   @override
   State<BNB> createState() => _BNBState();
@@ -60,11 +61,13 @@ class _BNBState extends State<BNB> {
   void initState() {
     super.initState();
 
-    _scrn = widget.file != null
-        ? HomeScreen(
-            file: widget.file,
-          )
-        : const HomeScreen();
+    widget.isProfile == true
+        ? _scrn = const Profile()
+        : _scrn = widget.file != null
+            ? HomeScreen(
+                file: widget.file,
+              )
+            : const HomeScreen();
   }
 
   @override

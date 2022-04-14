@@ -61,13 +61,11 @@ class _SignUpState extends State<SignUp> {
     return users.doc('$userId').set({
       'email': _emailcontroller.text.trim(),
       'topicsOfInterest': [0],
-      'Videos': 0,
       'name': _namecontroller.text,
       'followers': 0,
       'following': 0,
       'noOfVids': 0,
-      'profilePic': null,
-      'address': 'your address here',
+      'profilePic': '',
       'bio': 'your Bio here',
       'perspectiveRequests': 0
     }).catchError(

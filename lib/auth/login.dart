@@ -24,9 +24,34 @@ class _LoginState extends State<Login> {
   bool? isVisible;
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  bool loading1 = false;
+
+  userchecker() {
+    setState(() {
+      loading1 = true;
+    });
+
+    if (userId != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: ((context) => const Interested()),
+        ),
+      );
+    } else {
+      setState(() {
+        loading1 = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    userchecker();
+
     isVisible = false;
     _emailcontroller.text = '';
     _passwordcontroller.text = '';
@@ -141,246 +166,260 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Form(
-          key: _formKey,
-          child: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return const Interested();
-              } else {
-                return SingleChildScrollView(
-                  child: SizedBox(
-                    height: screenHeight(context) * 0.95,
-                    width: screenWidth(context),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: screenHeight(context) * 0.425,
-                          child: Stack(
+        body: loading1
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [CircularProgress()],
+              )
+            : Form(
+                key: _formKey,
+                child: StreamBuilder<User?>(
+                  stream: FirebaseAuth.instance.authStateChanges(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return const Interested();
+                    } else {
+                      return SingleChildScrollView(
+                        child: SizedBox(
+                          height: screenHeight(context) * 0.95,
+                          width: screenWidth(context),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Positioned(
-                                bottom: 0,
-                                left: 20,
-                                child: SvgPicture.string(
-                                  // Polygon
-                                  '<svg viewBox="60.0 386.0 33.0 17.0" ><path transform="matrix(-1.0, 0.0, 0.0, -1.0, 93.0, 403.0)" d="M 16.49999237060547 0 L 33 17 L 0 17 Z" fill="#1d1a2f" stroke="none" stroke-width="1" stroke-miterlimit="4" stroke-linecap="butt" /></svg>',
-                                  width: 33.0,
-                                  height: screenHeight(context) * 0.025,
+                              SizedBox(
+                                height: screenHeight(context) * 0.425,
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 20,
+                                      child: SvgPicture.string(
+                                        // Polygon
+                                        '<svg viewBox="60.0 386.0 33.0 17.0" ><path transform="matrix(-1.0, 0.0, 0.0, -1.0, 93.0, 403.0)" d="M 16.49999237060547 0 L 33 17 L 0 17 Z" fill="#1d1a2f" stroke="none" stroke-width="1" stroke-miterlimit="4" stroke-linecap="butt" /></svg>',
+                                        width: 33.0,
+                                        height: screenHeight(context) * 0.025,
+                                      ),
+                                    ),
+                                    Container(
+                                      height: screenHeight(context) * 0.4,
+                                      color: const Color(0xFF1D1A2F),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Hero(
+                                            tag: 'logo',
+                                            child: SvgPicture.asset(
+                                              'assets/svgs/logo.svg',
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height:
+                                                screenHeight(context) * 0.02,
+                                          ),
+                                          txt(
+                                              txt:
+                                                  'Hear and Be heard! Your perspective matters',
+                                              fontColor: Colors.white,
+                                              fontSize: 14)
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Container(
-                                height: screenHeight(context) * 0.4,
-                                color: const Color(0xFF1D1A2F),
-                              ),
-                              Align(
-                                alignment: Alignment.center,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(30, 15, 30, 15),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Hero(
-                                      tag: 'logo',
-                                      child: SvgPicture.asset(
-                                        'assets/svgs/logo.svg',
-                                        color: Colors.white,
+                                    txt(
+                                        txt: 'Login',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                    SizedBox(
+                                      height: screenHeight(context) * 0.02,
+                                    ),
+                                    txt(
+                                        txt: 'Enter you email and password',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                    SizedBox(
+                                      height: screenHeight(context) * 0.03,
+                                    ),
+                                    textField(
+                                      validator: EmailValidator(
+                                          errorText: 'Invalid email address'),
+                                      context: context,
+                                      prefixIcon: const Icon(
+                                        Icons.email_outlined,
+                                      ),
+                                      controller: _emailcontroller,
+                                    ),
+                                    SizedBox(
+                                      height: screenHeight(context) * 0.02,
+                                    ),
+                                    textField(
+                                      context: context,
+                                      prefixIcon: const Icon(
+                                        Icons.lock_outline,
+                                      ),
+                                      controller: _passwordcontroller,
+                                      isobscuretext: isVisible! ? false : true,
+                                      hinttext: 'Password',
+                                      suffixIcon: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isVisible = !isVisible!;
+                                          });
+                                        },
+                                        child: Icon(
+                                          isVisible!
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
                                       height: screenHeight(context) * 0.02,
                                     ),
-                                    txt(
-                                        txt:
-                                            'Hear and Be heard! Your perspective matters',
-                                        fontColor: Colors.white,
-                                        fontSize: 14)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            navigator(
+                                                function: const ResetScreen(),
+                                                child: txt(
+                                                    txt: 'Forgot Password?',
+                                                    fontSize: 12)),
+                                            Row(
+                                              children: [
+                                                txt(
+                                                    txt:
+                                                        'Don\'t have an account?',
+                                                    fontSize: 12),
+                                                navigator(
+                                                  function: const SignUp(),
+                                                  child: txt(
+                                                      txt: ' Sign up ',
+                                                      fontSize: 12,
+                                                      fontColor: const Color(
+                                                          blueColor)),
+                                                ),
+                                                txt(txt: 'here', fontSize: 12),
+                                              ],
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              txt(
-                                  txt: 'Login',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                              SizedBox(
-                                height: screenHeight(context) * 0.02,
-                              ),
-                              txt(
-                                  txt: 'Enter you email and password',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400),
-                              SizedBox(
-                                height: screenHeight(context) * 0.03,
-                              ),
-                              textField(
-                                validator: EmailValidator(
-                                    errorText: 'Invalid email address'),
-                                context: context,
-                                prefixIcon: const Icon(
-                                  Icons.email_outlined,
-                                ),
-                                controller: _emailcontroller,
-                              ),
-                              SizedBox(
-                                height: screenHeight(context) * 0.02,
-                              ),
-                              textField(
-                                context: context,
-                                prefixIcon: const Icon(
-                                  Icons.lock_outline,
-                                ),
-                                controller: _passwordcontroller,
-                                isobscuretext: isVisible! ? false : true,
-                                hinttext: 'Password',
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      isVisible = !isVisible!;
-                                    });
-                                  },
-                                  child: Icon(
-                                    isVisible!
-                                        ? Icons.visibility_outlined
-                                        : Icons.visibility_off,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: screenHeight(context) * 0.02,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      navigator(
-                                          function: const ResetScreen(),
-                                          child: txt(
-                                              txt: 'Forgot Password?',
-                                              fontSize: 12)),
-                                      Row(
-                                        children: [
-                                          txt(
-                                              txt: 'Don\'t have an account?',
-                                              fontSize: 12),
-                                          navigator(
-                                            function: const SignUp(),
-                                            child: txt(
-                                                txt: ' Sign up ',
-                                                fontSize: 12,
-                                                fontColor:
-                                                    const Color(blueColor)),
-                                          ),
-                                          txt(txt: 'here', fontSize: 12),
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        if (loading) ...[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              CircularProgress(),
-                            ],
-                          )
-                        ],
-                        if (!loading) ...[
-                          Row(
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    _loginWithFb();
-                                  },
-                                  child: Container(
-                                    height: screenHeight(context) * 0.088,
-                                    color: const Color(blueColor),
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/svgs/facebook.svg',
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    if (_emailcontroller.text.isNotEmpty) {
-                                      if (_passwordcontroller.text.isNotEmpty) {
-                                        if (_formKey.currentState!.validate()) {
-                                          signIn();
-                                        }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Please enter the password')),
-                                        );
-                                      }
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'Please enter the email address')),
-                                      );
-                                    }
-                                  },
-                                  child: Container(
-                                    height: screenHeight(context) * 0.088,
-                                    color: const Color(0xFF1D1A2F),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          txt(
-                                              txt: 'SIGN IN',
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              fontColor: Colors.white),
-                                          SizedBox(
-                                            width: screenWidth(context) * 0.03,
-                                          ),
-                                          Transform.rotate(
-                                            angle: pi,
+                              if (loading) ...[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    CircularProgress(),
+                                  ],
+                                )
+                              ],
+                              if (!loading) ...[
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          _loginWithFb();
+                                        },
+                                        child: Container(
+                                          height: screenHeight(context) * 0.088,
+                                          color: const Color(blueColor),
+                                          child: Center(
                                             child: SvgPicture.asset(
-                                              'assets/svgs/arrowForward.svg',
+                                              'assets/svgs/facebook.svg',
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          if (_emailcontroller
+                                              .text.isNotEmpty) {
+                                            if (_passwordcontroller
+                                                .text.isNotEmpty) {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                signIn();
+                                              }
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        'Please enter the password')),
+                                              );
+                                            }
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Please enter the email address')),
+                                            );
+                                          }
+                                        },
+                                        child: Container(
+                                          height: screenHeight(context) * 0.088,
+                                          color: const Color(0xFF1D1A2F),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                txt(
+                                                    txt: 'SIGN IN',
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontColor: Colors.white),
+                                                SizedBox(
+                                                  width: screenWidth(context) *
+                                                      0.03,
+                                                ),
+                                                Transform.rotate(
+                                                  angle: pi,
+                                                  child: SvgPicture.asset(
+                                                    'assets/svgs/arrowForward.svg',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                              )
+                              ]
                             ],
                           ),
-                        ]
-                      ],
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
       ),
     );
   }

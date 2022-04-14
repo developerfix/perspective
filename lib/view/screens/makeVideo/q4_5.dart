@@ -1,27 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import 'dart:io';
+import 'package:hashtagable/hashtagable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:slant/bnb.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/homeScreen.dart';
+import 'package:slant/view/screens/makeVideo/q2_3.dart';
+import 'package:slant/view/widgets/circularProgress.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:math';
 import 'package:image_picker/image_picker.dart';
 
 class Question4And5 extends StatefulWidget {
-  const Question4And5({Key? key}) : super(key: key);
+  final String? selectedTopic;
+  final String? title;
+  final String? perspectiveTag;
+  const Question4And5(
+      {Key? key, this.perspectiveTag, this.selectedTopic, this.title})
+      : super(key: key);
 
   @override
   State<Question4And5> createState() => _Question4And5State();
 }
 
 class _Question4And5State extends State<Question4And5> {
-  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _hashtagController = TextEditingController();
 
   bool? p1 = false;
@@ -31,122 +43,383 @@ class _Question4And5State extends State<Question4And5> {
   bool? p5 = false;
 
   final ImagePicker _picker = ImagePicker();
-  VideoPlayerController? _controller;
+  List<String> hashTags = [];
+  bool loading = false;
+  String? downloadURL;
+  File? _video;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+  String? userName = "";
+
+  getUserName() async {
+    await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        if (documentSnapshot.data() != null) {
+          if (documentSnapshot.get(FieldPath(const ['name'])) != []) {
+            setState(() {
+              userName = documentSnapshot.get(FieldPath(const ['name']));
+            });
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUserName();
+  }
+
+  // uploading the data to firebase cloudstore
+  Future uploadContent({
+    String? publishersName,
+    String? videoTopic,
+    String? videoTitle,
+    String? videoDescription,
+    String? videoTag,
+    required List<String?> videoHastags,
+  }) async {
+    setState(() {
+      loading = true;
+    });
+    final vidId = DateTime.now().millisecondsSinceEpoch.toString();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    Reference reference = FirebaseStorage.instance
+        .ref()
+        .child('$userId/videos')
+        .child("post_$vidId");
+    if (_video != null) {
+      await reference.putFile(_video!);
+      downloadURL = await reference.getDownloadURL();
+
+      if (downloadURL != null) {
+        firebaseFirestore
+            .collection('videos')
+            .doc(videoTopic)
+            .collection(videoTag!)
+            .add(
+          {
+            'publisherName': publishersName,
+            'videoTitle': videoTitle,
+            'videoTopic': videoTopic,
+            'videoHastags': videoHastags,
+            'videoTag': videoTag,
+            'videoDescription': videoDescription,
+            'brainOnFireReactions': 0,
+            'veryConservative': 0,
+            'Conservative': 0,
+            'Neutral': 0,
+            'Liberal': 0,
+            'veryLiberal': 0,
+            'videoLink': downloadURL,
+          },
+        ).then((value) {
+          for (var i in videoHastags) {
+            firebaseFirestore
+                .collection('hashtags')
+                .doc(i)
+                .collection(videoTag)
+                .add(
+              {
+                'publisherName': publishersName,
+                'videoTitle': videoTitle,
+                'videoTopic': videoTopic,
+                'videoHastags': videoHastags,
+                'videoTag': videoTag,
+                'videoDescription': videoDescription,
+                'brainOnFireReactions': 0,
+                'veryConservative': 0,
+                'Conservative': 0,
+                'Neutral': 0,
+                'Liberal': 0,
+                'veryLiberal': 0,
+                'videoLink': downloadURL,
+              },
+            );
+          }
+        }).then((value) {
+          firebaseFirestore
+              .collection('titles')
+              .doc(videoTitle)
+              .collection(videoTag)
+              .add(
+            {
+              'publisherName': publishersName,
+              'videoTitle': videoTitle,
+              'videoTopic': videoTopic,
+              'videoHastags': videoHastags,
+              'videoTag': videoTag,
+              'videoDescription': videoDescription,
+              'brainOnFireReactions': 0,
+              'veryConservative': 0,
+              'Conservative': 0,
+              'Neutral': 0,
+              'Liberal': 0,
+              'veryLiberal': 0,
+              'videoLink': downloadURL,
+            },
+          );
+        }).then((value) {
+          firebaseFirestore
+              .collection("users")
+              .doc(userId)
+              .collection('videos')
+              .add({
+            'publisherName': publishersName,
+            'videoTitle': videoTitle,
+            'videoTopic': videoTopic,
+            'videoHastags': videoHastags,
+            'videoTag': videoTag,
+            'videoDescription': videoDescription,
+            'brainOnFireReactions': 0,
+            'veryConservative': 0,
+            'Conservative': 0,
+            'Neutral': 0,
+            'Liberal': 0,
+            'veryLiberal': 0,
+            'videoLink': downloadURL,
+          }).then((value) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => const BNB(),
+                ),
+                (Route<dynamic> route) => false);
+
+            showSnackBar('Video published successfully');
+          }).onError((error, stackTrace) =>
+                  showSnackBar('Something went wrong, please try again'));
+        });
+      }
+    } else {
+      showSnackBar('Video not selected');
+    }
+
+    setState(() {
+      loading = false;
+    });
+  }
+
+  showSnackBar(String snackText) {
+    final snackBar = SnackBar(content: Text(snackText));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: SizedBox(
-            height: screenHeight(context) * 0.95,
-            width: screenWidth(context),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: screenHeight(context) * 0.03,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(40.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      txt(
-                          txt: 'Almost There',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                      SizedBox(
-                        height: screenHeight(context) * 0.005,
-                      ),
-                      LinearPercentIndicator(
-                        barRadius: const Radius.circular(8),
-                        // width: screenWidth(context),
-                        lineHeight: screenHeight(context) * 0.015,
-                        percent: 1,
-                        backgroundColor: Colors.black.withOpacity(0.2),
-                        progressColor: const Color(blueColor),
-                      ),
-                      SizedBox(
-                        height: screenHeight(context) * 0.05,
-                      ),
-                      txt(txt: 'Add Description', fontSize: 14),
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                      textField(
-                          maxlines: 8,
-                          hinttext: '...',
-                          controller: _titleController,
-                          context: context),
-                      SizedBox(
-                        height: screenHeight(context) * 0.05,
-                      ),
-                      txt(txt: 'Hastags', fontSize: 14),
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                      textField(
-                          hinttext: '...',
-                          controller: _hashtagController,
-                          context: context),
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: () async {
-                    final XFile? file = await _picker.pickVideo(
-                        source: ImageSource.camera,
-                        maxDuration: const Duration(minutes: 2));
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => const BNB()),
+          ),
+        );
 
-                    if (file != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) => BNB(
-                            file: file,
-                          ),
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Video published successfully')));
-                    }
-                  },
-                  child: Container(
-                    height: screenHeight(context) * 0.088,
-                    color: Colors.black,
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          txt(
-                              txt: 'MAKE VIDEO',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontColor: Colors.white),
-                          SizedBox(
-                            width: screenWidth(context) * 0.03,
-                          ),
-                          Transform.rotate(
-                            angle: pi,
-                            child: SvgPicture.asset(
-                              'assets/svgs/arrowForward.svg',
+        return Future<bool>(
+          () => true,
+        );
+      },
+      child: SafeArea(
+        child: Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: SizedBox(
+              height: screenHeight(context) * 0.95,
+              width: screenWidth(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: screenHeight(context) * 0.03,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.topToBottom,
+                                    child: const Question2And3()));
+                          },
+                          child: Container(
+                            width: screenWidth(context) * 0.08,
+                            height: screenHeight(context) * 0.05,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF3B5998),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.16),
+                                  offset: const Offset(0, 3.0),
+                                  blurRadius: 6.0,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: screenHeight(context) * 0.005,
+                                ),
+                                const RotatedBox(
+                                  quarterTurns: 1,
+                                  child: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: screenHeight(context) * 0.03,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        txt(
+                            txt: 'Almost There',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                        SizedBox(
+                          height: screenHeight(context) * 0.005,
+                        ),
+                        LinearPercentIndicator(
+                          barRadius: const Radius.circular(8),
+                          // width: screenWidth(context),
+                          lineHeight: screenHeight(context) * 0.015,
+                          percent: 1,
+                          backgroundColor: Colors.black.withOpacity(0.2),
+                          progressColor: const Color(blueColor),
+                        ),
+                        SizedBox(
+                          height: screenHeight(context) * 0.05,
+                        ),
+                        txt(txt: 'Add Description', fontSize: 14),
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        textField(
+                            maxlines: 8,
+                            hinttext: '...',
+                            controller: _descriptionController,
+                            context: context),
+                        SizedBox(
+                          height: screenHeight(context) * 0.05,
+                        ),
+                        txt(txt: 'Hastags', fontSize: 14),
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        textField(
+                            onChanged: (value) {
+                              hashTags = extractHashTags(value);
+                            },
+                            hinttext: '#...',
+                            controller: _hashtagController,
+                            context: context),
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        hashTags.isNotEmpty
+                            ? txt(txt: 'Selected Hastags', fontSize: 14)
+                            : Container(),
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        hashTags.isNotEmpty
+                            ? txt(
+                                txt: hashTags.toString(),
+                                fontSize: 14,
+                                fontColor: const Color(blueColor))
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  if (loading) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [CircularProgress()],
+                    )
+                  ],
+                  if (!loading) ...[
+                    InkWell(
+                      onTap: () async {
+                        if (widget.perspectiveTag!.isEmpty ||
+                            widget.selectedTopic!.isEmpty ||
+                            widget.title!.isEmpty ||
+                            _descriptionController.text.isEmpty ||
+                            _hashtagController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Please fill out the video details first')));
+                        } else {
+                          final XFile? file = await _picker.pickVideo(
+                              source: ImageSource.camera,
+                              maxDuration: const Duration(minutes: 2));
+
+                          if (file != null) {
+                            setState(() {
+                              _video = File(file.path);
+                            });
+                            await uploadContent(
+                                videoDescription: _descriptionController.text,
+                                videoHastags: hashTags,
+                                videoTag: widget.perspectiveTag!,
+                                videoTitle: widget.title!,
+                                videoTopic: widget.selectedTopic,
+                                publishersName: userName);
+                          }
+                        }
+                      },
+                      child: Container(
+                        height: screenHeight(context) * 0.088,
+                        color: Colors.black,
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              txt(
+                                  txt: 'MAKE VIDEO',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  fontColor: Colors.white),
+                              SizedBox(
+                                width: screenWidth(context) * 0.03,
+                              ),
+                              Transform.rotate(
+                                angle: pi,
+                                child: SvgPicture.asset(
+                                  'assets/svgs/arrowForward.svg',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         ),

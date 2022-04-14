@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:slant/res.dart';
@@ -27,7 +28,9 @@ class _DiscoverState extends State<Discover> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.arrow_back, color: Colors.white),
+                Container(
+                  width: screenWidth(context) * 0.05,
+                ),
                 isSearching
                     ? Container(
                         height: 77,
@@ -45,10 +48,10 @@ class _DiscoverState extends State<Discover> {
                           decoration: InputDecoration(
                               contentPadding:
                                   const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                              hintText: 'Search...',
+                              hintText: 'Search with titles or #hastags',
                               hintStyle: const TextStyle(
                                 fontFamily: 'Open Sans',
-                                fontSize: 16.0,
+                                fontSize: 12,
                                 color: Colors.white,
                               ),
                               filled: true,
@@ -114,11 +117,22 @@ class _DiscoverState extends State<Discover> {
                     ],
                   )
                 : GridView.count(
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                     crossAxisCount: 2,
-                    children: List.generate(100, (index) {
-                      return Center(child: buildTopics(topic: '#Taylor swift'));
-                    }),
-                  ),
+                    children: [
+                        buildTopics(topic: 'What’s happening in my country'),
+                        buildTopics(topic: 'What’s happening around the world'),
+                        buildTopics(
+                            topic:
+                                'My sense of belonging and it’s representation'),
+                        buildTopics(topic: 'How society around me functions'),
+                        buildTopics(topic: 'My Lifestyle'),
+                        buildTopics(topic: 'My Religion'),
+                        buildTopics(topic: 'What I see online/on my TV'),
+                        buildTopics(topic: 'My identity'),
+                        buildTopics(topic: 'Money and finances'),
+                      ]),
           ),
         )
       ],
@@ -144,8 +158,8 @@ class _DiscoverState extends State<Discover> {
 
   Container buildTopics({String? topic}) {
     return Container(
-      width: screenWidth(context) * 0.4,
-      height: screenHeight(context) * 0.18,
+      // width: screenWidth(context)* 0.4,
+      // height: screenHeight(context) * 0.18,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
         color: const Color(0xFF3B5998),
@@ -158,8 +172,21 @@ class _DiscoverState extends State<Discover> {
         ],
       ),
       child: Center(
-        child: txt(txt: topic, fontColor: Colors.white, fontSize: 14),
-      ),
+          child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: AutoSizeText(
+          topic!,
+          textAlign: TextAlign.center,
+          maxFontSize: 12,
+          minFontSize: 8,
+          maxLines: 2,
+          style: const TextStyle(
+            fontFamily: 'OpenSans',
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      )),
     );
   }
 

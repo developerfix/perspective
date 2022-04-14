@@ -5,6 +5,8 @@ import 'package:slant/res.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:slant/view/screens/makeVideo/q2_3.dart';
 
+import '../../../bnb.dart';
+
 class Question1 extends StatefulWidget {
   const Question1({Key? key}) : super(key: key);
 
@@ -22,257 +24,293 @@ class _Question1State extends State<Question1> {
   bool? p7 = false;
   bool? p8 = false;
 
+  String topicSelected = '';
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: SizedBox(
-            height: screenHeight(context) * 0.95,
-            width: screenWidth(context),
-            child: Padding(
-              padding: const EdgeInsets.all(40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: screenHeight(context) * 0.03,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      txt(
-                          txt: 'Lets Start',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                      SizedBox(
-                        height: screenHeight(context) * 0.005,
-                      ),
-                      LinearPercentIndicator(
-                        barRadius: const Radius.circular(8),
-                        // width: screenWidth(context),
-                        lineHeight: screenHeight(context) * 0.015,
-                        percent: 0.2,
-                        backgroundColor: Colors.black.withOpacity(0.2),
-                        progressColor: const Color(blueColor),
-                      ),
-                      SizedBox(
-                        height: screenHeight(context) * 0.05,
-                      ),
-                      txt(
-                          txt: 'What do you want to share\nslant on',
-                          fontSize: 14),
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p1 = true;
-                            if (p1 == true) {
-                              p2 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text:
-                                'My sense of belonging and it’s representation',
-                            topic: p1 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p2 = true;
-                            if (p2 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'What’s happening around the world',
-                            topic: p2 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p3 = true;
-                            if (p3 == true) {
-                              p1 == false;
-                              p2 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'How society around me functions',
-                            topic: p3 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p4 = true;
-                            if (p4 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p2 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'My Lifestyle', topic: p4 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p5 = true;
-                            if (p5 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p2 == false;
-                              p6 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'My Religion', topic: p5 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p6 = true;
-                            if (p6 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p2 == false;
-                              p7 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'What I see online/on my TV',
-                            topic: p6 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p7 = true;
-                            if (p7 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p2 == false;
-                              p8 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'My identity', topic: p7 == true ? 1 : 0),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            p8 = true;
-                            if (p8 == true) {
-                              p1 == false;
-                              p3 == false;
-                              p4 == false;
-                              p5 == false;
-                              p6 == false;
-                              p7 == false;
-                              p2 == false;
-                            }
-                          });
-                        },
-                        child: topicWidget(context,
-                            text: 'Money and finances',
-                            topic: p8 == true ? 1 : 0),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      txt(
-                          txt: 'Please give it a title',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontColor: Colors.black.withOpacity(0.3)),
-                      SizedBox(
-                        width: screenWidth(context) * 0.03,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.bottomToTop,
-                                  child: const Question2And3()));
-                        },
-                        child: Container(
-                          width: screenWidth(context) * 0.08,
-                          height: screenHeight(context) * 0.05,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF3B5998),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.16),
-                                offset: const Offset(0, 3.0),
-                                blurRadius: 6.0,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const RotatedBox(
-                                quarterTurns: 3,
-                                child: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
-                              ),
-                              SizedBox(
-                                height: screenHeight(context) * 0.005,
-                              )
-                            ],
-                          ),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => const BNB()),
+          ),
+        );
+
+        return Future<bool>(
+          () => true,
+        );
+      },
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: SizedBox(
+              height: screenHeight(context) * 0.95,
+              width: screenWidth(context),
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: screenHeight(context) * 0.03,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        txt(
+                            txt: 'Lets Start',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                        SizedBox(
+                          height: screenHeight(context) * 0.005,
                         ),
-                      )
-                    ],
-                  ),
-                ],
+                        LinearPercentIndicator(
+                          barRadius: const Radius.circular(8),
+                          lineHeight: screenHeight(context) * 0.015,
+                          percent: 0.2,
+                          backgroundColor: Colors.black.withOpacity(0.2),
+                          progressColor: const Color(blueColor),
+                        ),
+                        SizedBox(
+                          height: screenHeight(context) * 0.05,
+                        ),
+                        txt(
+                            txt: 'What do you want to share\nperspective on',
+                            fontSize: 14),
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p1 = true;
+                              topicSelected =
+                                  'My sense of belonging and it’s representation';
+                              if (p1 == true) {
+                                p2 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                                p6 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text:
+                                  'My sense of belonging and it’s representation',
+                              topic: p1 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p2 = true;
+                              topicSelected =
+                                  'What’s happening around the world';
+                              if (p2 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                                p6 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'What’s happening around the world',
+                              topic: p2 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p3 = true;
+                              topicSelected = 'How society around me functions';
+                              if (p3 == true) {
+                                p1 = false;
+                                p2 = false;
+                                p4 = false;
+                                p5 = false;
+                                p6 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'How society around me functions',
+                              topic: p3 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p4 = true;
+                              topicSelected = 'My Lifestyle';
+                              if (p4 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p2 = false;
+                                p5 = false;
+                                p6 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'My Lifestyle', topic: p4 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p5 = true;
+                              topicSelected = 'My Religion';
+                              if (p5 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p2 = false;
+                                p6 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'My Religion', topic: p5 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p6 = true;
+                              topicSelected = 'What I see online/on my TV';
+                              if (p6 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                                p2 = false;
+                                p7 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'What I see online/on my TV',
+                              topic: p6 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p7 = true;
+                              topicSelected = 'My identity';
+                              if (p7 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                                p6 = false;
+                                p2 = false;
+                                p8 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'My identity', topic: p7 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p8 = true;
+                              topicSelected = 'Money and finances';
+                              if (p8 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                                p6 = false;
+                                p7 = false;
+                                p2 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: 'Money and finances',
+                              topic: p8 == true ? 1 : 0),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        txt(
+                            txt: 'Please give it a title',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontColor: Colors.black.withOpacity(0.3)),
+                        SizedBox(
+                          width: screenWidth(context) * 0.03,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            if (topicSelected.isNotEmpty) {
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  type: PageTransitionType.bottomToTop,
+                                  child: Question2And3(
+                                    selectedTopic: topicSelected,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Please select the topic first')));
+                            }
+                          },
+                          child: Container(
+                            width: screenWidth(context) * 0.08,
+                            height: screenHeight(context) * 0.05,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF3B5998),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.16),
+                                  offset: const Offset(0, 3.0),
+                                  blurRadius: 6.0,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const RotatedBox(
+                                  quarterTurns: 3,
+                                  child: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: screenHeight(context) * 0.005,
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

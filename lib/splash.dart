@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:slant/auth/interested.dart';
 import 'package:slant/auth/login.dart';
+import 'package:slant/bnb.dart';
 import 'package:slant/res.dart';
 
-class Splash extends StatelessWidget {
+class Splash extends StatefulWidget {
   const Splash({Key? key}) : super(key: key);
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(
+        const Duration(seconds: 3),
+        () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BNB()),
+            ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +31,9 @@ class Splash extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
-            child: navigator(
-                function: const Login(),
-                child: Hero(
-                    tag: 'logo',
-                    child: SvgPicture.asset('assets/svgs/logo.svg'))),
-          ),
+              child: Hero(
+                  tag: 'logo',
+                  child: SvgPicture.asset('assets/svgs/logo.svg'))),
           SizedBox(
             height: screenHeight(context) * 0.02,
           ),

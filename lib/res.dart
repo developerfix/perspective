@@ -7,18 +7,20 @@ const int redColor = 0xffEE6C4D;
 const int blackColor = 0xff1D1A2F;
 
 //for all the text in the app
-Widget txt({
-  String? txt,
-  FontWeight? fontWeight,
-  double? fontSize,
-  Color? fontColor,
-}) {
+Widget txt(
+    {String? txt,
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? fontColor,
+    int? maxLines}) {
   return AutoSizeText(
     txt!,
-    maxLines: 2,
+    maxLines: maxLines ?? 2,
+    maxFontSize: fontSize!,
+    minFontSize: fontSize - 5,
     style: TextStyle(
       fontFamily: 'OpenSans',
-      fontSize: fontSize,
+      // fontSize: fontSize,
       color: fontColor ?? Colors.black,
       fontWeight: fontWeight ?? FontWeight.w600,
     ),

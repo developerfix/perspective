@@ -3,10 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
+
+import '../../../bnb.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -19,6 +23,47 @@ class _ProfileState extends State<Profile> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
+  final geolocator =
+      Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
+  Position? _currentPosition;
+  String currentAddress = "";
+
+  void getCurrentLocation() async {
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+      });
+
+      getAddressFromLatLng();
+    }).catchError((e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    });
+  }
+
+  void getAddressFromLatLng() async {
+    try {
+      List<Placemark> p = await placemarkFromCoordinates(
+          _currentPosition!.latitude, _currentPosition!.longitude);
+
+      Placemark place = p[0];
+
+      setState(() {
+        currentAddress =
+            "${place.thoroughfare},${place.subThoroughfare},${place.name}, ${place.subLocality}";
+      });
+    } catch (e) {
+      Container();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // getCurrentLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -26,11 +71,11 @@ class _ProfileState extends State<Profile> {
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text("Something went wrong");
+            return Container();
           }
 
           if (snapshot.hasData && !snapshot.data!.exists) {
-            return Text("Document does not exist");
+            return Container();
           }
           if (snapshot.connectionState == ConnectionState.done) {
             Map<String, dynamic> data =
@@ -51,7 +96,9 @@ class _ProfileState extends State<Profile> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(Icons.arrow_back, color: Colors.white),
+                            Container(
+                              width: screenWidth(context) * 0.05,
+                            ),
                             txt(
                                 txt: 'Profile',
                                 fontSize: 18,
@@ -67,11 +114,12 @@ class _ProfileState extends State<Profile> {
                                   } else if (value == 2) {
                                     await FirebaseAuth.instance.signOut();
                                     await FacebookAuth.instance.logOut();
-                                    Navigator.push(
+                                    Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
-                                            builder: ((context) =>
-                                                const Login())));
+                                          builder: ((context) => const Login()),
+                                        ),
+                                        (Route<dynamic> route) => false);
                                     setState(() {});
                                   }
                                 },
@@ -100,7 +148,21 @@ class _ProfileState extends State<Profile> {
                         SizedBox(
                           height: screenHeight(context) * 0.02,
                         ),
-                        Image.asset('assets/images/girl3.png'),
+                        CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 50,
+                            child: data['profilePic'].toString().isEmpty
+                                ? const CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage: AssetImage(
+                                        'assets/images/placeholder.png'))
+                                : CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    radius: 50,
+                                    backgroundImage: NetworkImage(
+                                      '${data['profilePic']}',
+                                    ),
+                                  )),
                         SizedBox(
                           height: screenHeight(context) * 0.01,
                         ),
@@ -108,7 +170,17 @@ class _ProfileState extends State<Profile> {
                             txt: '${data['name']}',
                             fontSize: 18,
                             fontWeight: FontWeight.bold),
-                        txt(txt: '${data['address']}', fontSize: 12),
+                        // ignore: unnecessary_null_comparison
+                        currentAddress.isNotEmpty
+                            ? txt(txt: currentAddress, fontSize: 12)
+                            : InkWell(
+                                onTap: () {
+                                  getCurrentLocation();
+                                },
+                                child: txt(
+                                    txt: 'Click here to add your location',
+                                    fontSize: 12),
+                              ),
                         SizedBox(
                           height: screenHeight(context) * 0.01,
                         ),
@@ -129,7 +201,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 txt(
-                                    txt: '40.3K',
+                                    txt: '${data['following']}',
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 txt(txt: 'FOLLOWING', fontSize: 10),
@@ -152,7 +224,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 txt(
-                                    txt: '993K',
+                                    txt: '${data['followers']}',
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 txt(txt: 'FOLLOWERS', fontSize: 10),
@@ -175,7 +247,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 txt(
-                                    txt: '112',
+                                    txt: '${data['noOfVids']}',
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 txt(txt: 'VIDS', fontSize: 10),

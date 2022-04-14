@@ -12,6 +12,8 @@ import 'dart:math';
 import 'package:slant/res.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 
+import '../../../bnb.dart';
+
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
 
@@ -25,7 +27,6 @@ class _EditProfileState extends State<EditProfile> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _statusController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
 
   // initializing some values
   File? _image;
@@ -33,6 +34,8 @@ class _EditProfileState extends State<EditProfile> {
   String? downloadURL;
 
   late Map<String, dynamic> dataChecker;
+
+  bool loading = false;
 
   // picking the image
 
@@ -47,31 +50,39 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-  // uploading the image to firebase cloudstore
-  Future uploadContent(File _image) async {
+  // uploading the data to firebase cloudstore
+  Future uploadContent(
+      {String? profilePic, String? name, String? bio, String? address}) async {
+    setState(() {
+      loading = true;
+    });
     final imgId = DateTime.now().millisecondsSinceEpoch.toString();
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     Reference reference = FirebaseStorage.instance
         .ref()
         .child('$userId/images')
         .child("post_$imgId");
-
-    await reference.putFile(_image);
-    downloadURL = await reference.getDownloadURL();
+    if (_image != null) {
+      await reference.putFile(_image!);
+      downloadURL = await reference.getDownloadURL();
+    }
 
     // cloud firestore
     await firebaseFirestore
         .collection("users")
         .doc(userId)
         .update({
-          'profilePic': downloadURL,
-          // 'name': _nameController.text,
-          // 'bio': _statusController,
-          // 'address': _addressController
+          'profilePic': _image == null ? profilePic : downloadURL,
+          'name': _nameController.text.isEmpty ? name : _nameController.text,
+          'bio': _statusController.text.isEmpty ? bio : _statusController.text,
         })
         .onError((error, stackTrace) =>
             showSnackBar('Something went wrong, please try again'))
         .whenComplete(() => showSnackBar('Changes Saved'));
+
+    setState(() {
+      loading = false;
+    });
   }
 
   showSnackBar(String snackText) {
@@ -84,14 +95,12 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     _nameController.text = '';
     _statusController.text = '';
-    _addressController.text = '';
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _statusController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -137,8 +146,13 @@ class _EditProfileState extends State<EditProfile> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Icon(Icons.arrow_back,
-                                        color: Colors.white),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Icon(Icons.arrow_back,
+                                          color: Colors.white),
+                                    ),
                                     txt(
                                         txt: 'Edit Profile',
                                         fontSize: 18,
@@ -167,6 +181,8 @@ class _EditProfileState extends State<EditProfile> {
                                             children: [
                                               _image == null
                                                   ? CircleAvatar(
+                                                      backgroundColor:
+                                                          Colors.transparent,
                                                       radius: 100,
                                                       child: data['profilePic']
                                                               .toString()
@@ -177,37 +193,28 @@ class _EditProfileState extends State<EditProfile> {
                                                                   AssetImage(
                                                                       'assets/images/placeholder.png'))
                                                           : CircleAvatar(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
                                                               radius: 95,
                                                               backgroundImage:
                                                                   NetworkImage(
-                                                                      '${data['profilePic']}'),
+                                                                '${data['profilePic']}',
+                                                              ),
                                                             ))
                                                   : CircleAvatar(
+                                                      backgroundColor:
+                                                          Colors.transparent,
                                                       radius: 100,
                                                       child: CircleAvatar(
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
                                                           radius: 95,
                                                           backgroundImage:
                                                               Image.file(
                                                             _image!,
                                                           ).image),
-                                                      //   data['profilePic'] == null ?  const AssetImage(
-                                                      //             'assets/images/placeholder.png'
-                                                      //           ) :
-
-                                                      //           NetworkImage('${data['profilePic']}'),
-                                                      // )
-                                                      //  _image == null?  CircleAvatar(
-                                                      //       radius: 95,
-                                                      //       backgroundImage:
-                                                      //       data['profilePic'] == null ?  const AssetImage(
-                                                      //               'assets/images/placeholder.png'
-                                                      //             ) : NetworkImage('${data['profilePic']}')
-
-                                                      //       ) : CircleAvatar(
-                                                      //       radius: 95,
-                                                      //       backgroundImage:  Image.file(
-                                                      //               _image!,
-                                                      //             ).image),
                                                     ),
                                               Positioned(
                                                 bottom: 0,
@@ -253,61 +260,65 @@ class _EditProfileState extends State<EditProfile> {
                                       SizedBox(
                                         height: screenHeight(context) * 0.05,
                                       ),
-                                      textField(
-                                        context: context,
-                                        hinttext: '${data['address']}',
-                                        prefixIcon:
-                                            const Icon(Icons.add_location),
-                                        controller: _addressController,
-                                      ),
-                                      SizedBox(
-                                        height: screenHeight(context) * 0.015,
-                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                             const Spacer(),
-                            InkWell(
-                              onTap: () {
-                                if (_nameController.text.isEmpty &&
-                                    _addressController.text.isEmpty &&
-                                    _statusController.text.isEmpty &&
-                                    _image == null) {
-                                  showSnackBar(
-                                    "Made some changes first",
-                                  );
-                                } else {
-                                  uploadContent(_image!);
-                                }
-                              },
-                              child: Container(
-                                height: screenHeight(context) * 0.088,
-                                color: Colors.black,
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      txt(
-                                          txt: 'Save Changes',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontColor: Colors.white),
-                                      SizedBox(
-                                        width: screenWidth(context) * 0.03,
-                                      ),
-                                      Transform.rotate(
-                                        angle: pi,
-                                        child: SvgPicture.asset(
-                                          'assets/svgs/arrowForward.svg',
+                            if (loading) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  CircularProgress(),
+                                ],
+                              )
+                            ],
+                            if (!loading) ...[
+                              InkWell(
+                                onTap: () {
+                                  if (_nameController.text.isEmpty &&
+                                      _statusController.text.isEmpty &&
+                                      _image == null) {
+                                    showSnackBar(
+                                      "Please make some changes first",
+                                    );
+                                  } else {
+                                    uploadContent(
+                                        address: '${data['address']}',
+                                        bio: '${data['bio']}',
+                                        name: '${data['name']}',
+                                        profilePic: '${data['profilePic']}');
+                                  }
+                                },
+                                child: Container(
+                                  height: screenHeight(context) * 0.088,
+                                  color: Colors.black,
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        txt(
+                                            txt: 'Save Changes',
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            fontColor: Colors.white),
+                                        SizedBox(
+                                          width: screenWidth(context) * 0.03,
                                         ),
-                                      ),
-                                    ],
+                                        Transform.rotate(
+                                          angle: pi,
+                                          child: SvgPicture.asset(
+                                            'assets/svgs/arrowForward.svg',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       ),

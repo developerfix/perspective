@@ -22,7 +22,9 @@ class _FavouritesState extends State<Favourites> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.arrow_back, color: Colors.white),
+                Container(
+                  width: screenWidth(context) * 0.05,
+                ),
                 txt(txt: 'Favourites', fontSize: 18, fontColor: Colors.white),
                 Container(
                   width: screenWidth(context) * 0.05,
