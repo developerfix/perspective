@@ -26,6 +26,13 @@ class _Question2And3State extends State<Question2And3> {
   String tagSelected = '';
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(widget.selectedTopic);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
@@ -144,7 +151,7 @@ class _Question2And3State extends State<Question2And3> {
                           onTap: () {
                             setState(() {
                               p1 = true;
-                              tagSelected = 'Very Conservative';
+                              tagSelected = veryConservative;
                               if (p1 == true) {
                                 p2 = false;
                                 p3 = false;
@@ -154,14 +161,14 @@ class _Question2And3State extends State<Question2And3> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Very Conservative',
+                              text: veryConservative,
                               topic: p1 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p2 = true;
-                              tagSelected = 'Conservative';
+                              tagSelected = conservative;
 
                               if (p2 == true) {
                                 p1 = false;
@@ -172,13 +179,13 @@ class _Question2And3State extends State<Question2And3> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Conservative', topic: p2 == true ? 1 : 0),
+                              text: conservative, topic: p2 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p3 = true;
-                              tagSelected = 'Neutral';
+                              tagSelected = neutral;
 
                               if (p3 == true) {
                                 p1 = false;
@@ -189,13 +196,13 @@ class _Question2And3State extends State<Question2And3> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Neutral', topic: p3 == true ? 1 : 0),
+                              text: neutral, topic: p3 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p4 = true;
-                              tagSelected = 'Liberal';
+                              tagSelected = liberal;
 
                               if (p4 == true) {
                                 p1 = false;
@@ -206,13 +213,13 @@ class _Question2And3State extends State<Question2And3> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Liberal', topic: p4 == true ? 1 : 0),
+                              text: liberal, topic: p4 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p5 = true;
-                              tagSelected = 'Very Liberal';
+                              tagSelected = veryLiberal;
 
                               if (p5 == true) {
                                 p1 = false;
@@ -223,7 +230,7 @@ class _Question2And3State extends State<Question2And3> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Very Liberal', topic: p5 == true ? 1 : 0),
+                              text: veryLiberal, topic: p5 == true ? 1 : 0),
                         ),
                       ],
                     ),

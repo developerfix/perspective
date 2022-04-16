@@ -1,18 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_video_player/cached_video_player.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import "dart:math" show pi;
-
-import 'package:video_player/video_player.dart';
 
 import '../widgets/circularProgress.dart';
 
@@ -27,15 +25,66 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin<HomeScreen> {
-  VideoPlayerController? _controller =
-      VideoPlayerController.asset('assets/images.facebook.png');
+  final VideoPlayerController? _controller =
+      VideoPlayerController.asset('assets/images/placeholder.png');
   bool isFavourite = false;
+  bool _isPlaying = false;
   bool seeMore = false;
   bool isbrainOnFire = false;
   List<dynamic> topicsOfInterest = [];
   var homeScreenVideos = [];
+  bool isLoading = false;
 
-  bool _isPlaying = false;
+  var myidentityLiberalDoc = FirebaseFirestore.instance
+      .collectionGroup(liberal)
+      .orderBy(FieldPath.documentId)
+      .startAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
+  ]).endAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
+        "\uf8ff"
+  ]);
+
+  var myidentityNeutralDoc = FirebaseFirestore.instance
+      .collectionGroup(neutral)
+      .orderBy(FieldPath.documentId)
+      .startAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
+  ]).endAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
+        "\uf8ff"
+  ]);
+
+  var myidentityVeryLiberalDoc = FirebaseFirestore.instance
+      .collectionGroup(veryLiberal)
+      .orderBy(FieldPath.documentId)
+      .startAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
+  ]).endAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
+        "\uf8ff"
+  ]);
+
+  var myidentityConservativeDoc = FirebaseFirestore.instance
+      .collectionGroup(conservative)
+      .orderBy(FieldPath.documentId)
+      .startAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
+  ]).endAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
+        "\uf8ff"
+  ]);
+
+  var myidentityVeryConservativeDoc = FirebaseFirestore.instance
+      .collectionGroup(veryConservative)
+      .orderBy(FieldPath.documentId)
+      .startAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
+  ]).endAt([
+    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
+        "\uf8ff"
+  ]);
+
   final PageController _pageController = PageController(initialPage: 0);
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -43,106 +92,189 @@ class _HomeScreenState extends State<HomeScreen>
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  Future<void> _playVideo(XFile? file) async {
-    _controller = VideoPlayerController.file(File(file!.path));
-    await _controller!.initialize();
-    await _controller!.setLooping(true);
-    await _controller!.play();
-    setState(() {});
-  }
-
-  Future<void> _getUserName() async {
-    await users
-        .doc((FirebaseAuth.instance.currentUser!.uid))
+  Future<void> getVideos() async {
+    setState(() {
+      isLoading = true;
+    });
+    await FirebaseFirestore.instance
+        .collectionGroup(veryConservative)
+        .orderBy(FieldPath.documentId)
+        .startAt([
+          FirebaseFirestore.instance
+              .collection("videos")
+              .doc(howSocietyAroundMeFunctions)
+              .path
+        ])
+        .endAt([
+          FirebaseFirestore.instance
+                  .collection("videos")
+                  .doc(whatsHappeningAroundTheWorld)
+                  .path +
+              "\uf8ff"
+        ])
         .get()
-        .then((value) {
-      setState(() {
-        topicsOfInterest = (value.data() as Map)['topicsOfInterest'];
-      });
+        .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            homeScreenVideos.add((doc));
+          }
+        });
+    await FirebaseFirestore.instance
+        .collectionGroup(conservative)
+        .orderBy(FieldPath.documentId)
+        .startAt([
+          FirebaseFirestore.instance
+              .collection("videos")
+              .doc(howSocietyAroundMeFunctions)
+              .path
+        ])
+        .endAt([
+          FirebaseFirestore.instance
+                  .collection("videos")
+                  .doc(whatsHappeningAroundTheWorld)
+                  .path +
+              "\uf8ff"
+        ])
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            homeScreenVideos.add((doc));
+          }
+        });
+    await FirebaseFirestore.instance
+        .collectionGroup(neutral)
+        .orderBy(FieldPath.documentId)
+        .startAt([
+          FirebaseFirestore.instance
+              .collection("videos")
+              .doc(howSocietyAroundMeFunctions)
+              .path
+        ])
+        .endAt([
+          FirebaseFirestore.instance
+                  .collection("videos")
+                  .doc(whatsHappeningAroundTheWorld)
+                  .path +
+              "\uf8ff"
+        ])
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            homeScreenVideos.add((doc));
+          }
+        });
+    await FirebaseFirestore.instance
+        .collectionGroup(liberal)
+        .orderBy(FieldPath.documentId)
+        .startAt([
+          FirebaseFirestore.instance
+              .collection("videos")
+              .doc(howSocietyAroundMeFunctions)
+              .path
+        ])
+        .endAt([
+          FirebaseFirestore.instance
+                  .collection("videos")
+                  .doc(whatsHappeningAroundTheWorld)
+                  .path +
+              "\uf8ff"
+        ])
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            homeScreenVideos.add((doc));
+          }
+        });
+    await FirebaseFirestore.instance
+        .collectionGroup(veryLiberal)
+        .orderBy(FieldPath.documentId)
+        .startAt([
+          FirebaseFirestore.instance
+              .collection("videos")
+              .doc(howSocietyAroundMeFunctions)
+              .path
+        ])
+        .endAt([
+          FirebaseFirestore.instance
+                  .collection("videos")
+                  .doc(whatsHappeningAroundTheWorld)
+                  .path +
+              "\uf8ff"
+        ])
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            homeScreenVideos.add((doc));
+          }
+        });
+
+    setState(() {
+      isLoading = false;
     });
   }
 
-  Future<void> getDocs() async {
-    print(FirebaseFirestore.instance
-        .collection('videos')
-        .doc('My Lifestyle')
-        .collection('Liberal')
-        .snapshots());
-
-    // await FirebaseFirestore.instance.collectionGroup('Neutral').get()
-    //     // .collection("hastags/#iii/Neutral")
-    //     // .doc()
-    //     // .get()
-    //     .then((value) {
-    //   setState(() {
-    //     print(value.docs.length);
-    //   });
-    // });
-  }
-
-  String ds = 'hello';
   @override
   void initState() {
     super.initState();
-    widget.file != null ? _playVideo(widget.file) : null;
-    // _getUserName();
+    getVideos();
+  }
 
-    getDocs();
+  @override
+  void dispose() {
+    super.dispose();
+    _controller!.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('videos')
-              .doc('My identity')
-              .collection('Neutral')
-              .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Container();
-            }
-
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot orderData = snapshot.data!.docs[index];
-                  setState(() {
-                    videos.add(orderData);
-                  });
-                  return videosWidget(context, name: orderData['videoTitle']);
-                },
-              );
-              // PageView(
-              //   scrollDirection: Axis.vertical,
-              //   children: [
-              //     videosWidget(context,
-              //         name: data['videos']['videoDescription']),
-              //   ],
-              // ),
-
-            }
-            return const Scaffold(body: Center(child: CircularProgress()));
-          }),
+      body: isLoading
+          ? const Center(
+              child: CircularProgress(),
+            )
+          : PageView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: homeScreenVideos.length,
+              // controller: PreloadPageController(initialPage: 1),
+              // preloadPagesCount: 3,
+              itemBuilder: ((context, index) {
+                final item = homeScreenVideos[index];
+                return SizedBox(
+                  height: screenHeight(context) * 0.5,
+                  width: screenWidth(context),
+                  child: videosWidget(
+                    context,
+                    name: item['publisherName'],
+                    description: item['videoDescription'],
+                    topic: item['videoTopic'],
+                    videoTag: item['videoTag'],
+                    videoLink: item['videoLink'],
+                    // profilePic: item['publisherProfilePic']
+                  ),
+                );
+              }),
+            ),
     );
   }
 
   SizedBox videosWidget(
     BuildContext context, {
     String? name,
+    String? profilePic,
+    String? description,
+    String? topic,
+    String? videoTag,
+    List<String>? hastags,
+    String? videoLink,
   }) {
     return SizedBox(
       height: screenHeight(context),
       child: Stack(
         children: [
           Positioned.fill(
-              child: _controller != null
-                  ? AspectRatioVideo(_controller)
+              child: videoLink != null
+                  ? AspectRatioVideo(videoLink, _controller!)
                   : Image.asset(
-                      'assets/images/image.png',
+                      'assets/images/placeholder.png',
                       fit: BoxFit.fitHeight,
                     )),
           Transform.rotate(
@@ -163,6 +295,44 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
+          // InkWell(
+          //   onTap: () {
+          //     setState(() {
+          //       if (_controller!.value.isPlaying) {
+          //         _controller!.pause();
+          //         Timer(
+          //             const Duration(seconds: 2),
+          //             () => setState(() {
+          //                   _isPlaying = false;
+          //                 }));
+          //       } else {
+          //         _controller!.play();
+          //         setState(() {
+          //           _isPlaying = true;
+          //         });
+          //       }
+          //     });
+          //   },
+          //   child: Align(
+          //       alignment: Alignment.center,
+          //       child: _controller!.value.isPlaying
+          //           ? _isPlaying
+          //               ? const Icon(
+          //                   Icons.pause_circle,
+          //                   color: Color(
+          //                     blueColor,
+          //                   ),
+          //                   size: 80,
+          //                 )
+          //               : Container()
+          //           : const Icon(
+          //               Icons.play_circle_rounded,
+          //               color: Color(
+          //                 blueColor,
+          //               ),
+          //               size: 80,
+          //             )),
+          // ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Transform.rotate(
@@ -184,46 +354,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
-          widget.file != null
-              ? InkWell(
-                  onTap: () {
-                    setState(() {
-                      if (_controller!.value.isPlaying) {
-                        _controller!.pause();
-                        Timer(
-                            const Duration(seconds: 2),
-                            () => setState(() {
-                                  _isPlaying = false;
-                                }));
-                      } else {
-                        _controller!.play();
-                        setState(() {
-                          _isPlaying = true;
-                        });
-                      }
-                    });
-                  },
-                  child: Align(
-                      alignment: Alignment.center,
-                      child: _controller!.value.isPlaying
-                          ? _isPlaying
-                              ? const Icon(
-                                  Icons.pause_circle,
-                                  color: Color(
-                                    blueColor,
-                                  ),
-                                  size: 80,
-                                )
-                              : Container()
-                          : const Icon(
-                              Icons.play_circle_rounded,
-                              color: Color(
-                                blueColor,
-                              ),
-                              size: 80,
-                            )),
-                )
-              : Container(),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -273,11 +403,14 @@ class _HomeScreenState extends State<HomeScreen>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const CircleAvatar(
-                            maxRadius: 40,
-                            backgroundColor: Colors.transparent,
-                            backgroundImage:
-                                AssetImage('assets/images/girl.png'),
-                          ),
+                              maxRadius: 40,
+                              backgroundColor: Colors.transparent,
+                              backgroundImage:
+                                  // profilePic == null
+                                  //     ?
+                                  AssetImage('assets/images/girl.png')
+                              // : NetworkImage(profilePic) as ImageProvider,
+                              ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
                             child: Column(
@@ -303,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           duration:
                                               const Duration(milliseconds: 500),
                                           child: AutoSizeText(
-                                            'fsdfilehf[woefhecsdjsdsdsdddcdc',
+                                            description!,
                                             maxLines: seeMore ? 5 : 1,
                                             maxFontSize: 10,
                                             softWrap: true,
@@ -317,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           ),
                                         ),
                                       ),
-                                      ds.length == 5
+                                      description.length == 20
                                           ? seeMore
                                               ? GestureDetector(
                                                   child: txt(
@@ -343,13 +476,13 @@ class _HomeScreenState extends State<HomeScreen>
                                 ),
                                 txt(
                                     maxLines: 1,
-                                    txt: '#Bidens no war policy',
+                                    txt: '#$topic',
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor)),
                                 txt(
                                     maxLines: 1,
-                                    txt: '#BeingNeutral',
+                                    txt: '#Being $videoTag',
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor))

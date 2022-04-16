@@ -121,17 +121,16 @@ class _DiscoverState extends State<Discover> {
                     mainAxisSpacing: 10,
                     crossAxisCount: 2,
                     children: [
-                        buildTopics(topic: 'What’s happening in my country'),
-                        buildTopics(topic: 'What’s happening around the world'),
+                        buildTopics(topic: whatsHappeningInMyCountry),
+                        buildTopics(topic: whatsHappeningAroundTheWorld),
                         buildTopics(
-                            topic:
-                                'My sense of belonging and it’s representation'),
-                        buildTopics(topic: 'How society around me functions'),
-                        buildTopics(topic: 'My Lifestyle'),
-                        buildTopics(topic: 'My Religion'),
-                        buildTopics(topic: 'What I see online/on my TV'),
-                        buildTopics(topic: 'My identity'),
-                        buildTopics(topic: 'Money and finances'),
+                            topic: mySenseOfBelongingAndItsRepresentation),
+                        buildTopics(topic: howSocietyAroundMeFunctions),
+                        buildTopics(topic: myLifestyle),
+                        buildTopics(topic: myReligion),
+                        buildTopics(topic: whatISeeOnMyTV),
+                        buildTopics(topic: myIdentity),
+                        buildTopics(topic: moneyAndFinances),
                       ]),
           ),
         )

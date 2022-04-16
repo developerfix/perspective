@@ -8,7 +8,6 @@ import 'package:slant/view/screens/discover/discover.dart';
 import 'package:slant/view/screens/favourites.dart';
 import 'package:slant/view/screens/makeVideo/makeVideo.dart';
 import 'package:slant/view/screens/profile/profile.dart';
-import 'package:video_player/video_player.dart';
 
 class BNB extends StatefulWidget {
   final bool? isProfile;

@@ -87,7 +87,7 @@ class _Question1State extends State<Question1> {
                             setState(() {
                               p1 = true;
                               topicSelected =
-                                  'My sense of belonging and it’s representation';
+                                  mySenseOfBelongingAndItsRepresentation;
                               if (p1 == true) {
                                 p2 = false;
                                 p3 = false;
@@ -100,16 +100,14 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text:
-                                  'My sense of belonging and it’s representation',
+                              text: mySenseOfBelongingAndItsRepresentation,
                               topic: p1 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p2 = true;
-                              topicSelected =
-                                  'What’s happening around the world';
+                              topicSelected = whatsHappeningAroundTheWorld;
                               if (p2 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -122,14 +120,14 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'What’s happening around the world',
+                              text: whatsHappeningAroundTheWorld,
                               topic: p2 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p3 = true;
-                              topicSelected = 'How society around me functions';
+                              topicSelected = howSocietyAroundMeFunctions;
                               if (p3 == true) {
                                 p1 = false;
                                 p2 = false;
@@ -142,14 +140,14 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'How society around me functions',
+                              text: howSocietyAroundMeFunctions,
                               topic: p3 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p4 = true;
-                              topicSelected = 'My Lifestyle';
+                              topicSelected = myLifestyle;
                               if (p4 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -162,13 +160,13 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'My Lifestyle', topic: p4 == true ? 1 : 0),
+                              text: myLifestyle, topic: p4 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p5 = true;
-                              topicSelected = 'My Religion';
+                              topicSelected = myReligion;
                               if (p5 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -181,13 +179,13 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'My Religion', topic: p5 == true ? 1 : 0),
+                              text: myReligion, topic: p5 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p6 = true;
-                              topicSelected = 'What I see online/on my TV';
+                              topicSelected = whatISeeOnMyTV;
                               if (p6 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -200,14 +198,13 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'What I see online/on my TV',
-                              topic: p6 == true ? 1 : 0),
+                              text: whatISeeOnMyTV, topic: p6 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p7 = true;
-                              topicSelected = 'My identity';
+                              topicSelected = myIdentity;
                               if (p7 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -220,13 +217,13 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'My identity', topic: p7 == true ? 1 : 0),
+                              text: myIdentity, topic: p7 == true ? 1 : 0),
                         ),
                         InkWell(
                           onTap: () {
                             setState(() {
                               p8 = true;
-                              topicSelected = 'Money and finances';
+                              topicSelected = moneyAndFinances;
                               if (p8 == true) {
                                 p1 = false;
                                 p3 = false;
@@ -239,7 +236,7 @@ class _Question1State extends State<Question1> {
                             });
                           },
                           child: topicWidget(context,
-                              text: 'Money and finances',
+                              text: moneyAndFinances,
                               topic: p8 == true ? 1 : 0),
                         ),
                       ],

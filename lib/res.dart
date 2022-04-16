@@ -6,6 +6,23 @@ const int blueColor = 0xff3B5998;
 const int redColor = 0xffEE6C4D;
 const int blackColor = 0xff1D1A2F;
 
+const String howSocietyAroundMeFunctions = 'How society around me functions';
+const String whatsHappeningInMyCountry = 'What’s happening in my country';
+const String whatsHappeningAroundTheWorld = 'What’s happening around the world';
+const String mySenseOfBelongingAndItsRepresentation =
+    'My sense of belonging and it’s representation';
+const String whatISeeOnMyTV = 'What I see online or on my TV';
+const String myLifestyle = 'My Lifestyle';
+const String myReligion = 'My Religion';
+const String myIdentity = 'My identity';
+const String moneyAndFinances = 'Money and finances';
+
+const String veryConservative = 'Very Conservative';
+const String conservative = 'Conservative';
+const String neutral = 'Neutral';
+const String liberal = 'Liberal';
+const String veryLiberal = 'Very Liberal';
+
 //for all the text in the app
 Widget txt(
     {String? txt,

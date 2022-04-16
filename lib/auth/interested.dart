@@ -168,16 +168,16 @@ class _InterestedState extends State<Interested> {
                                   setState(() {
                                     topic1Selected = !topic1Selected!;
                                     if (topic1Selected!) {
-                                      topicsOfInterest.add(
-                                          'What’s happening in my country');
+                                      topicsOfInterest
+                                          .add(whatsHappeningInMyCountry);
                                     } else {
-                                      topicsOfInterest.remove(
-                                          'What’s happening in my country');
+                                      topicsOfInterest
+                                          .remove(whatsHappeningInMyCountry);
                                     }
                                   });
                                 },
                                 child: interestedItems(context,
-                                    itemText: 'What’s happening in my country',
+                                    itemText: whatsHappeningInMyCountry,
                                     width: screenWidth(context) * 0.5,
                                     color: topic1Selected!
                                         ? const Color(blueColor)
@@ -188,17 +188,16 @@ class _InterestedState extends State<Interested> {
                                   setState(() {
                                     topic2Selected = !topic2Selected!;
                                     if (topic2Selected!) {
-                                      topicsOfInterest.add(
-                                          'What’s happening around the world');
+                                      topicsOfInterest
+                                          .add(whatsHappeningAroundTheWorld);
                                     } else {
-                                      topicsOfInterest.remove(
-                                          'What’s happening around the world');
+                                      topicsOfInterest
+                                          .remove(whatsHappeningAroundTheWorld);
                                     }
                                   });
                                 },
                                 child: interestedItems(context,
-                                    itemText:
-                                        'What’s happening around the world',
+                                    itemText: whatsHappeningAroundTheWorld,
                                     color: topic2Selected!
                                         ? const Color(blueColor)
                                         : null,
@@ -210,16 +209,16 @@ class _InterestedState extends State<Interested> {
                                     topic3Selected = !topic3Selected!;
                                     if (topic3Selected!) {
                                       topicsOfInterest.add(
-                                          'My sense of belonging and it’s representation');
+                                          mySenseOfBelongingAndItsRepresentation);
                                     } else {
                                       topicsOfInterest.remove(
-                                          'My sense of belonging and it’s representation');
+                                          mySenseOfBelongingAndItsRepresentation);
                                     }
                                   });
                                 },
                                 child: interestedItems(context,
                                     itemText:
-                                        'My sense of belonging and it’s representation',
+                                        mySenseOfBelongingAndItsRepresentation,
                                     color: topic3Selected!
                                         ? const Color(blueColor)
                                         : null,
@@ -230,16 +229,16 @@ class _InterestedState extends State<Interested> {
                                   setState(() {
                                     topic4Selected = !topic4Selected!;
                                     if (topic4Selected!) {
-                                      topicsOfInterest.add(
-                                          'How society around me functions');
+                                      topicsOfInterest
+                                          .add(howSocietyAroundMeFunctions);
                                     } else {
-                                      topicsOfInterest.remove(
-                                          'How society around me functions');
+                                      topicsOfInterest
+                                          .remove(howSocietyAroundMeFunctions);
                                     }
                                   });
                                 },
                                 child: interestedItems(context,
-                                    itemText: 'How society around me functions',
+                                    itemText: howSocietyAroundMeFunctions,
                                     color: topic4Selected!
                                         ? const Color(blueColor)
                                         : null,
@@ -253,15 +252,14 @@ class _InterestedState extends State<Interested> {
                                       setState(() {
                                         topic5Selected = !topic5Selected!;
                                         if (topic5Selected!) {
-                                          topicsOfInterest.add('My Lifestyle');
+                                          topicsOfInterest.add(myLifestyle);
                                         } else {
-                                          topicsOfInterest
-                                              .remove('My Lifestyle');
+                                          topicsOfInterest.remove(myLifestyle);
                                         }
                                       });
                                     },
                                     child: interestedItems(context,
-                                        itemText: 'My Lifestyle',
+                                        itemText: myLifestyle,
                                         color: topic5Selected!
                                             ? const Color(blueColor)
                                             : null,
@@ -275,15 +273,14 @@ class _InterestedState extends State<Interested> {
                                       setState(() {
                                         topic6Selected = !topic6Selected!;
                                         if (topic6Selected!) {
-                                          topicsOfInterest.add('My Religion');
+                                          topicsOfInterest.add(myReligion);
                                         } else {
-                                          topicsOfInterest
-                                              .remove('My Religion');
+                                          topicsOfInterest.remove(myReligion);
                                         }
                                       });
                                     },
                                     child: interestedItems(context,
-                                        itemText: 'My Religion',
+                                        itemText: myReligion,
                                         color: topic6Selected!
                                             ? const Color(blueColor)
                                             : null,
@@ -296,16 +293,14 @@ class _InterestedState extends State<Interested> {
                                   setState(() {
                                     topic7Selected = !topic7Selected!;
                                     if (topic7Selected!) {
-                                      topicsOfInterest
-                                          .add('What I see online/on my TV');
+                                      topicsOfInterest.add(whatISeeOnMyTV);
                                     } else {
-                                      topicsOfInterest
-                                          .remove('What I see online/on my TV');
+                                      topicsOfInterest.remove(whatISeeOnMyTV);
                                     }
                                   });
                                 },
                                 child: interestedItems(context,
-                                    itemText: 'What I see online/on my TV',
+                                    itemText: whatISeeOnMyTV,
                                     color: topic7Selected!
                                         ? const Color(blueColor)
                                         : null,
@@ -319,15 +314,14 @@ class _InterestedState extends State<Interested> {
                                       setState(() {
                                         topic8Selected = !topic8Selected!;
                                         if (topic8Selected!) {
-                                          topicsOfInterest.add('My identity');
+                                          topicsOfInterest.add(myIdentity);
                                         } else {
-                                          topicsOfInterest
-                                              .remove('My identity');
+                                          topicsOfInterest.remove(myIdentity);
                                         }
                                       });
                                     },
                                     child: interestedItems(context,
-                                        itemText: 'My identity',
+                                        itemText: myIdentity,
                                         color: topic8Selected!
                                             ? const Color(blueColor)
                                             : null,
@@ -342,15 +336,15 @@ class _InterestedState extends State<Interested> {
                                         topic9Selected = !topic9Selected!;
                                         if (topic9Selected!) {
                                           topicsOfInterest
-                                              .add('Money and finances');
+                                              .add(moneyAndFinances);
                                         } else {
                                           topicsOfInterest
-                                              .remove('Money and finances');
+                                              .remove(moneyAndFinances);
                                         }
                                       });
                                     },
                                     child: interestedItems(context,
-                                        itemText: 'Money and finances',
+                                        itemText: moneyAndFinances,
                                         color: topic9Selected!
                                             ? const Color(blueColor)
                                             : null,

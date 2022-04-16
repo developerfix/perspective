@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geocoding/geocoding.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
@@ -23,40 +23,40 @@ class _ProfileState extends State<Profile> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  final geolocator =
-      Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
-  Position? _currentPosition;
-  String currentAddress = "";
+  // final geolocator =
+  //     Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
+  // Position? _currentPosition;
+  // String currentAddress = "";
 
-  void getCurrentLocation() async {
-    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
+  // void getCurrentLocation() async {
+  //   await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+  //       .then((Position position) {
+  //     setState(() {
+  //       _currentPosition = position;
+  //     });
 
-      getAddressFromLatLng();
-    }).catchError((e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
-    });
-  }
+  //     getAddressFromLatLng();
+  //   }).catchError((e) {
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text(e.toString())));
+  //   });
+  // }
 
-  void getAddressFromLatLng() async {
-    try {
-      List<Placemark> p = await placemarkFromCoordinates(
-          _currentPosition!.latitude, _currentPosition!.longitude);
+  // void getAddressFromLatLng() async {
+  //   try {
+  //     List<Placemark> p = await placemarkFromCoordinates(
+  //         _currentPosition!.latitude, _currentPosition!.longitude);
 
-      Placemark place = p[0];
+  //     Placemark place = p[0];
 
-      setState(() {
-        currentAddress =
-            "${place.thoroughfare},${place.subThoroughfare},${place.name}, ${place.subLocality}";
-      });
-    } catch (e) {
-      Container();
-    }
-  }
+  //     setState(() {
+  //       currentAddress =
+  //           "${place.thoroughfare},${place.subThoroughfare},${place.name}, ${place.subLocality}";
+  //     });
+  //   } catch (e) {
+  //     Container();
+  //   }
+  // }
 
   @override
   void initState() {
@@ -171,16 +171,17 @@ class _ProfileState extends State<Profile> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold),
                         // ignore: unnecessary_null_comparison
-                        currentAddress.isNotEmpty
-                            ? txt(txt: currentAddress, fontSize: 12)
-                            : InkWell(
-                                onTap: () {
-                                  getCurrentLocation();
-                                },
-                                child: txt(
-                                    txt: 'Click here to add your location',
-                                    fontSize: 12),
-                              ),
+                        // currentAddress.isNotEmpty
+                        //     ? txt(txt: currentAddress, fontSize: 12)
+                        //     :
+                        InkWell(
+                          onTap: () {
+                            // getCurrentLocation();
+                          },
+                          child: txt(
+                              txt: 'Click here to add your location',
+                              fontSize: 12),
+                        ),
                         SizedBox(
                           height: screenHeight(context) * 0.01,
                         ),

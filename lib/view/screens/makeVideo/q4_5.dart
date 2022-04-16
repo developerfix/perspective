@@ -10,13 +10,9 @@ import 'package:slant/res.dart';
 import 'dart:io';
 import 'package:hashtagable/hashtagable.dart';
 
-import 'package:flutter/material.dart';
 import 'package:slant/bnb.dart';
-import 'package:slant/res.dart';
-import 'package:slant/view/screens/homeScreen.dart';
 import 'package:slant/view/screens/makeVideo/q2_3.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
-import 'package:video_player/video_player.dart';
 import 'dart:math';
 import 'package:image_picker/image_picker.dart';
 
@@ -52,14 +48,27 @@ class _Question4And5State extends State<Question4And5> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
   String? userName = "";
+  String? userProfilePic = "";
 
   getUserName() async {
     await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
         if (documentSnapshot.data() != null) {
-          if (documentSnapshot.get(FieldPath(const ['name'])) != []) {
+          if (documentSnapshot
+              .get(FieldPath(const ['name']))
+              .toString()
+              .isNotEmpty) {
             setState(() {
               userName = documentSnapshot.get(FieldPath(const ['name']));
+            });
+          }
+          if (documentSnapshot
+              .get(FieldPath(const ['profilePic']))
+              .toString()
+              .isNotEmpty) {
+            setState(() {
+              userProfilePic =
+                  documentSnapshot.get(FieldPath(const ['profilePic']));
             });
           }
         }
@@ -77,6 +86,7 @@ class _Question4And5State extends State<Question4And5> {
   // uploading the data to firebase cloudstore
   Future uploadContent({
     String? publishersName,
+    String? publisherProfilePic,
     String? videoTopic,
     String? videoTitle,
     String? videoDescription,
@@ -104,6 +114,7 @@ class _Question4And5State extends State<Question4And5> {
             .add(
           {
             'publisherName': publishersName,
+            'publisherProfilePic': publisherProfilePic,
             'videoTitle': videoTitle,
             'videoTopic': videoTopic,
             'videoHastags': videoHastags,
@@ -125,6 +136,7 @@ class _Question4And5State extends State<Question4And5> {
                 .collection(videoTag)
                 .add(
               {
+                'publisherProfilePic': publisherProfilePic,
                 'publisherName': publishersName,
                 'videoTitle': videoTitle,
                 'videoTopic': videoTopic,
@@ -148,6 +160,7 @@ class _Question4And5State extends State<Question4And5> {
               .collection(videoTag)
               .add(
             {
+              'publisherProfilePic': publisherProfilePic,
               'publisherName': publishersName,
               'videoTitle': videoTitle,
               'videoTopic': videoTopic,
@@ -169,6 +182,7 @@ class _Question4And5State extends State<Question4And5> {
               .doc(userId)
               .collection('videos')
               .add({
+            'publisherProfilePic': publisherProfilePic,
             'publisherName': publishersName,
             'videoTitle': videoTitle,
             'videoTopic': videoTopic,
@@ -387,6 +401,7 @@ class _Question4And5State extends State<Question4And5> {
                                 videoTag: widget.perspectiveTag!,
                                 videoTitle: widget.title!,
                                 videoTopic: widget.selectedTopic,
+                                publisherProfilePic: userProfilePic,
                                 publishersName: userName);
                           }
                         }
