@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -156,20 +157,25 @@ class _ProfileState extends State<Profile> {
                           height: screenHeight(context) * 0.02,
                         ),
                         CircleAvatar(
-                            backgroundColor: Colors.transparent,
-                            radius: 50,
-                            child: data['profilePic'].toString().isEmpty
-                                ? const CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: AssetImage(
-                                        'assets/images/placeholder.png'))
-                                : CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          radius: 50,
+                          child: CachedNetworkImage(
+                            imageUrl: '${data['profilePic']}',
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(
                                     backgroundColor: Colors.transparent,
                                     radius: 50,
-                                    backgroundImage: NetworkImage(
-                                      '${data['profilePic']}',
-                                    ),
-                                  )),
+                                    backgroundImage: imageProvider),
+                            placeholder: (context, url) =>
+                                const CircularProgress(),
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    radius: 50,
+                                    backgroundImage: AssetImage(
+                                        'assets/images/placeholder.png')),
+                          ),
+                        ),
                         SizedBox(
                           height: screenHeight(context) * 0.01,
                         ),
@@ -270,20 +276,6 @@ class _ProfileState extends State<Profile> {
                         SizedBox(
                           height: screenHeight(context) * 0.015,
                         ),
-                        // Container(
-                        //   width: screenWidth(context) * 0.5,
-                        //   height: screenHeight(context) * 0.055,
-                        //   decoration: BoxDecoration(
-                        //     borderRadius: BorderRadius.circular(2.0),
-                        //     color: const Color(0xFF3B5998),
-                        //   ),
-                        //   child: Center(
-                        //     child: txt(
-                        //         txt: 'Edit Profile',
-                        //         fontSize: 13,
-                        //         fontColor: Colors.white),
-                        //   ),
-                        // )
                       ],
                     ),
                     SizedBox(
@@ -310,8 +302,10 @@ class _ProfileState extends State<Profile> {
                                       AsyncSnapshot<QuerySnapshot> snapshot) {
                                     if (!snapshot.hasData ||
                                         snapshot.hasError) {
-                                      return const Text(
-                                        'No videos...',
+                                      return const Center(
+                                        child: Text(
+                                          'No videos...',
+                                        ),
                                       );
                                     } else if (snapshot.data!.docs.isNotEmpty) {
                                       return ListView.builder(
@@ -323,6 +317,7 @@ class _ProfileState extends State<Profile> {
                                             return favouriteItem(context,
                                                 doc: doc,
                                                 name: data['name'],
+                                                profileUrl: data['profilePic'],
                                                 title: (doc.data()
                                                     as Map)['videoTitle'],
                                                 videoLink: (doc.data()
@@ -541,6 +536,7 @@ class _ProfileState extends State<Profile> {
   Padding favouriteItem(
     BuildContext context, {
     String? name,
+    String? profileUrl,
     DocumentSnapshot? doc,
     String? videoLink,
     String? topic,
@@ -610,6 +606,7 @@ class _ProfileState extends State<Profile> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => ViewVideo(
+                            pictureUrl: profileUrl!,
                             name: name!,
                             doc: doc!,
                           )),

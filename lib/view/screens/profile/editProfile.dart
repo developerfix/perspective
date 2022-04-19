@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -37,6 +38,63 @@ class _EditProfileState extends State<EditProfile> {
 
   bool loading = false;
 
+//updating the name and profile of the current user in existing documents on firestore
+  getDocs({String? name, String? profilePic, String? tag}) async {
+    var inCompletePaths = [];
+    var collectionPaths = [];
+    var fullDocPaths = [];
+    var finalCollectionPaths = [];
+    var finalDocPaths = [];
+
+    await FirebaseFirestore.instance
+        .collectionGroup(tag!)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        inCompletePaths.add(doc.reference.path);
+      }
+
+      for (var doc in inCompletePaths) {
+        var ss = doc.toString().split("/");
+        ss.length = ss.length - 1;
+        var sd = ss.join("/");
+        collectionPaths.add(sd);
+      }
+    }).then((value) async {
+      for (var collectionPath in collectionPaths) {
+        await FirebaseFirestore.instance
+            .collection(collectionPath)
+            .where('publisherID', isEqualTo: userId)
+            .get()
+            .then((QuerySnapshot querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            fullDocPaths.add(doc.reference.path);
+          }
+        });
+      }
+      for (var doc in fullDocPaths) {
+        var ab = doc.toString().split("/");
+        var cd = ab.removeLast();
+        var ss = doc.toString().split("/");
+        ss.length = ss.length - 1;
+        var sd = ss.join("/");
+        finalDocPaths.add(cd);
+        finalCollectionPaths.add(sd);
+      }
+    }).then((value) async {
+      for (int i = 0; i < finalCollectionPaths.length; i++) {
+        await FirebaseFirestore.instance
+            .collection(finalCollectionPaths[i])
+            .doc(finalDocPaths[i])
+            .update({
+          'publisherProfilePic': _image == null ? profilePic : downloadURL,
+          'publisherName':
+              _nameController.text.isEmpty ? name : _nameController.text,
+        });
+      }
+    });
+  }
+
   // picking the image
 
   Future imagePickerMethod() async {
@@ -68,17 +126,20 @@ class _EditProfileState extends State<EditProfile> {
     }
 
     // cloud firestore
-    await firebaseFirestore
-        .collection("users")
-        .doc(userId)
-        .update({
-          'profilePic': _image == null ? profilePic : downloadURL,
-          'name': _nameController.text.isEmpty ? name : _nameController.text,
-          'bio': _statusController.text.isEmpty ? bio : _statusController.text,
-        })
-        .onError((error, stackTrace) =>
-            showSnackBar('Something went wrong, please try again'))
-        .whenComplete(() => showSnackBar('Changes Saved'));
+    await firebaseFirestore.collection("users").doc(userId).update({
+      'profilePic': _image == null ? profilePic : downloadURL,
+      'name': _nameController.text.isEmpty ? name : _nameController.text,
+      'bio': _statusController.text.isEmpty ? bio : _statusController.text,
+    }).then((value) async {
+      await getDocs(name: name, profilePic: profilePic, tag: veryConservative);
+      await getDocs(name: name, profilePic: profilePic, tag: conservative);
+      await getDocs(name: name, profilePic: profilePic, tag: neutral);
+      await getDocs(name: name, profilePic: profilePic, tag: liberal);
+      await getDocs(name: name, profilePic: profilePic, tag: veryLiberal);
+    }).then((value) {
+      showSnackBar("Changes saved");
+    }).onError((error, stackTrace) =>
+        showSnackBar('Something went wrong, please try again'));
 
     setState(() {
       loading = false;
@@ -114,11 +175,11 @@ class _EditProfileState extends State<EditProfile> {
           builder:
               (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text("Something went wrong");
+              return Container();
             }
 
             if (snapshot.hasData && !snapshot.data!.exists) {
-              return Text("Document does not exist");
+              return Container();
             }
             if (snapshot.connectionState == ConnectionState.done) {
               Map<String, dynamic> data =
@@ -184,24 +245,33 @@ class _EditProfileState extends State<EditProfile> {
                                                       backgroundColor:
                                                           Colors.transparent,
                                                       radius: 100,
-                                                      child: data['profilePic']
-                                                              .toString()
-                                                              .isEmpty
-                                                          ? const CircleAvatar(
-                                                              radius: 95,
-                                                              backgroundImage:
-                                                                  AssetImage(
-                                                                      'assets/images/placeholder.png'))
-                                                          : CircleAvatar(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              radius: 95,
-                                                              backgroundImage:
-                                                                  NetworkImage(
-                                                                '${data['profilePic']}',
-                                                              ),
-                                                            ))
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            '${data['profilePic']}',
+                                                        imageBuilder: (context,
+                                                                imageProvider) =>
+                                                            CircleAvatar(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                radius: 100,
+                                                                backgroundImage:
+                                                                    imageProvider),
+                                                        placeholder: (context,
+                                                                url) =>
+                                                            const CircularProgress(),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const CircleAvatar(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                radius: 100,
+                                                                backgroundImage:
+                                                                    AssetImage(
+                                                                        'assets/images/placeholder.png')),
+                                                      ),
+                                                    )
                                                   : CircleAvatar(
                                                       backgroundColor:
                                                           Colors.transparent,
@@ -210,7 +280,7 @@ class _EditProfileState extends State<EditProfile> {
                                                           backgroundColor:
                                                               Colors
                                                                   .transparent,
-                                                          radius: 95,
+                                                          radius: 100,
                                                           backgroundImage:
                                                               Image.file(
                                                             _image!,

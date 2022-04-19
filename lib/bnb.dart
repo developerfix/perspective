@@ -55,7 +55,13 @@ class _BNBState extends State<BNB> {
   void initState() {
     super.initState();
 
-    widget.isProfile == true ? _scrn = const Profile() : const HomeScreen();
+    if (widget.isProfile == true) {
+      _scrn = const Profile();
+      _selectedIndex = 4;
+      screen(4);
+    } else {
+      const HomeScreen();
+    }
   }
 
   @override

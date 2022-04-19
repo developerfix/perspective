@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:preload_page_view/preload_page_view.dart';
+import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
@@ -242,16 +244,15 @@ class _HomeScreenState extends State<HomeScreen>
                 return SizedBox(
                   height: screenHeight(context) * 0.5,
                   width: screenWidth(context),
-                  child: videosWidget(
-                    context,
-                    name: item['publisherName'],
-                    publishersID: item['publisherID'],
-                    description: item['videoDescription'],
-                    topic: item['videoTopic'],
-                    videoTag: item['videoTag'],
-                    videoLink: item['videoLink'],
-                    // profilePic: item['publisherProfilePic']
-                  ),
+                  child: videosWidget(context,
+                      name: item['publisherName'],
+                      publishersID: item['publisherID'],
+                      description: item['videoDescription'],
+                      topic: item['videoTopic'],
+                      videoTag: item['videoTag'],
+                      videoLink: item['videoLink'],
+                      profilePic: item['publisherProfilePic'] ?? "",
+                      brainOnFireReactions: item['brainOnFireReactions']),
                 );
               }),
             ),
@@ -262,6 +263,7 @@ class _HomeScreenState extends State<HomeScreen>
     BuildContext context, {
     String? name,
     String? publishersID,
+    int? brainOnFireReactions,
     String? profilePic,
     String? description,
     String? topic,
@@ -389,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         : SvgPicture.asset(
                                             'assets/svgs/brain.svg')),
                                 txt(
-                                    txt: '26',
+                                    txt: brainOnFireReactions.toString(),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: isbrainOnFire
@@ -401,22 +403,42 @@ class _HomeScreenState extends State<HomeScreen>
                           SvgPicture.asset('assets/svgs/slant.svg'),
                         ],
                       ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           navigator(
-                            function:
-                                OtherUserProfile(publishersID: publishersID!),
-                            child: const CircleAvatar(
-                                maxRadius: 40,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage:
-                                    // profilePic == null
-                                    //     ?
-                                    AssetImage('assets/images/girl.png')
-                                // : NetworkImage(profilePic) as ImageProvider,
-                                ),
+                            function: publishersID == userId
+                                ? const BNB(
+                                    isProfile: true,
+                                  )
+                                : OtherUserProfile(publishersID: publishersID!),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 30,
+                              child: CachedNetworkImage(
+                                imageUrl: profilePic!,
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: imageProvider),
+                                placeholder: (context, url) =>
+                                    const CircularProgress(),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/placeholder.png')),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth(context) * 0.04,
                           ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
@@ -497,6 +519,9 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           )
                         ],
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.015,
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,

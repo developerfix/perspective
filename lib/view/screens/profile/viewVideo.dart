@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +21,12 @@ import '../../widgets/circularProgress.dart';
 class ViewVideo extends StatefulWidget {
   final DocumentSnapshot doc;
   final String name;
-  const ViewVideo({Key? key, required this.name, required this.doc})
+  final String pictureUrl;
+  const ViewVideo(
+      {Key? key,
+      required this.pictureUrl,
+      required this.name,
+      required this.doc})
       : super(key: key);
 
   @override
@@ -176,19 +182,36 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                           SvgPicture.asset('assets/svgs/slant.svg'),
                         ],
                       ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const CircleAvatar(
-                              maxRadius: 40,
-                              backgroundColor: Colors.transparent,
-                              backgroundImage:
-                                  // profilePic == null
-                                  //     ?
-                                  AssetImage('assets/images/girl.png')
-                              // : NetworkImage(profilePic) as ImageProvider,
-                              ),
+                          CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 30,
+                            child: CachedNetworkImage(
+                              imageUrl: widget.pictureUrl,
+                              imageBuilder: (context, imageProvider) =>
+                                  CircleAvatar(
+                                      backgroundColor: Colors.transparent,
+                                      radius: 30,
+                                      backgroundImage: imageProvider),
+                              placeholder: (context, url) =>
+                                  const CircularProgress(),
+                              errorWidget: (context, url, error) =>
+                                  const CircleAvatar(
+                                      backgroundColor: Colors.transparent,
+                                      radius: 30,
+                                      backgroundImage: AssetImage(
+                                          'assets/images/placeholder.png')),
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth(context) * 0.04,
+                          ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
                             child: Column(
@@ -395,6 +418,9 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                             ),
                           )
                         ],
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.015,
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
