@@ -4,220 +4,34 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expand_widget/expand_widget.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
 import "dart:math" show pi;
 
-import '../widgets/circularProgress.dart';
+import '../../widgets/circularProgress.dart';
 
-class HomeScreen extends StatefulWidget {
-  final XFile? file;
-
-  const HomeScreen({Key? key, this.file}) : super(key: key);
+class ViewVideo extends StatefulWidget {
+  final DocumentSnapshot doc;
+  final String name;
+  const ViewVideo({Key? key, required this.name, required this.doc})
+      : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ViewVideo> createState() => _ViewVideoState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin<HomeScreen> {
+class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
   final VideoPlayerController? _controller =
       VideoPlayerController.asset('assets/images/placeholder.png');
-  bool isFavourite = false;
-  bool _isPlaying = false;
+
   bool seeMore = false;
-  bool isbrainOnFire = false;
-  List<dynamic> topicsOfInterest = [];
-  var homeScreenVideos = [];
-  bool isLoading = false;
-
-  var myidentityLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(liberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityNeutralDoc = FirebaseFirestore.instance
-      .collectionGroup(neutral)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(veryLiberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(conservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(veryConservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  final PageController _pageController = PageController(initialPage: 0);
-
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  CollectionReference videos = FirebaseFirestore.instance.collection('videos');
-
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-  Future<void> getVideos() async {
-    setState(() {
-      isLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryConservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(conservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(neutral)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(liberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryLiberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getVideos();
-  }
 
   @override
   void dispose() {
@@ -227,55 +41,64 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: isLoading
-          ? const Center(
-              child: CircularProgress(),
-            )
-          : PageView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: homeScreenVideos.length,
-              // controller: PreloadPageController(initialPage: 1),
-              // preloadPagesCount: 3,
-              itemBuilder: ((context, index) {
-                final item = homeScreenVideos[index];
-                return SizedBox(
-                  height: screenHeight(context) * 0.5,
-                  width: screenWidth(context),
-                  child: videosWidget(
-                    context,
-                    name: item['publisherName'],
-                    publishersID: item['publisherID'],
-                    description: item['videoDescription'],
-                    topic: item['videoTopic'],
-                    videoTag: item['videoTag'],
-                    videoLink: item['videoLink'],
-                    // profilePic: item['publisherProfilePic']
-                  ),
-                );
-              }),
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox(
+          height: screenHeight(context),
+          width: screenWidth(context),
+          child: Column(children: [
+            Container(
+              height: screenHeight(context) * 0.08,
+              color: const Color(0xFF080808),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                    ),
+                    SizedBox(
+                      width: screenWidth(context) * 0.7,
+                      child: AutoSizeText(
+                        'your Perspective on ${(widget.doc.data() as Map)['videoTitle']}',
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        maxFontSize: 14,
+                        minFontSize: 8,
+                        style: const TextStyle(
+                          fontFamily: 'OpenSans',
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: screenWidth(context) * 0.005,
+                    )
+                  ],
+                ),
+              ),
             ),
+            Expanded(child: videosWidget(context, widget.doc)),
+          ]),
+        ),
+      ),
     );
   }
 
-  SizedBox videosWidget(
-    BuildContext context, {
-    String? name,
-    String? publishersID,
-    String? profilePic,
-    String? description,
-    String? topic,
-    String? videoTag,
-    List<String>? hastags,
-    String? videoLink,
-  }) {
+  SizedBox videosWidget(BuildContext context, DocumentSnapshot doc) {
     return SizedBox(
       height: screenHeight(context),
       child: Stack(
         children: [
           Positioned.fill(
-              child: videoLink != null
-                  ? AspectRatioVideo(videoLink, _controller!)
+              child: (doc.data() as Map)['videoLink'] != null
+                  ? AspectRatioVideo(
+                      (doc.data() as Map)['videoLink'], _controller!)
                   : Image.asset(
                       'assets/images/placeholder.png',
                       fit: BoxFit.fitHeight,
@@ -298,44 +121,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
-          // InkWell(
-          //   onTap: () {
-          //     setState(() {
-          //       if (_controller!.value.isPlaying) {
-          //         _controller!.pause();
-          //         Timer(
-          //             const Duration(seconds: 2),
-          //             () => setState(() {
-          //                   _isPlaying = false;
-          //                 }));
-          //       } else {
-          //         _controller!.play();
-          //         setState(() {
-          //           _isPlaying = true;
-          //         });
-          //       }
-          //     });
-          //   },
-          //   child: Align(
-          //       alignment: Alignment.center,
-          //       child: _controller!.value.isPlaying
-          //           ? _isPlaying
-          //               ? const Icon(
-          //                   Icons.pause_circle,
-          //                   color: Color(
-          //                     blueColor,
-          //                   ),
-          //                   size: 80,
-          //                 )
-          //               : Container()
-          //           : const Icon(
-          //               Icons.play_circle_rounded,
-          //               color: Color(
-          //                 blueColor,
-          //               ),
-          //               size: 80,
-          //             )),
-          // ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Transform.rotate(
@@ -377,24 +162,14 @@ class _HomeScreenState extends State<HomeScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        isbrainOnFire = !isbrainOnFire;
-                                      });
-                                    },
-                                    child: isbrainOnFire
-                                        ? SvgPicture.asset(
-                                            'assets/svgs/brainOnFire.svg')
-                                        : SvgPicture.asset(
-                                            'assets/svgs/brain.svg')),
+                                SvgPicture.asset('assets/svgs/brainOnFire.svg'),
                                 txt(
-                                    txt: '26',
+                                    txt: (doc.data()
+                                            as Map)['brainOnFireReactions']
+                                        .toString(),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    fontColor: isbrainOnFire
-                                        ? const Color(blueColor)
-                                        : Colors.white)
+                                    fontColor: const Color(blueColor)),
                               ],
                             ),
                           ),
@@ -405,19 +180,15 @@ class _HomeScreenState extends State<HomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          navigator(
-                            function:
-                                OtherUserProfile(publishersID: publishersID!),
-                            child: const CircleAvatar(
-                                maxRadius: 40,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage:
-                                    // profilePic == null
-                                    //     ?
-                                    AssetImage('assets/images/girl.png')
-                                // : NetworkImage(profilePic) as ImageProvider,
-                                ),
-                          ),
+                          const CircleAvatar(
+                              maxRadius: 40,
+                              backgroundColor: Colors.transparent,
+                              backgroundImage:
+                                  // profilePic == null
+                                  //     ?
+                                  AssetImage('assets/images/girl.png')
+                              // : NetworkImage(profilePic) as ImageProvider,
+                              ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
                             child: Column(
@@ -425,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen>
                               children: [
                                 txt(
                                   maxLines: 1,
-                                  txt: '$name perspective on',
+                                  txt: '${widget.name} perspective on',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -442,22 +213,76 @@ class _HomeScreenState extends State<HomeScreen>
                                         child: AnimatedSize(
                                           duration:
                                               const Duration(milliseconds: 500),
-                                          child: AutoSizeText(
-                                            description!,
-                                            maxLines: seeMore ? 5 : 1,
-                                            maxFontSize: 10,
-                                            softWrap: true,
-                                            overflow: TextOverflow.ellipsis,
-                                            minFontSize: seeMore ? 5 : 8,
+                                          child:
+
+                                              // RichText(
+                                              //   text: TextSpan(children: [
+                                              //     TextSpan(
+                                              //       text: description!,
+                                              //       style: TextStyle(
+                                              //         fontSize: 8,
+                                              //         color: Colors.black,
+                                              //       ),
+                                              //     ),
+                                              //     TextSpan(
+                                              //         text: 'Login',
+                                              //         style: TextStyle(
+                                              //           fontSize: 8,
+                                              //           color: Colors.blue,
+                                              //         ),
+                                              //         recognizer:
+                                              //             TapGestureRecognizer()
+                                              //               ..onTap = () {
+                                              //                 print(
+                                              //                     'Login Text Clicked');
+                                              //               }),
+                                              //   ]),
+                                              // ),
+                                              AutoSizeText.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      '${(doc.data() as Map)['videoDescription']}',
+                                                ),
+                                                TextSpan(
+                                                  text: '#hello',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(blueColor)),
+                                                ),
+                                              ],
+                                            ),
                                             style: const TextStyle(
                                               fontFamily: 'OpenSans',
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400,
                                             ),
+                                            maxLines: seeMore ? 5 : 1,
+                                            maxFontSize: 10,
+                                            softWrap: true,
+                                            overflow: TextOverflow.ellipsis,
+                                            minFontSize: seeMore ? 5 : 8,
                                           ),
+                                          // AutoSizeText(
+                                          //   description!,
+                                          //   maxLines: seeMore ? 5 : 1,
+                                          //   maxFontSize: 10,
+                                          //   softWrap: true,
+                                          //   overflow: TextOverflow.ellipsis,
+                                          //   minFontSize: seeMore ? 5 : 8,
+                                          //   style: const TextStyle(
+                                          //     fontFamily: 'OpenSans',
+                                          //     color: Colors.black,
+                                          //     fontWeight: FontWeight.w400,
+                                          //   ),
+                                          // ),
                                         ),
                                       ),
-                                      description.length == 20
+                                      (doc.data() as Map)['videoDescription']
+                                                  .length >
+                                              20
                                           ? seeMore
                                               ? GestureDetector(
                                                   child: txt(
@@ -481,15 +306,88 @@ class _HomeScreenState extends State<HomeScreen>
                                     ],
                                   ),
                                 ),
+                                // SizedBox(
+                                //   width: screenWidth(context) * 0.7,
+                                //   height: seeMore
+                                //       ? description!.length > 20
+                                //           ? screenHeight(context) * 0.055
+                                //           : screenHeight(context) * 0.045
+                                //       : screenHeight(context) * 0.015,
+                                //   child: Row(
+                                //     crossAxisAlignment: seeMore
+                                //         ? CrossAxisAlignment.end
+                                //         : CrossAxisAlignment.center,
+                                //     children: [
+                                //       // Expanded(
+                                //       //   child: ExpandableText(
+                                //       //     "$description $hastags",
+                                //       //     expandText: 'show more',
+                                //       //     collapseText: 'show less',
+                                //       //     style: const TextStyle(
+                                //       //       fontFamily: 'OpenSans',
+                                //       //       color: Colors.black,
+                                //       //       fontSize: 10,
+                                //       //       fontWeight: FontWeight.w400,
+                                //       //     ),
+                                //       //     linkStyle: const TextStyle(
+                                //       //       fontFamily: 'OpenSans',
+                                //       //       fontSize: 10,
+                                //       //       fontWeight: FontWeight.w400,
+                                //       //     ),
+                                //       //     maxLines: 2,
+                                //       //     linkColor: const Color(blueColor),
+                                //       //   ),
+
+                                //       AutoSizeText(
+                                //         description!,
+                                //         maxLines: seeMore ? 5 : 1,
+                                //         maxFontSize: 10,
+                                //         softWrap: true,
+                                //         overflow: TextOverflow.ellipsis,
+                                //         minFontSize: seeMore ? 5 : 8,
+                                //         style: const TextStyle(
+                                //           fontFamily: 'OpenSans',
+                                //           color: Colors.black,
+                                //           fontWeight: FontWeight.w400,
+                                //         ),
+                                //       ),
+                                //       description.length > 20
+                                //           ? seeMore
+                                //               ? GestureDetector(
+                                //                   child: txt(
+                                //                     txt: 'see less',
+                                //                     fontSize: 10,
+                                //                     fontColor:
+                                //                         const Color(blueColor),
+                                //                   ),
+                                //                   onTap: () => setState(
+                                //                       () => seeMore = false))
+                                //               : GestureDetector(
+                                //                   child: txt(
+                                //                     txt: 'see more',
+                                //                     fontSize: 10,
+                                //                     fontColor:
+                                //                         const Color(blueColor),
+                                //                   ),
+                                //                   onTap: () => setState(
+                                //                       () => seeMore = true))
+                                //           : Container(),
+                                //     ],
+                                //   ),
+                                // ),
+                                // for (var document in hastags!) Text(document),
+
                                 txt(
                                     maxLines: 1,
-                                    txt: '#$topic',
+                                    txt:
+                                        '#${(doc.data() as Map)['videoTopic']}',
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor)),
                                 txt(
                                     maxLines: 1,
-                                    txt: '#Being $videoTag',
+                                    txt:
+                                        '#Being ${(doc.data() as Map)['videoTag']}',
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor))
@@ -601,23 +499,6 @@ class _HomeScreenState extends State<HomeScreen>
                 SizedBox(
                   width: screenWidth(context) * 0.03,
                 ),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      isFavourite = !isFavourite;
-                    });
-                  },
-                  child: SizedBox(
-                    height: screenHeight(context) * 0.04,
-                    child: isFavourite
-                        ? const Icon(
-                            Icons.favorite,
-                            color: Color(redColor),
-                            size: 30,
-                          )
-                        : SvgPicture.asset('assets/svgs/heart.svg'),
-                  ),
-                )
               ]),
             ),
           ),

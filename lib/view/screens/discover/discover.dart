@@ -1,7 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:slant/res.dart';
+import 'package:slant/view/screens/discover/videosList.dart';
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);
@@ -11,7 +13,31 @@ class Discover extends StatefulWidget {
 }
 
 class _DiscoverState extends State<Discover> {
+  final TextEditingController _searchController = TextEditingController();
+
   bool isSearching = false;
+  List<DocumentSnapshot> list = [];
+
+  getSearchedList(String? value) async {
+    List<DocumentSnapshot> documentList = (await FirebaseFirestore.instance
+            .collection("titles")
+            .where("setSearchTitlesParams", arrayContains: value)
+            .get())
+        .docs;
+    // List<DocumentSnapshot> documentList = (await FirebaseFirestore.instance
+    //         .collection("hashtags")
+    //         .doc('moneyTopicCheck')
+    //         // .collection(conservative)
+    //         .where("setSearchTitlesParams", arrayContains: value)
+    //         .get())
+    //     .docs;
+    print('documentList: $documentList');
+    setState(() {
+      list = documentList;
+    });
+    return documentList;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,6 +63,23 @@ class _DiscoverState extends State<Discover> {
                         width: screenWidth(context) * 0.785,
                         padding: const EdgeInsets.fromLTRB(10, 15, 0, 7),
                         child: TextField(
+                          controller: _searchController,
+                          onChanged: (String value) {
+                            getSearchedList(value);
+                          },
+
+                          //   FirebaseFirestore.instance
+                          //       .collection('titles')
+                          //       .where(FirebaseFirestore.instance.namedQueryGet(name),
+                          //           isEqualTo: 'check')
+                          //       .get()
+                          //       .then((value) {
+                          //     print("value.docs");
+                          //     print("value.docs");
+                          //     print("value.docs");
+                          //     print(value.docs);
+                          //   });
+                          // },
                           autocorrect: true,
                           style: const TextStyle(
                             fontFamily: 'Open Sans',
@@ -104,34 +147,85 @@ class _DiscoverState extends State<Discover> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: isSearching
-                ? ListView(
-                    children: [
-                      txt(txt: 'Recent Searches', fontSize: 18),
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                      searchitems(item: 'ukarain'),
-                      searchitems(item: 'ukarain'),
-                      searchitems(item: 'ukarain'),
-                      searchitems(item: 'ukarain'),
-                    ],
-                  )
+                ? _searchController.text.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: list.length,
+                        itemBuilder: ((context, index) {
+                          return txt(txt: list[index]['videoTitle'] ?? '');
+                        }))
+                    : ListView(
+                        children: [
+                          txt(txt: 'Recent Searches', fontSize: 18),
+                          SizedBox(
+                            height: screenHeight(context) * 0.02,
+                          ),
+                          searchitems(item: 'ukarain'),
+                          searchitems(item: 'ukarain'),
+                          searchitems(item: 'ukarain'),
+                          searchitems(item: 'ukarain'),
+                        ],
+                      )
                 : GridView.count(
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     crossAxisCount: 2,
                     children: [
-                        buildTopics(topic: whatsHappeningInMyCountry),
-                        buildTopics(topic: whatsHappeningAroundTheWorld),
-                        buildTopics(
-                            topic: mySenseOfBelongingAndItsRepresentation),
-                        buildTopics(topic: howSocietyAroundMeFunctions),
-                        buildTopics(topic: myLifestyle),
-                        buildTopics(topic: myReligion),
-                        buildTopics(topic: whatISeeOnMyTV),
-                        buildTopics(topic: myIdentity),
-                        buildTopics(topic: moneyAndFinances),
-                      ]),
+                      buildTopics(
+                        topic: whatsHappeningInMyCountry,
+                        route: const VideoList(
+                          topicName: whatsHappeningInMyCountry,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: whatsHappeningAroundTheWorld,
+                        route: const VideoList(
+                          topicName: whatsHappeningAroundTheWorld,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: mySenseOfBelongingAndItsRepresentation,
+                        route: const VideoList(
+                          topicName: mySenseOfBelongingAndItsRepresentation,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: howSocietyAroundMeFunctions,
+                        route: const VideoList(
+                          topicName: howSocietyAroundMeFunctions,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: myLifestyle,
+                        route: const VideoList(
+                          topicName: myLifestyle,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: myReligion,
+                        route: const VideoList(
+                          topicName: myReligion,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: whatISeeOnMyTV,
+                        route: const VideoList(
+                          topicName: whatISeeOnMyTV,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: myIdentity,
+                        route: const VideoList(
+                          topicName: myIdentity,
+                        ),
+                      ),
+                      buildTopics(
+                        topic: moneyAndFinances,
+                        route: const VideoList(
+                          topicName: moneyAndFinances,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         )
       ],
@@ -155,37 +249,45 @@ class _DiscoverState extends State<Discover> {
     );
   }
 
-  Container buildTopics({String? topic}) {
-    return Container(
-      // width: screenWidth(context)* 0.4,
-      // height: screenHeight(context) * 0.18,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        color: const Color(0xFF3B5998),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.16),
-            offset: const Offset(0, 3.0),
-            blurRadius: 6.0,
-          ),
-        ],
-      ),
-      child: Center(
-          child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: AutoSizeText(
-          topic!,
-          textAlign: TextAlign.center,
-          maxFontSize: 12,
-          minFontSize: 8,
-          maxLines: 2,
-          style: const TextStyle(
-            fontFamily: 'OpenSans',
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+  InkWell buildTopics({String? topic, Widget? route}) {
+    return InkWell(
+      onTap: () {
+        print('pressed topic');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => route!,
+            ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: const Color(0xFF3B5998),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.16),
+              offset: const Offset(0, 3.0),
+              blurRadius: 6.0,
+            ),
+          ],
         ),
-      )),
+        child: Center(
+            child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: AutoSizeText(
+            topic!,
+            textAlign: TextAlign.center,
+            maxFontSize: 12,
+            minFontSize: 8,
+            maxLines: 2,
+            style: const TextStyle(
+              fontFamily: 'OpenSans',
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        )),
+      ),
     );
   }
 

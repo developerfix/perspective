@@ -29,12 +29,13 @@ Widget txt(
     FontWeight? fontWeight,
     double? fontSize,
     Color? fontColor,
+    double? minFontSize,
     int? maxLines}) {
   return AutoSizeText(
     txt!,
     maxLines: maxLines ?? 2,
     maxFontSize: fontSize!,
-    minFontSize: fontSize - 5,
+    minFontSize: minFontSize ?? fontSize - 5,
     style: TextStyle(
       fontFamily: 'OpenSans',
       // fontSize: fontSize,
@@ -66,6 +67,7 @@ Widget textField(
     {TextEditingController? controller,
     BuildContext? context,
     bool? isobscuretext,
+    int? maxLength,
     Widget? prefixIcon,
     Widget? suffixIcon,
     Function(String)? onChanged,
@@ -85,6 +87,7 @@ Widget textField(
           border: Border.all(width: 1.0, color: const Color(0xffe1e1e5)),
         ),
         child: TextFormField(
+          maxLength: maxLength,
           controller: controller,
           obscureText: isobscuretext ?? false,
           onChanged: onChanged,

@@ -11,8 +11,7 @@ import 'package:slant/view/screens/profile/profile.dart';
 
 class BNB extends StatefulWidget {
   final bool? isProfile;
-  final XFile? file;
-  const BNB({Key? key, this.file, this.isProfile}) : super(key: key);
+  const BNB({Key? key, this.isProfile}) : super(key: key);
 
   @override
   State<BNB> createState() => _BNBState();
@@ -27,11 +26,7 @@ class _BNBState extends State<BNB> {
       _selectedIndex = index;
       switch (index) {
         case 0:
-          _scrn = widget.file != null
-              ? HomeScreen(
-                  file: widget.file,
-                )
-              : const HomeScreen();
+          _scrn = const HomeScreen();
           break;
         case 1:
           _scrn = const Discover();
@@ -60,13 +55,7 @@ class _BNBState extends State<BNB> {
   void initState() {
     super.initState();
 
-    widget.isProfile == true
-        ? _scrn = const Profile()
-        : _scrn = widget.file != null
-            ? HomeScreen(
-                file: widget.file,
-              )
-            : const HomeScreen();
+    widget.isProfile == true ? _scrn = const Profile() : const HomeScreen();
   }
 
   @override

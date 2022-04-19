@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.slant">
+    package="com.slant.app">
      <queries>
         <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />
     </queries>

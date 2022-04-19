@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "643585796669",
-    "project_id": "slant-ab0ff",
-    "storage_bucket": "slant-ab0ff.appspot.com"
+    "project_number": "129546012995",
+    "project_id": "slant-be0e4",
+    "storage_bucket": "slant-be0e4.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:643585796669:android:2807779bd0a29debd6d854",
+        "mobilesdk_app_id": "1:129546012995:android:fe001f5dc65103b8b2c7f6",
         "android_client_info": {
-          "package_name": "com.example.slant"
+          "package_name": "com.slant.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "643585796669-e1p040va2j9efujb88ir8mssjud8au5p.apps.googleusercontent.com",
+          "client_id": "129546012995-kihm048muibkhloe43dsb4ar9id4fsdu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBQ_8RryPYztbeznnmhxQtYrginzEQJIJY"
+          "current_key": "AIzaSyDEd5z2c_cef-bDx6NMa35ggXhECPmTZY4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "643585796669-e1p040va2j9efujb88ir8mssjud8au5p.apps.googleusercontent.com",
+              "client_id": "129546012995-kihm048muibkhloe43dsb4ar9id4fsdu.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -25,6 +25,9 @@ dependencies:
   # geocoding: ^2.0.4
   hashtagable: ^2.0.2+1
   better_player: ^0.0.81
+  firestore_search: ^0.1.9
+  video_thumbnail: ^0.5.0
+  delayed_display: ^2.0.0
 
   cached_network_image: ^3.2.0
   cloud_firestore: ^3.1.11
@@ -34,6 +37,9 @@ dependencies:
   preload_page_view: ^0.1.6
   get: ^4.6.1
   image_picker: ^0.8.4+11
+  expandable: ^5.0.1
+  expandable_text: ^2.3.0
+  expand_widget: ^2.1.0
   timeago: ^3.2.2
   # video_compress: ^3.1.0
   video_compress:

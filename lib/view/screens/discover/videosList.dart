@@ -4,28 +4,31 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expand_widget/expand_widget.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
 import "dart:math" show pi;
 
-import '../widgets/circularProgress.dart';
+import '../../widgets/circularProgress.dart';
 
-class HomeScreen extends StatefulWidget {
-  final XFile? file;
-
-  const HomeScreen({Key? key, this.file}) : super(key: key);
+class VideoList extends StatefulWidget {
+  final String? topicName;
+  const VideoList({
+    Key? key,
+    this.topicName,
+  }) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<VideoList> createState() => _VideoListState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin<HomeScreen> {
+class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   final VideoPlayerController? _controller =
       VideoPlayerController.asset('assets/images/placeholder.png');
   bool isFavourite = false;
@@ -33,58 +36,18 @@ class _HomeScreenState extends State<HomeScreen>
   bool seeMore = false;
   bool isbrainOnFire = false;
   List<dynamic> topicsOfInterest = [];
-  var homeScreenVideos = [];
-  bool isLoading = false;
+  var veryConservativeVideos = [];
+  var conservativeVideos = [];
+  var neutralVideos = [];
+  var liberalVideos = [];
+  var veryLiberalVideos = [];
+  List<dynamic>? hastagsList = [];
 
-  var myidentityLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(liberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityNeutralDoc = FirebaseFirestore.instance
-      .collectionGroup(neutral)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(veryLiberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(conservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(veryConservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
+  bool isVeryConservativeVideosLoading = false;
+  bool isConservativeVideosLoading = false;
+  bool isNeutralVideosLoading = false;
+  bool isLiberalVideosLoading = false;
+  bool isVeryLiberalVideosLoading = false;
 
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -93,9 +56,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  Future<void> getVideos() async {
+  Future<void> getVeryConservativeVideos() async {
     setState(() {
-      isLoading = true;
+      isVeryConservativeVideosLoading = true;
     });
     await FirebaseFirestore.instance
         .collectionGroup(veryConservative)
@@ -103,120 +66,164 @@ class _HomeScreenState extends State<HomeScreen>
         .startAt([
           FirebaseFirestore.instance
               .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
+              .doc(widget.topicName)
               .path
         ])
         .endAt([
           FirebaseFirestore.instance
                   .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
+                  .doc(widget.topicName)
                   .path +
               "\uf8ff"
         ])
         .get()
         .then((QuerySnapshot querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
+            veryConservativeVideos.add((doc.data()));
           }
         });
+
+    setState(() {
+      isVeryConservativeVideosLoading = false;
+    });
+  }
+
+  Future<void> getConservativeVideos() async {
+    setState(() {
+      isConservativeVideosLoading = true;
+    });
     await FirebaseFirestore.instance
         .collectionGroup(conservative)
         .orderBy(FieldPath.documentId)
         .startAt([
           FirebaseFirestore.instance
               .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
+              .doc(widget.topicName)
               .path
         ])
         .endAt([
           FirebaseFirestore.instance
                   .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
+                  .doc(widget.topicName)
                   .path +
               "\uf8ff"
         ])
         .get()
         .then((QuerySnapshot querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
+            conservativeVideos.add((doc.data()));
           }
         });
+
+    setState(() {
+      isConservativeVideosLoading = false;
+    });
+  }
+
+  Future<void> getNeutralVideos() async {
+    setState(() {
+      isNeutralVideosLoading = true;
+    });
     await FirebaseFirestore.instance
         .collectionGroup(neutral)
         .orderBy(FieldPath.documentId)
         .startAt([
           FirebaseFirestore.instance
               .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
+              .doc(widget.topicName)
               .path
         ])
         .endAt([
           FirebaseFirestore.instance
                   .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
+                  .doc(widget.topicName)
                   .path +
               "\uf8ff"
         ])
         .get()
         .then((QuerySnapshot querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
+            neutralVideos.add((doc.data()));
           }
         });
+
+    setState(() {
+      isNeutralVideosLoading = false;
+    });
+  }
+
+  Future<void> getLiberalVideos() async {
+    setState(() {
+      isLiberalVideosLoading = true;
+    });
     await FirebaseFirestore.instance
         .collectionGroup(liberal)
         .orderBy(FieldPath.documentId)
         .startAt([
           FirebaseFirestore.instance
               .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
+              .doc(widget.topicName)
               .path
         ])
         .endAt([
           FirebaseFirestore.instance
                   .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
+                  .doc(widget.topicName)
                   .path +
               "\uf8ff"
         ])
         .get()
         .then((QuerySnapshot querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
+            liberalVideos.add((doc.data()));
           }
         });
+
+    setState(() {
+      isLiberalVideosLoading = false;
+    });
+  }
+
+  Future<void> getVeryLiberalVideos() async {
+    setState(() {
+      isVeryLiberalVideosLoading = true;
+    });
     await FirebaseFirestore.instance
         .collectionGroup(veryLiberal)
         .orderBy(FieldPath.documentId)
         .startAt([
           FirebaseFirestore.instance
               .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
+              .doc(widget.topicName)
               .path
         ])
         .endAt([
           FirebaseFirestore.instance
                   .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
+                  .doc(widget.topicName)
                   .path +
               "\uf8ff"
         ])
         .get()
         .then((QuerySnapshot querySnapshot) {
           for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
+            veryLiberalVideos.add((doc.data()));
           }
         });
 
     setState(() {
-      isLoading = false;
+      isVeryLiberalVideosLoading = false;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getVideos();
+    getVeryConservativeVideos();
+    getConservativeVideos();
+    getNeutralVideos();
+    getLiberalVideos();
+    getVeryLiberalVideos();
   }
 
   @override
@@ -227,46 +234,129 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: isLoading
-          ? const Center(
-              child: CircularProgress(),
-            )
-          : PageView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: homeScreenVideos.length,
-              // controller: PreloadPageController(initialPage: 1),
-              // preloadPagesCount: 3,
-              itemBuilder: ((context, index) {
-                final item = homeScreenVideos[index];
-                return SizedBox(
-                  height: screenHeight(context) * 0.5,
-                  width: screenWidth(context),
-                  child: videosWidget(
-                    context,
-                    name: item['publisherName'],
-                    publishersID: item['publisherID'],
-                    description: item['videoDescription'],
-                    topic: item['videoTopic'],
-                    videoTag: item['videoTag'],
-                    videoLink: item['videoLink'],
-                    // profilePic: item['publisherProfilePic']
+    return SafeArea(
+      child: DefaultTabController(
+        length: 5,
+        child: Scaffold(
+          body: SizedBox(
+            height: screenHeight(context),
+            width: screenWidth(context),
+            child: Column(children: [
+              Container(
+                height: screenHeight(context) * 0.08,
+                color: const Color(0xFF080808),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child:
+                            const Icon(Icons.arrow_back, color: Colors.white),
+                      ),
+                      SizedBox(
+                        width: screenWidth(context) * 0.7,
+                        child: AutoSizeText(
+                          'Perspectives on ${widget.topicName}',
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          maxFontSize: 14,
+                          minFontSize: 8,
+                          style: const TextStyle(
+                            fontFamily: 'OpenSans',
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: screenWidth(context) * 0.005,
+                      )
+                    ],
                   ),
-                );
-              }),
-            ),
+                ),
+              ),
+              TabBar(
+                isScrollable: true,
+                indicatorColor: const Color(blueColor).withOpacity(0.5),
+                tabs: [
+                  Tab(icon: txt(txt: veryConservative, fontSize: 14)),
+                  Tab(icon: txt(txt: conservative, fontSize: 14)),
+                  Tab(icon: txt(txt: neutral, fontSize: 14)),
+                  Tab(icon: txt(txt: liberal, fontSize: 14)),
+                  Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(children: [
+                  listOfVideos(
+                      list: veryConservativeVideos,
+                      videoLoader: isVeryConservativeVideosLoading),
+                  listOfVideos(
+                      list: conservativeVideos,
+                      videoLoader: isConservativeVideosLoading),
+                  listOfVideos(
+                      list: neutralVideos, videoLoader: isNeutralVideosLoading),
+                  listOfVideos(
+                      list: liberalVideos, videoLoader: isLiberalVideosLoading),
+                  listOfVideos(
+                      list: veryLiberalVideos,
+                      videoLoader: isVeryLiberalVideosLoading),
+                ]),
+              )
+            ]),
+          ),
+        ),
+      ),
     );
+  }
+
+  Widget listOfVideos({List? list, String? docPath, bool? videoLoader}) {
+    return videoLoader!
+        ? const Center(
+            child: CircularProgress(),
+          )
+        : PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: list!.length,
+            // controller: PreloadPageController(initialPage: 1),
+            // preloadPagesCount: 3,
+            itemBuilder: ((context, index) {
+              final item = list[index];
+
+              // List<dynamic> checkerList = [];
+              // for (var i in (item['videoHashtags'])) {
+              //   checkerList.add(i);
+              // }
+              return SizedBox(
+                height: screenHeight(context) * 0.5,
+                width: screenWidth(context),
+                child: videosWidget(
+                  context,
+                  name: item['publisherName'] ?? '',
+                  description: item['videoDescription'] ?? '',
+                  topic: item['videoTopic'] ?? '',
+                  videoTag: item['videoTag'] ?? '',
+                  videoLink: item['videoLink'] ?? '',
+                  // hastags: hastagsList!.isEmpty ? [] : hastagsList
+                  // profilePic: item['publisherProfilePic']
+                ),
+              );
+            }),
+          );
   }
 
   SizedBox videosWidget(
     BuildContext context, {
     String? name,
-    String? publishersID,
     String? profilePic,
     String? description,
     String? topic,
     String? videoTag,
-    List<String>? hastags,
+    List<dynamic>? hastags,
     String? videoLink,
   }) {
     return SizedBox(
@@ -298,44 +388,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
-          // InkWell(
-          //   onTap: () {
-          //     setState(() {
-          //       if (_controller!.value.isPlaying) {
-          //         _controller!.pause();
-          //         Timer(
-          //             const Duration(seconds: 2),
-          //             () => setState(() {
-          //                   _isPlaying = false;
-          //                 }));
-          //       } else {
-          //         _controller!.play();
-          //         setState(() {
-          //           _isPlaying = true;
-          //         });
-          //       }
-          //     });
-          //   },
-          //   child: Align(
-          //       alignment: Alignment.center,
-          //       child: _controller!.value.isPlaying
-          //           ? _isPlaying
-          //               ? const Icon(
-          //                   Icons.pause_circle,
-          //                   color: Color(
-          //                     blueColor,
-          //                   ),
-          //                   size: 80,
-          //                 )
-          //               : Container()
-          //           : const Icon(
-          //               Icons.play_circle_rounded,
-          //               color: Color(
-          //                 blueColor,
-          //               ),
-          //               size: 80,
-          //             )),
-          // ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Transform.rotate(
@@ -405,19 +457,15 @@ class _HomeScreenState extends State<HomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          navigator(
-                            function:
-                                OtherUserProfile(publishersID: publishersID!),
-                            child: const CircleAvatar(
-                                maxRadius: 40,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage:
-                                    // profilePic == null
-                                    //     ?
-                                    AssetImage('assets/images/girl.png')
-                                // : NetworkImage(profilePic) as ImageProvider,
-                                ),
-                          ),
+                          const CircleAvatar(
+                              maxRadius: 40,
+                              backgroundColor: Colors.transparent,
+                              backgroundImage:
+                                  // profilePic == null
+                                  //     ?
+                                  AssetImage('assets/images/girl.png')
+                              // : NetworkImage(profilePic) as ImageProvider,
+                              ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
                             child: Column(
@@ -442,22 +490,73 @@ class _HomeScreenState extends State<HomeScreen>
                                         child: AnimatedSize(
                                           duration:
                                               const Duration(milliseconds: 500),
-                                          child: AutoSizeText(
-                                            description!,
-                                            maxLines: seeMore ? 5 : 1,
-                                            maxFontSize: 10,
-                                            softWrap: true,
-                                            overflow: TextOverflow.ellipsis,
-                                            minFontSize: seeMore ? 5 : 8,
+                                          child:
+
+                                              // RichText(
+                                              //   text: TextSpan(children: [
+                                              //     TextSpan(
+                                              //       text: description!,
+                                              //       style: TextStyle(
+                                              //         fontSize: 8,
+                                              //         color: Colors.black,
+                                              //       ),
+                                              //     ),
+                                              //     TextSpan(
+                                              //         text: 'Login',
+                                              //         style: TextStyle(
+                                              //           fontSize: 8,
+                                              //           color: Colors.blue,
+                                              //         ),
+                                              //         recognizer:
+                                              //             TapGestureRecognizer()
+                                              //               ..onTap = () {
+                                              //                 print(
+                                              //                     'Login Text Clicked');
+                                              //               }),
+                                              //   ]),
+                                              // ),
+                                              AutoSizeText.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: description!,
+                                                ),
+                                                TextSpan(
+                                                  text: '#hello',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(blueColor)),
+                                                ),
+                                              ],
+                                            ),
                                             style: const TextStyle(
                                               fontFamily: 'OpenSans',
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400,
                                             ),
+                                            maxLines: seeMore ? 5 : 1,
+                                            maxFontSize: 10,
+                                            softWrap: true,
+                                            overflow: TextOverflow.ellipsis,
+                                            minFontSize: seeMore ? 5 : 8,
                                           ),
+                                          // AutoSizeText(
+                                          //   description!,
+                                          //   maxLines: seeMore ? 5 : 1,
+                                          //   maxFontSize: 10,
+                                          //   softWrap: true,
+                                          //   overflow: TextOverflow.ellipsis,
+                                          //   minFontSize: seeMore ? 5 : 8,
+                                          //   style: const TextStyle(
+                                          //     fontFamily: 'OpenSans',
+                                          //     color: Colors.black,
+                                          //     fontWeight: FontWeight.w400,
+                                          //   ),
+                                          // ),
                                         ),
                                       ),
-                                      description.length == 20
+                                      description.length > 20
                                           ? seeMore
                                               ? GestureDetector(
                                                   child: txt(
@@ -481,6 +580,77 @@ class _HomeScreenState extends State<HomeScreen>
                                     ],
                                   ),
                                 ),
+                                // SizedBox(
+                                //   width: screenWidth(context) * 0.7,
+                                //   height: seeMore
+                                //       ? description!.length > 20
+                                //           ? screenHeight(context) * 0.055
+                                //           : screenHeight(context) * 0.045
+                                //       : screenHeight(context) * 0.015,
+                                //   child: Row(
+                                //     crossAxisAlignment: seeMore
+                                //         ? CrossAxisAlignment.end
+                                //         : CrossAxisAlignment.center,
+                                //     children: [
+                                //       // Expanded(
+                                //       //   child: ExpandableText(
+                                //       //     "$description $hastags",
+                                //       //     expandText: 'show more',
+                                //       //     collapseText: 'show less',
+                                //       //     style: const TextStyle(
+                                //       //       fontFamily: 'OpenSans',
+                                //       //       color: Colors.black,
+                                //       //       fontSize: 10,
+                                //       //       fontWeight: FontWeight.w400,
+                                //       //     ),
+                                //       //     linkStyle: const TextStyle(
+                                //       //       fontFamily: 'OpenSans',
+                                //       //       fontSize: 10,
+                                //       //       fontWeight: FontWeight.w400,
+                                //       //     ),
+                                //       //     maxLines: 2,
+                                //       //     linkColor: const Color(blueColor),
+                                //       //   ),
+
+                                //       AutoSizeText(
+                                //         description!,
+                                //         maxLines: seeMore ? 5 : 1,
+                                //         maxFontSize: 10,
+                                //         softWrap: true,
+                                //         overflow: TextOverflow.ellipsis,
+                                //         minFontSize: seeMore ? 5 : 8,
+                                //         style: const TextStyle(
+                                //           fontFamily: 'OpenSans',
+                                //           color: Colors.black,
+                                //           fontWeight: FontWeight.w400,
+                                //         ),
+                                //       ),
+                                //       description.length > 20
+                                //           ? seeMore
+                                //               ? GestureDetector(
+                                //                   child: txt(
+                                //                     txt: 'see less',
+                                //                     fontSize: 10,
+                                //                     fontColor:
+                                //                         const Color(blueColor),
+                                //                   ),
+                                //                   onTap: () => setState(
+                                //                       () => seeMore = false))
+                                //               : GestureDetector(
+                                //                   child: txt(
+                                //                     txt: 'see more',
+                                //                     fontSize: 10,
+                                //                     fontColor:
+                                //                         const Color(blueColor),
+                                //                   ),
+                                //                   onTap: () => setState(
+                                //                       () => seeMore = true))
+                                //           : Container(),
+                                //     ],
+                                //   ),
+                                // ),
+                                // for (var document in hastags!) Text(document),
+
                                 txt(
                                     maxLines: 1,
                                     txt: '#$topic',

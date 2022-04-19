@@ -114,6 +114,7 @@ class _Question4And5State extends State<Question4And5> {
             .add(
           {
             'publisherName': publishersName,
+            'publisherID': userId,
             'publisherProfilePic': publisherProfilePic,
             'videoTitle': videoTitle,
             'videoTopic': videoTopic,
@@ -129,6 +130,16 @@ class _Question4And5State extends State<Question4And5> {
             'videoLink': downloadURL,
           },
         ).then((value) {
+          setSearchHastagParams(String hastag) {
+            List<String> caseSearchList = [];
+            String temp = "";
+            for (int i = 0; i < hastag.length; i++) {
+              temp = temp + hastag[i];
+              caseSearchList.add(temp);
+            }
+            return caseSearchList;
+          }
+
           for (var i in videoHastags) {
             firebaseFirestore
                 .collection('hashtags')
@@ -138,6 +149,8 @@ class _Question4And5State extends State<Question4And5> {
               {
                 'publisherProfilePic': publisherProfilePic,
                 'publisherName': publishersName,
+                'publisherID': userId,
+                'searchHashtagParams': setSearchHastagParams(i!),
                 'videoTitle': videoTitle,
                 'videoTopic': videoTopic,
                 'videoHastags': videoHastags,
@@ -154,6 +167,16 @@ class _Question4And5State extends State<Question4And5> {
             );
           }
         }).then((value) {
+          setSearchTitlesParams(String hastag) {
+            List<String> caseSearchList = [];
+            String temp = "";
+            for (int i = 0; i < hastag.length; i++) {
+              temp = temp + hastag[i];
+              caseSearchList.add(temp);
+            }
+            return caseSearchList;
+          }
+
           firebaseFirestore
               .collection('titles')
               .doc(videoTitle)
@@ -162,6 +185,8 @@ class _Question4And5State extends State<Question4And5> {
             {
               'publisherProfilePic': publisherProfilePic,
               'publisherName': publishersName,
+              'publisherID': userId,
+              'setSearchTitlesParams': setSearchTitlesParams(videoTitle!),
               'videoTitle': videoTitle,
               'videoTopic': videoTopic,
               'videoHastags': videoHastags,
@@ -184,6 +209,7 @@ class _Question4And5State extends State<Question4And5> {
               .add({
             'publisherProfilePic': publisherProfilePic,
             'publisherName': publishersName,
+            'publisherID': userId,
             'videoTitle': videoTitle,
             'videoTopic': videoTopic,
             'videoHastags': videoHastags,
@@ -326,12 +352,13 @@ class _Question4And5State extends State<Question4And5> {
                         SizedBox(
                           height: screenHeight(context) * 0.05,
                         ),
-                        txt(txt: 'Add Description', fontSize: 14),
+                        txt(txt: 'Add Short Description', fontSize: 14),
                         SizedBox(
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
-                            maxlines: 8,
+                            maxLength: 100,
+                            maxlines: 5,
                             hinttext: '...',
                             controller: _descriptionController,
                             context: context),
