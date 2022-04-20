@@ -9,6 +9,7 @@ import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import 'dart:io';
 import 'package:hashtagable/hashtagable.dart';
+import 'package:video_compress/video_compress.dart';
 
 import 'package:slant/bnb.dart';
 import 'package:slant/view/screens/makeVideo/q2_3.dart';
@@ -83,6 +84,13 @@ class _Question4And5State extends State<Question4And5> {
     getUserName();
   }
 
+  _compressVideo() async {
+    final compressedVideo = await VideoCompress.compressVideo(_video!.path,
+        quality: VideoQuality.MediumQuality);
+
+    return compressedVideo!.file;
+  }
+
   // uploading the data to firebase cloudstore
   Future uploadContent({
     String? publishersName,
@@ -103,7 +111,7 @@ class _Question4And5State extends State<Question4And5> {
         .child('$userId/videos')
         .child("post_$vidId");
     if (_video != null) {
-      await reference.putFile(_video!);
+      await reference.putFile(_compressVideo());
       downloadURL = await reference.getDownloadURL();
 
       if (downloadURL != null) {
