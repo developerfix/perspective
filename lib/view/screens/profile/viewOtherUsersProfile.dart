@@ -13,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
+import 'package:slant/view/screens/profile/followers.dart';
 import 'package:slant/view/screens/profile/viewVideo.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -34,6 +35,92 @@ class OtherUserProfile extends StatefulWidget {
 
 class _OtherUserProfileState extends State<OtherUserProfile> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+  int noOfVids = 0;
+  int noOfFollowers = 0;
+  int noOfFollowing = 0;
+
+  bool isFollowed = false;
+
+  checkIfFollowedOrNot() async {
+    await users
+        .doc(userId)
+        .collection('following')
+        .doc(widget.publishersID)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        setState(() {
+          isFollowed = true;
+        });
+      } else {
+        setState(() {
+          isFollowed = false;
+        });
+      }
+    });
+  }
+
+  followUser() async {
+    await users
+        .doc(widget.publishersID)
+        .collection(followers)
+        .doc(userId)
+        .set({}).then((value) {
+      users.doc(userId).collection(following).doc(widget.publishersID).set({});
+    }).then((value) {
+      setState(() {
+        isFollowed = true;
+      });
+    });
+  }
+
+  unFollowUser() async {
+    await users
+        .doc(widget.publishersID)
+        .collection(followers)
+        .doc(userId)
+        .delete()
+        .then((value) {
+      users.doc(userId).collection(following).doc(widget.publishersID).delete();
+    }).then((value) {
+      setState(() {
+        isFollowed = false;
+      });
+    });
+  }
+
+  getUserInfo() async {
+    await users
+        .doc(widget.publishersID)
+        .collection('videos')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfVids = querySnapshot.size;
+    });
+    await users
+        .doc(widget.publishersID)
+        .collection(followers)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfFollowers = querySnapshot.size;
+    });
+    await users
+        .doc(widget.publishersID)
+        .collection(following)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfFollowing = querySnapshot.size;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+    checkIfFollowedOrNot();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,18 +204,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               txt: '${data['name']}',
                               fontSize: 18,
                               fontWeight: FontWeight.bold),
-                          // ignore: unnecessary_null_comparison
-                          // currentAddress.isNotEmpty
-                          //     ? txt(txt: currentAddress, fontSize: 12)
-                          //     :
-                          // InkWell(
-                          //   onTap: () {
-                          //     // getCurrentLocation();
-                          //   },
-                          //   child: txt(
-                          //       txt: 'Click here to add your location',
-                          //       fontSize: 12),
-                          // ),
                           SizedBox(
                             height: screenHeight(context) * 0.01,
                           ),
@@ -149,7 +224,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               Column(
                                 children: [
                                   txt(
-                                      txt: '${data['following']}',
+                                      txt: noOfFollowing.toString(),
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                   txt(txt: 'FOLLOWING', fontSize: 10),
@@ -169,14 +244,18 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                                 ],
                               ),
                               const Spacer(),
-                              Column(
-                                children: [
-                                  txt(
-                                      txt: '${data['followers']}',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                  txt(txt: 'FOLLOWERS', fontSize: 10),
-                                ],
+                              navigator(
+                                function:
+                                    Followers(userID: widget.publishersID),
+                                child: Column(
+                                  children: [
+                                    txt(
+                                        txt: noOfFollowers.toString(),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                    txt(txt: 'FOLLOWERS', fontSize: 10),
+                                  ],
+                                ),
                               ),
                               const Spacer(),
                               Column(
@@ -195,7 +274,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               Column(
                                 children: [
                                   txt(
-                                      txt: '${data['noOfVids']}',
+                                      txt: noOfVids.toString(),
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                   txt(txt: 'VIDS', fontSize: 10),
@@ -210,18 +289,23 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                           SizedBox(
                             height: screenHeight(context) * 0.015,
                           ),
-                          Container(
-                            width: screenWidth(context) * 0.5,
-                            height: screenHeight(context) * 0.055,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2.0),
-                              color: const Color(0xFF3B5998),
-                            ),
-                            child: Center(
-                              child: txt(
-                                  txt: 'Follow',
-                                  fontSize: 13,
-                                  fontColor: Colors.white),
+                          InkWell(
+                            onTap: () {
+                              isFollowed ? unFollowUser() : followUser();
+                            },
+                            child: Container(
+                              width: screenWidth(context) * 0.5,
+                              height: screenHeight(context) * 0.055,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(2.0),
+                                color: const Color(0xFF3B5998),
+                              ),
+                              child: Center(
+                                child: txt(
+                                    txt: isFollowed ? 'Unfollow' : 'Follow',
+                                    fontSize: 13,
+                                    fontColor: Colors.white),
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -241,29 +325,5 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
             }),
       ),
     );
-  }
-}
-
-class CircleRevealClipper extends CustomClipper<Rect> {
-  CircleRevealClipper();
-
-  @override
-  Rect getClip(Size size) {
-    final epicenter = new Offset(size.width, size.height);
-
-    // Calculate distance from epicenter to the top left corner to make sure clip the image into circle.
-
-    final distanceToCorner = epicenter.dy;
-
-    final radius = distanceToCorner;
-    final diameter = radius;
-
-    return new Rect.fromLTWH(
-        epicenter.dx - radius, epicenter.dy - radius, diameter, diameter);
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Rect> oldClipper) {
-    return true;
   }
 }

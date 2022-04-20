@@ -58,15 +58,12 @@ class _SignUpState extends State<SignUp> {
   Future<void> addUserInfo() {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
-    return users.doc('$userId').set({
+    return users.doc(userId).set({
       'email': _emailcontroller.text.trim(),
       'topicsOfInterest': [0],
       'name': _namecontroller.text,
-      'followers': 0,
-      'following': 0,
-      'noOfVids': 0,
       'profilePic': '',
-      'bio': 'your Bio here',
+      'bio': 'new account',
       'perspectiveRequests': 0
     }).catchError(
       (error) {

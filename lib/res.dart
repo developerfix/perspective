@@ -22,6 +22,8 @@ const String conservative = 'Conservative';
 const String neutral = 'Neutral';
 const String liberal = 'Liberal';
 const String veryLiberal = 'Very Liberal';
+const String followers = 'followers';
+const String following = 'following';
 
 //for all the text in the app
 Widget txt(

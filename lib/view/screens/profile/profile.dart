@@ -13,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
+import 'package:slant/view/screens/profile/followers.dart';
 import 'package:slant/view/screens/profile/viewVideo.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -31,6 +32,9 @@ class _ProfileState extends State<Profile> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
+  int noOfVids = 0;
+  int noOfFollowers = 0;
+  int noOfFollowing = 0;
   // final geolocator =
   //     Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
   // Position? _currentPosition;
@@ -66,9 +70,34 @@ class _ProfileState extends State<Profile> {
   //   }
   // }
 
+  getUserInfo() async {
+    await users
+        .doc(userId)
+        .collection('videos')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfVids = querySnapshot.size;
+    });
+    await users
+        .doc(userId)
+        .collection(followers)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfFollowers = querySnapshot.size;
+    });
+    await users
+        .doc(userId)
+        .collection(following)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      noOfFollowing = querySnapshot.size;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getUserInfo();
     // getCurrentLocation();
   }
 
@@ -160,7 +189,8 @@ class _ProfileState extends State<Profile> {
                           backgroundColor: Colors.transparent,
                           radius: 50,
                           child: CachedNetworkImage(
-                            imageUrl: '${data['profilePic']}',
+                            imageUrl:
+                                '${data['profilePic'] == null || data['profilePic'].toString().isEmpty ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png' : data['profilePic']}',
                             imageBuilder: (context, imageProvider) =>
                                 CircleAvatar(
                                     backgroundColor: Colors.transparent,
@@ -215,7 +245,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 txt(
-                                    txt: '${data['following']}',
+                                    txt: noOfFollowing.toString(),
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 txt(txt: 'FOLLOWING', fontSize: 10),
@@ -235,14 +265,17 @@ class _ProfileState extends State<Profile> {
                               ],
                             ),
                             const Spacer(),
-                            Column(
-                              children: [
-                                txt(
-                                    txt: '${data['followers']}',
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                                txt(txt: 'FOLLOWERS', fontSize: 10),
-                              ],
+                            navigator(
+                              function: Followers(userID: userId!),
+                              child: Column(
+                                children: [
+                                  txt(
+                                      txt: noOfFollowers.toString(),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                  txt(txt: 'FOLLOWERS', fontSize: 10),
+                                ],
+                              ),
                             ),
                             const Spacer(),
                             Column(
@@ -261,7 +294,7 @@ class _ProfileState extends State<Profile> {
                             Column(
                               children: [
                                 txt(
-                                    txt: '${data['noOfVids']}',
+                                    txt: noOfVids.toString(),
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 txt(txt: 'VIDS', fontSize: 10),

@@ -193,7 +193,9 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                             backgroundColor: Colors.transparent,
                             radius: 30,
                             child: CachedNetworkImage(
-                              imageUrl: widget.pictureUrl,
+                              imageUrl: widget.pictureUrl.isEmpty
+                                  ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
+                                  : widget.pictureUrl,
                               imageBuilder: (context, imageProvider) =>
                                   CircleAvatar(
                                       backgroundColor: Colors.transparent,

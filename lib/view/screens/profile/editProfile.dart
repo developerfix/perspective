@@ -247,7 +247,7 @@ class _EditProfileState extends State<EditProfile> {
                                                       radius: 100,
                                                       child: CachedNetworkImage(
                                                         imageUrl:
-                                                            '${data['profilePic']}',
+                                                            '${data['profilePic'] == null || data['profilePic'].toString().isEmpty ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png' : data['profilePic']}',
                                                         imageBuilder: (context,
                                                                 imageProvider) =>
                                                             CircleAvatar(
