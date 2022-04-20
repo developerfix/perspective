@@ -13,7 +13,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
-import 'package:slant/view/screens/profile/followers.dart';
+import 'package:slant/view/screens/profile/followersScreen.dart';
+import 'package:slant/view/screens/profile/followingScreen.dart';
 import 'package:slant/view/screens/profile/viewVideo.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -221,14 +222,18 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                                 width: screenWidth(context) * 0.2,
                               ),
                               const Spacer(),
-                              Column(
-                                children: [
-                                  txt(
-                                      txt: noOfFollowing.toString(),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                  txt(txt: 'FOLLOWING', fontSize: 10),
-                                ],
+                              navigator(
+                                function:
+                                    Following(userID: widget.publishersID),
+                                child: Column(
+                                  children: [
+                                    txt(
+                                        txt: noOfFollowing.toString(),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                    txt(txt: 'FOLLOWING', fontSize: 10),
+                                  ],
+                                ),
                               ),
                               const Spacer(
                                 flex: 3,
