@@ -336,7 +336,7 @@ class _Question1State extends State<Question1> {
         ),
         child: Center(
           child: txt(
-              txt: text,
+              txt: text!,
               fontSize: 11,
               fontColor:
                   topic == 0 ? Colors.black.withOpacity(0.5) : Colors.white),

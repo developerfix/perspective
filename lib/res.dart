@@ -25,16 +25,21 @@ const String veryLiberal = 'Very Liberal';
 const String followers = 'followers';
 const String following = 'following';
 
+showSnackBar({String? snackText, BuildContext? context}) {
+  final snackBar = SnackBar(content: Text(snackText!));
+  ScaffoldMessenger.of(context!).showSnackBar(snackBar);
+}
+
 //for all the text in the app
 Widget txt(
-    {String? txt,
+    {required String txt,
     FontWeight? fontWeight,
     double? fontSize,
     Color? fontColor,
     double? minFontSize,
     int? maxLines}) {
   return AutoSizeText(
-    txt!,
+    txt,
     maxLines: maxLines ?? 2,
     maxFontSize: fontSize!,
     minFontSize: minFontSize ?? fontSize - 5,

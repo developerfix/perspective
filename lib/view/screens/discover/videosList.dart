@@ -16,6 +16,7 @@ import 'package:slant/res.dart';
 import "dart:math" show pi;
 
 import '../../widgets/circularProgress.dart';
+import '../videoItem.dart';
 
 class VideoList extends StatefulWidget {
   final String? topicName;
@@ -800,7 +801,7 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
 Row popupmenuItem(String? itemText, String? itemPercentage) {
   return Row(
     children: [
-      txt(txt: itemText, fontSize: 12, fontColor: Colors.white),
+      txt(txt: itemText!, fontSize: 12, fontColor: Colors.white),
       const Spacer(),
       Container(
         width: 24.0,
@@ -811,7 +812,7 @@ Row popupmenuItem(String? itemText, String? itemPercentage) {
         ),
         child: Center(
           child: txt(
-              txt: itemPercentage,
+              txt: itemPercentage!,
               fontSize: 10,
               fontWeight: FontWeight.bold,
               fontColor: const Color(blueColor)),

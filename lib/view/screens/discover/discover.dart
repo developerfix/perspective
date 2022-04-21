@@ -238,7 +238,7 @@ class _DiscoverState extends State<Discover> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          txt(txt: item, fontSize: 14),
+          txt(txt: item!, fontSize: 14),
           const Icon(
             Icons.clear,
             size: 20,

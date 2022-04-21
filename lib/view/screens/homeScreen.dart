@@ -8,11 +8,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:preload_page_view/preload_page_view.dart';
+import 'package:get/get.dart' as getx;
 import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
+import 'package:slant/view/screens/videoItem.dart';
 import "dart:math" show pi;
 
 import '../widgets/circularProgress.dart';
@@ -30,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin<HomeScreen> {
   final VideoPlayerController? _controller =
       VideoPlayerController.asset('assets/images/placeholder.png');
+
+  final VideoController videoController = getx.Get.put(VideoController());
   bool isFavourite = false;
   bool _isPlaying = false;
   bool seeMore = false;
@@ -38,56 +41,6 @@ class _HomeScreenState extends State<HomeScreen>
   var homeScreenVideos = [];
   bool isLoading = false;
 
-  var myidentityLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(liberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityNeutralDoc = FirebaseFirestore.instance
-      .collectionGroup(neutral)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryLiberalDoc = FirebaseFirestore.instance
-      .collectionGroup(veryLiberal)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(conservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
-  var myidentityVeryConservativeDoc = FirebaseFirestore.instance
-      .collectionGroup(veryConservative)
-      .orderBy(FieldPath.documentId)
-      .startAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path
-  ]).endAt([
-    FirebaseFirestore.instance.collection("videos").doc(myIdentity).path +
-        "\uf8ff"
-  ]);
-
   final PageController _pageController = PageController(initialPage: 0);
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -95,130 +48,130 @@ class _HomeScreenState extends State<HomeScreen>
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  Future<void> getVideos() async {
-    setState(() {
-      isLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryConservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(conservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(neutral)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(liberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryLiberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(howSocietyAroundMeFunctions)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(whatsHappeningAroundTheWorld)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            homeScreenVideos.add((doc));
-          }
-        });
+  // Future<void> getVideos() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //   await FirebaseFirestore.instance
+  //       .collectionGroup(veryConservative)
+  //       .orderBy(FieldPath.documentId)
+  //       .startAt([
+  //         FirebaseFirestore.instance
+  //             .collection("videos")
+  //             .doc(howSocietyAroundMeFunctions)
+  //             .path
+  //       ])
+  //       .endAt([
+  //         FirebaseFirestore.instance
+  //                 .collection("videos")
+  //                 .doc(whatsHappeningAroundTheWorld)
+  //                 .path +
+  //             "\uf8ff"
+  //       ])
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //         for (var doc in querySnapshot.docs) {
+  //           homeScreenVideos.add((doc));
+  //         }
+  //       });
+  //   await FirebaseFirestore.instance
+  //       .collectionGroup(conservative)
+  //       .orderBy(FieldPath.documentId)
+  //       .startAt([
+  //         FirebaseFirestore.instance
+  //             .collection("videos")
+  //             .doc(howSocietyAroundMeFunctions)
+  //             .path
+  //       ])
+  //       .endAt([
+  //         FirebaseFirestore.instance
+  //                 .collection("videos")
+  //                 .doc(whatsHappeningAroundTheWorld)
+  //                 .path +
+  //             "\uf8ff"
+  //       ])
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //         for (var doc in querySnapshot.docs) {
+  //           homeScreenVideos.add((doc));
+  //         }
+  //       });
+  //   await FirebaseFirestore.instance
+  //       .collectionGroup(neutral)
+  //       .orderBy(FieldPath.documentId)
+  //       .startAt([
+  //         FirebaseFirestore.instance
+  //             .collection("videos")
+  //             .doc(howSocietyAroundMeFunctions)
+  //             .path
+  //       ])
+  //       .endAt([
+  //         FirebaseFirestore.instance
+  //                 .collection("videos")
+  //                 .doc(whatsHappeningAroundTheWorld)
+  //                 .path +
+  //             "\uf8ff"
+  //       ])
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //         for (var doc in querySnapshot.docs) {
+  //           homeScreenVideos.add((doc));
+  //         }
+  //       });
+  //   await FirebaseFirestore.instance
+  //       .collectionGroup(liberal)
+  //       .orderBy(FieldPath.documentId)
+  //       .startAt([
+  //         FirebaseFirestore.instance
+  //             .collection("videos")
+  //             .doc(howSocietyAroundMeFunctions)
+  //             .path
+  //       ])
+  //       .endAt([
+  //         FirebaseFirestore.instance
+  //                 .collection("videos")
+  //                 .doc(whatsHappeningAroundTheWorld)
+  //                 .path +
+  //             "\uf8ff"
+  //       ])
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //         for (var doc in querySnapshot.docs) {
+  //           homeScreenVideos.add((doc));
+  //         }
+  //       });
+  //   await FirebaseFirestore.instance
+  //       .collectionGroup(veryLiberal)
+  //       .orderBy(FieldPath.documentId)
+  //       .startAt([
+  //         FirebaseFirestore.instance
+  //             .collection("videos")
+  //             .doc(howSocietyAroundMeFunctions)
+  //             .path
+  //       ])
+  //       .endAt([
+  //         FirebaseFirestore.instance
+  //                 .collection("videos")
+  //                 .doc(whatsHappeningAroundTheWorld)
+  //                 .path +
+  //             "\uf8ff"
+  //       ])
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //         for (var doc in querySnapshot.docs) {
+  //           homeScreenVideos.add((doc));
+  //         }
+  //       });
 
-    setState(() {
-      isLoading = false;
-    });
-  }
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+  // }
 
   @override
   void initState() {
     super.initState();
-    getVideos();
+    // getVideos();
   }
 
   @override
@@ -230,40 +183,43 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? const Center(
-              child: CircularProgress(),
-            )
-          : PageView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: homeScreenVideos.length,
-              // controller: PreloadPageController(initialPage: 1),
-              // preloadPagesCount: 3,
-              itemBuilder: ((context, index) {
-                final item = homeScreenVideos[index];
-                return SizedBox(
-                  height: screenHeight(context) * 0.5,
-                  width: screenWidth(context),
-                  child: videosWidget(context,
-                      name: item['publisherName'],
-                      publishersID: item['publisherID'],
-                      description: item['videoDescription'],
-                      topic: item['videoTopic'],
-                      videoTag: item['videoTag'],
-                      videoLink: item['videoLink'],
-                      profilePic: item['publisherProfilePic'] ?? "",
-                      brainOnFireReactions: item['brainOnFireReactions']),
+        body: isLoading
+            ? const Center(
+                child: CircularProgress(),
+              )
+            : getx.Obx(() {
+                return PageView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: videoController.videoList.length,
+                  controller:
+                      PageController(initialPage: 0, viewportFraction: 1),
+                  // controller: PreloadPageController(initialPage: 1),
+                  // preloadPagesCount: 3,
+                  itemBuilder: ((context, index) {
+                    final data = videoController.videoList[index];
+                    return SizedBox(
+                      height: screenHeight(context) * 0.5,
+                      width: screenWidth(context),
+                      child: videosWidget(context,
+                          name: data.publisherName,
+                          publishersID: data.publisherID,
+                          description: data.videoDescription,
+                          topic: data.videoTopic,
+                          videoTag: data.videoTag,
+                          videoLink: data.videoLink,
+                          profilePic: data.publisherProfilePic,
+                          brainOnFireReactions: data.brainOnFireReactions),
+                    );
+                  }),
                 );
-              }),
-            ),
-    );
+              }));
   }
 
   SizedBox videosWidget(
     BuildContext context, {
     String? name,
     String? publishersID,
-    int? brainOnFireReactions,
+    List? brainOnFireReactions,
     String? profilePic,
     String? description,
     String? topic,
@@ -276,12 +232,9 @@ class _HomeScreenState extends State<HomeScreen>
       child: Stack(
         children: [
           Positioned.fill(
-              child: videoLink != null
-                  ? AspectRatioVideo(videoLink, _controller!)
-                  : Image.asset(
-                      'assets/images/placeholder.png',
-                      fit: BoxFit.fitHeight,
-                    )),
+              child: VideoPlayerItem(
+            videoUrl: videoLink!,
+          )),
           Transform.rotate(
             angle: 180.0 * pi / 180,
             child: Container(
@@ -300,44 +253,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
-          // InkWell(
-          //   onTap: () {
-          //     setState(() {
-          //       if (_controller!.value.isPlaying) {
-          //         _controller!.pause();
-          //         Timer(
-          //             const Duration(seconds: 2),
-          //             () => setState(() {
-          //                   _isPlaying = false;
-          //                 }));
-          //       } else {
-          //         _controller!.play();
-          //         setState(() {
-          //           _isPlaying = true;
-          //         });
-          //       }
-          //     });
-          //   },
-          //   child: Align(
-          //       alignment: Alignment.center,
-          //       child: _controller!.value.isPlaying
-          //           ? _isPlaying
-          //               ? const Icon(
-          //                   Icons.pause_circle,
-          //                   color: Color(
-          //                     blueColor,
-          //                   ),
-          //                   size: 80,
-          //                 )
-          //               : Container()
-          //           : const Icon(
-          //               Icons.play_circle_rounded,
-          //               color: Color(
-          //                 blueColor,
-          //               ),
-          //               size: 80,
-          //             )),
-          // ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Transform.rotate(
@@ -391,7 +306,8 @@ class _HomeScreenState extends State<HomeScreen>
                                         : SvgPicture.asset(
                                             'assets/svgs/brain.svg')),
                                 txt(
-                                    txt: brainOnFireReactions.toString(),
+                                    txt:
+                                        brainOnFireReactions!.length.toString(),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: isbrainOnFire
@@ -655,7 +571,7 @@ class _HomeScreenState extends State<HomeScreen>
 Row popupmenuItem(String? itemText, String? itemPercentage) {
   return Row(
     children: [
-      txt(txt: itemText, fontSize: 12, fontColor: Colors.white),
+      txt(txt: itemText!, fontSize: 12, fontColor: Colors.white),
       const Spacer(),
       Container(
         width: 24.0,
@@ -666,7 +582,7 @@ Row popupmenuItem(String? itemText, String? itemPercentage) {
         ),
         child: Center(
           child: txt(
-              txt: itemPercentage,
+              txt: itemPercentage!,
               fontSize: 10,
               fontWeight: FontWeight.bold,
               fontColor: const Color(blueColor)),

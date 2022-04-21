@@ -1,76 +1,155 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:get/get.dart';
-// import 'package:tiktok_tutorial/constants.dart';
-// import 'package:tiktok_tutorial/models/video.dart';
-// import 'package:video_compress/video_compress.dart';
+import 'dart:io';
 
-// class UploadVideoController extends GetxController {
-//   _compressVideo(String videoPath) async {
-//     final compressedVideo = await VideoCompress.compressVideo(
-//       videoPath,
-//       quality: VideoQuality.MediumQuality,
-//     );
-//     return compressedVideo!.file;
-//   }
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:video_compress/video_compress.dart';
 
-//   Future<String> _uploadVideoToStorage(String id, String videoPath) async {
-//     Reference ref = firebaseStorage.ref().child('videos').child(id);
+import '../bnb.dart';
+import '../models/video.dart';
+import '../res.dart';
 
-//     UploadTask uploadTask = ref.putFile(await _compressVideo(videoPath));
-//     TaskSnapshot snap = await uploadTask;
-//     String downloadUrl = await snap.ref.getDownloadURL();
-//     return downloadUrl;
-//   }
+class UploadVideoController extends GetxController {
+  _compressVideo(String videoPath) async {
+    final compressedVideo = await VideoCompress.compressVideo(
+      videoPath,
+      quality: VideoQuality.MediumQuality,
+    );
+    return compressedVideo!.file;
+  }
 
-//   _getThumbnail(String videoPath) async {
-//     final thumbnail = await VideoCompress.getFileThumbnail(videoPath);
-//     return thumbnail;
-//   }
+  _getThumbnail(String videoPath) async {
+    final thumbnail = await VideoCompress.getFileThumbnail(videoPath);
+    return thumbnail;
+  }
 
-//   Future<String> _uploadImageToStorage(String id, String videoPath) async {
-//     Reference ref = firebaseStorage.ref().child('thumbnails').child(id);
-//     UploadTask uploadTask = ref.putFile(await _getThumbnail(videoPath));
-//     TaskSnapshot snap = await uploadTask;
-//     String downloadUrl = await snap.ref.getDownloadURL();
-//     return downloadUrl;
-//   }
+  Future<String> _uploadImageToStorage(String id, String videoPath) async {
+    Reference ref =
+        FirebaseStorage.instance.ref().child('thumbnails').child(id);
+    UploadTask uploadTask = ref.putFile(await _getThumbnail(videoPath));
+    TaskSnapshot snap = await uploadTask;
+    String downloadUrl = await snap.ref.getDownloadURL();
+    return downloadUrl;
+  }
 
-//   // upload video
-//   uploadVideo(String songName, String caption, String videoPath) async {
-//     try {
-//       String uid = firebaseAuth.currentUser!.uid;
-//       DocumentSnapshot userDoc =
-//           await firestore.collection('users').doc(uid).get();
-//       // get id
-//       var allDocs = await firestore.collection('videos').get();
-//       int len = allDocs.docs.length;
-//       String videoUrl = await _uploadVideoToStorage("Video $len", videoPath);
-//       String thumbnail = await _uploadImageToStorage("Video $len", videoPath);
+  // uploading the data to firebase cloudstore
+  Future uploadContent({
+    BuildContext? context,
+    String? publishersName,
+    File? video,
+    String? publisherProfilePic,
+    String? videoTopic,
+    String? videoTitle,
+    String? videoDescription,
+    String? videoTag,
+    required List<String?> videoHastags,
+  }) async {
+    var videosCollection = FirebaseFirestore.instance.collection('videos');
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
+    var allDocs = await videosCollection.get();
+    int len = allDocs.docs.length;
+    String? downloadURL;
 
-//       Video video = Video(
-//         username: (userDoc.data()! as Map<String, dynamic>)['name'],
-//         uid: uid,
-//         id: "Video $len",
-//         likes: [],
-//         commentCount: 0,
-//         shareCount: 0,
-//         songName: songName,
-//         caption: caption,
-//         videoUrl: videoUrl,
-//         profilePhoto: (userDoc.data()! as Map<String, dynamic>)['profilePhoto'],
-//         thumbnail: thumbnail,
-//       );
+    final vidId = DateTime.now().millisecondsSinceEpoch.toString();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
-//       await firestore.collection('videos').doc('Video $len').set(
-//             video.toJson(),
-//           );
-//       Get.back();
-//     } catch (e) {
-//       Get.snackbar(
-//         'Error Uploading Video',
-//         e.toString(),
-//       );
-//     }
-//   }
-// }
+    String thumbnail = await _uploadImageToStorage("Video $len", video!.path);
+
+    Reference reference = FirebaseStorage.instance
+        .ref()
+        .child('$userId/videos')
+        .child("post_$vidId");
+
+    UploadTask uploadTask = reference.putFile(await _compressVideo(video.path));
+    TaskSnapshot snap = await uploadTask;
+    downloadURL = await snap.ref.getDownloadURL();
+
+    Video videoo = Video(
+      brainOnFireReactions: [],
+      conservative: 0,
+      liberal: 0,
+      neutral: 0,
+      publisherID: userId!,
+      publisherName: publishersName!,
+      publisherProfilePic: publisherProfilePic!,
+      veryConservative: 0,
+      veryLiberal: 0,
+      videoDescription: videoDescription!,
+      videoHastags: videoHastags,
+      videoLink: downloadURL,
+      videoTag: videoTag!,
+      videoTopic: videoTitle!,
+      thumbnail: thumbnail,
+    );
+
+    await videosCollection
+        .doc(videoTopic)
+        .collection(videoTag)
+        .add(
+          videoo.toJson(),
+        )
+        .then((value) {
+      // setSearchHastagParams(String hastag) {
+      //   List<String> caseSearchList = [];
+      //   String temp = "";
+      //   for (int i = 0; i < hastag.length; i++) {
+      //     temp = temp + hastag[i];
+      //     caseSearchList.add(temp);
+      //   }
+      //   return caseSearchList;
+      // }
+
+      for (var i in videoHastags) {
+        firebaseFirestore
+            .collection('hashtags')
+            .doc(i)
+            .collection(videoTag)
+            .add(
+              videoo.toJson(),
+            );
+      }
+    }).then((value) {
+      // setSearchTitlesParams(String hastag) {
+      //   List<String> caseSearchList = [];
+      //   String temp = "";
+      //   for (int i = 0; i < hastag.length; i++) {
+      //     temp = temp + hastag[i];
+      //     caseSearchList.add(temp);
+      //   }
+      //   return caseSearchList;
+      // }
+
+      firebaseFirestore
+          .collection('titles')
+          .doc(videoTitle)
+          .collection(videoTag)
+          .add(
+            videoo.toJson(),
+          );
+    }).then((value) {
+      firebaseFirestore
+          .collection("users")
+          .doc(userId)
+          .collection('videos')
+          .add(videoo.toJson())
+          .then((value) {
+        Navigator.pushAndRemoveUntil(
+            Get.context!,
+            MaterialPageRoute(
+              builder: (ctx) => const BNB(),
+            ),
+            (Route<dynamic> route) => false);
+
+        showSnackBar(
+            context: context, snackText: 'Video published successfully');
+      }).onError((error, stackTrace) {
+        showSnackBar(
+          context: context,
+          snackText: 'Something went wrong, please try again',
+        );
+      });
+    });
+  }
+}

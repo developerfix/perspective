@@ -353,14 +353,18 @@ class _ProfileState extends State<Profile> {
 
                                             return favouriteItem(context,
                                                 doc: doc,
-                                                name: data['name'],
-                                                profileUrl: data['profilePic'],
+                                                name: data['name'] ?? ' ',
+                                                profileUrl:
+                                                    data['profilePic'] ?? ' ',
                                                 title: (doc.data()
-                                                    as Map)['videoTitle'],
+                                                        as Map)['videoTitle'] ??
+                                                    ' ',
                                                 videoLink: (doc.data()
-                                                    as Map)['videoLink'],
+                                                        as Map)['videoLink'] ??
+                                                    ' ',
                                                 topic: (doc.data()
-                                                    as Map)['videoTopic']);
+                                                        as Map)['videoTopic'] ??
+                                                    ' ');
                                           });
                                     } else {
                                       return const Center(
@@ -668,7 +672,7 @@ class _ProfileState extends State<Profile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   txt(
-                      txt: title,
+                      txt: title!,
                       fontColor: const Color(blueColor),
                       fontSize: 14,
                       fontWeight: FontWeight.bold),

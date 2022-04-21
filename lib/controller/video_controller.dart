@@ -1,98 +1,96 @@
-import 'dart:async';
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:slant/models/video.dart';
+import 'package:slant/view/screens/discover/videosList.dart';
 
-import 'package:cached_video_player/cached_video_player.dart';
-import 'package:flutter/material.dart';
-import 'package:slant/bnb.dart';
-import 'package:slant/res.dart';
-import 'package:slant/view/screens/homeScreen.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
-import 'package:image_picker/image_picker.dart';
+import '../res.dart';
 
-class AspectRatioVideo extends StatefulWidget {
-  final String? videoUrl;
-  VideoPlayerController controller;
+class VideoController extends GetxController {
+  final Rx<List<Video>> _videoList1 = Rx<List<Video>>([]);
+  // final Rx<List<Video>> _videoList2 = Rx<List<Video>>([]);
+  // final Rx<List<Video>> finalVideoList = Rx<List<Video>>([]);
 
-  AspectRatioVideo(this.videoUrl, this.controller, {Key? key})
-      : super(key: key);
+  List<Video> get videoList => _videoList1.value;
+  // var homeScreenVideos = [];
 
-  @override
-  AspectRatioVideoState createState() => AspectRatioVideoState();
-}
+  Future<void> getVideos() async {
+    try {
+      _videoList1.bindStream(FirebaseFirestore.instance
+          .collectionGroup(neutral)
+          .orderBy(FieldPath.documentId)
+          .startAt([
+            FirebaseFirestore.instance
+                .collection("videos")
+                .doc(myLifestyle)
+                .path
+          ])
+          .endAt([
+            FirebaseFirestore.instance
+                    .collection("videos")
+                    .doc(myLifestyle)
+                    .path +
+                "\uf8ff"
+          ])
+          .snapshots()
+          .map((QuerySnapshot query) {
+            List<Video> retVal = [];
+            for (var element in query.docs) {
+              retVal.add(
+                Video.fromSnap(element),
+              );
+            }
+            return retVal;
+          }));
 
-class AspectRatioVideoState extends State<AspectRatioVideo> {
-  bool _isPlaying = false;
+      // _videoList2.bindStream(FirebaseFirestore.instance
+      //     .collectionGroup(neutral)
+      //     .orderBy(FieldPath.documentId)
+      //     .startAt([
+      //       FirebaseFirestore.instance
+      //           .collection("videos")
+      //           .doc(howSocietyAroundMeFunctions)
+      //           .path
+      //     ])
+      //     .endAt([
+      //       FirebaseFirestore.instance
+      //               .collection("videos")
+      //               .doc(whatsHappeningAroundTheWorld)
+      //               .path +
+      //           "\uf8ff"
+      //     ])
+      //     .snapshots()
+      //     .map((QuerySnapshot query) {
+      //   List<Video> retVal = [];
+      //   for (var element in query.docs) {
+      //     retVal.add(
+      //       Video.fromSnap(element),
+      //     );
+      //   }
+      //   return retVal;
+      // }));
 
-  @override
-  void initState() {
-    super.initState();
-    widget.controller = VideoPlayerController.network(widget.videoUrl!)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {});
-        }
-      })
-      ..setLooping(false)
-      ..initialize().then((value) =>
-          widget.controller.play().then((value) => _isPlaying = true));
+    } catch (e) {
+      print('Error loading videos: $e');
+    }
   }
 
   @override
-  void dispose() {
-    widget.controller.dispose();
-    super.dispose();
+  void onInit() {
+    super.onInit();
+    getVideos();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return widget.controller.value.isInitialized
-        ?
-        // Stack(
-        //     children: [
-        AspectRatio(
-            aspectRatio: widget.controller.value.aspectRatio,
-            child: VideoPlayer(widget.controller))
-        //   Align(
-        //     alignment: Alignment.center,
-        //     child: GestureDetector(
-        //         onTap: () {
-        //           if (widget.controller.value.isPlaying) {
-        //             widget.controller.pause();
-        //             // Timer(
-        //             //     const Duration(seconds: 2),
-        //             //     () => setState(() {
-        //             //           _isPlaying = false;
-        //             //         }));
-        //           } else {
-        //             widget.controller.play();
-        //             _isPlaying = true;
-        //             // setState(() {
-
-        //             // });
-        //           }
-        //         },
-        //         child: widget.controller.value.isPlaying
-        //             ? _isPlaying
-        //                 ? const Icon(
-        //                     Icons.pause_circle,
-        //                     color: Color(
-        //                       blueColor,
-        //                     ),
-        //                     size: 80,
-        //                   )
-        //                 : Container()
-        //             : const Icon(
-        //                 Icons.play_circle_rounded,
-        //                 color: Color(
-        //                   blueColor,
-        //                 ),
-        //                 size: 80,
-        //               )),
-        //   )
-        // ],
-        // )
-        : const Center(
-            child: CircularProgress(),
-          );
-  }
+  // likeVideo(String id) async {
+  //   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('videos').doc(id).get();
+  //   var uid = authController.user.uid;
+  //   if ((doc.data()! as dynamic)['likes'].contains(uid)) {
+  //     await firestore.collection('videos').doc(id).update({
+  //       'likes': FieldValue.arrayRemove([uid]),
+  //     });
+  //   } else {
+  //     await firestore.collection('videos').doc(id).update({
+  //       'likes': FieldValue.arrayUnion([uid]),
+  //     });
+  //   }
+  // }
 }

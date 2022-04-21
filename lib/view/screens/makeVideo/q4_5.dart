@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:slant/controller/video_controller.dart';
@@ -16,6 +17,8 @@ import 'package:slant/view/screens/makeVideo/q2_3.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 import 'dart:math';
 import 'package:image_picker/image_picker.dart';
+
+import '../../../controller/upload_video_controller.dart';
 
 class Question4And5 extends StatefulWidget {
   final String? selectedTopic;
@@ -32,6 +35,8 @@ class Question4And5 extends StatefulWidget {
 class _Question4And5State extends State<Question4And5> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _hashtagController = TextEditingController();
+  UploadVideoController uploadVideoController =
+      Get.put(UploadVideoController());
 
   bool? p1 = false;
   bool? p2 = false;
@@ -84,173 +89,173 @@ class _Question4And5State extends State<Question4And5> {
     getUserName();
   }
 
-  _compressVideo() async {
-    final compressedVideo = await VideoCompress.compressVideo(_video!.path,
-        quality: VideoQuality.MediumQuality);
+  // _compressVideo() async {
+  //   final compressedVideo = await VideoCompress.compressVideo(_video!.path,
+  //       quality: VideoQuality.MediumQuality);
 
-    return compressedVideo!.file;
-  }
+  //   return compressedVideo!.file;
+  // }
 
-  // uploading the data to firebase cloudstore
-  Future uploadContent({
-    String? publishersName,
-    String? publisherProfilePic,
-    String? videoTopic,
-    String? videoTitle,
-    String? videoDescription,
-    String? videoTag,
-    required List<String?> videoHastags,
-  }) async {
-    setState(() {
-      loading = true;
-    });
-    final vidId = DateTime.now().millisecondsSinceEpoch.toString();
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    Reference reference = FirebaseStorage.instance
-        .ref()
-        .child('$userId/videos')
-        .child("post_$vidId");
-    if (_video != null) {
-      await reference.putFile(_compressVideo());
-      downloadURL = await reference.getDownloadURL();
+  // // uploading the data to firebase cloudstore
+  // Future uploadContent({
+  //   String? publishersName,
+  //   String? publisherProfilePic,
+  //   String? videoTopic,
+  //   String? videoTitle,
+  //   String? videoDescription,
+  //   String? videoTag,
+  //   required List<String?> videoHastags,
+  // }) async {
+  //   setState(() {
+  //     loading = true;
+  //   });
+  //   final vidId = DateTime.now().millisecondsSinceEpoch.toString();
+  //   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  //   Reference reference = FirebaseStorage.instance
+  //       .ref()
+  //       .child('$userId/videos')
+  //       .child("post_$vidId");
+  //   if (_video != null) {
+  //     await reference.putFile(_compressVideo());
+  //     downloadURL = await reference.getDownloadURL();
 
-      if (downloadURL != null) {
-        firebaseFirestore
-            .collection('videos')
-            .doc(videoTopic)
-            .collection(videoTag!)
-            .add(
-          {
-            'publisherName': publishersName,
-            'publisherID': userId,
-            'publisherProfilePic': publisherProfilePic,
-            'videoTitle': videoTitle,
-            'videoTopic': videoTopic,
-            'videoHastags': videoHastags,
-            'videoTag': videoTag,
-            'videoDescription': videoDescription,
-            'brainOnFireReactions': 0,
-            'veryConservative': 0,
-            'Conservative': 0,
-            'Neutral': 0,
-            'Liberal': 0,
-            'veryLiberal': 0,
-            'videoLink': downloadURL,
-          },
-        ).then((value) {
-          setSearchHastagParams(String hastag) {
-            List<String> caseSearchList = [];
-            String temp = "";
-            for (int i = 0; i < hastag.length; i++) {
-              temp = temp + hastag[i];
-              caseSearchList.add(temp);
-            }
-            return caseSearchList;
-          }
+  //     if (downloadURL != null) {
+  //       firebaseFirestore
+  //           .collection('videos')
+  //           .doc(videoTopic)
+  //           .collection(videoTag!)
+  //           .add(
+  //         {
+  //           'publisherName': publishersName,
+  //           'publisherID': userId,
+  //           'publisherProfilePic': publisherProfilePic,
+  //           'videoTitle': videoTitle,
+  //           'videoTopic': videoTopic,
+  //           'videoHastags': videoHastags,
+  //           'videoTag': videoTag,
+  //           'videoDescription': videoDescription,
+  //           'brainOnFireReactions': 0,
+  //           'veryConservative': 0,
+  //           'Conservative': 0,
+  //           'Neutral': 0,
+  //           'Liberal': 0,
+  //           'veryLiberal': 0,
+  //           'videoLink': downloadURL,
+  //         },
+  //       ).then((value) {
+  //         setSearchHastagParams(String hastag) {
+  //           List<String> caseSearchList = [];
+  //           String temp = "";
+  //           for (int i = 0; i < hastag.length; i++) {
+  //             temp = temp + hastag[i];
+  //             caseSearchList.add(temp);
+  //           }
+  //           return caseSearchList;
+  //         }
 
-          for (var i in videoHastags) {
-            firebaseFirestore
-                .collection('hashtags')
-                .doc(i)
-                .collection(videoTag)
-                .add(
-              {
-                'publisherProfilePic': publisherProfilePic,
-                'publisherName': publishersName,
-                'publisherID': userId,
-                'searchHashtagParams': setSearchHastagParams(i!),
-                'videoTitle': videoTitle,
-                'videoTopic': videoTopic,
-                'videoHastags': videoHastags,
-                'videoTag': videoTag,
-                'videoDescription': videoDescription,
-                'brainOnFireReactions': 0,
-                'veryConservative': 0,
-                'Conservative': 0,
-                'Neutral': 0,
-                'Liberal': 0,
-                'veryLiberal': 0,
-                'videoLink': downloadURL,
-              },
-            );
-          }
-        }).then((value) {
-          setSearchTitlesParams(String hastag) {
-            List<String> caseSearchList = [];
-            String temp = "";
-            for (int i = 0; i < hastag.length; i++) {
-              temp = temp + hastag[i];
-              caseSearchList.add(temp);
-            }
-            return caseSearchList;
-          }
+  //         for (var i in videoHastags) {
+  //           firebaseFirestore
+  //               .collection('hashtags')
+  //               .doc(i)
+  //               .collection(videoTag)
+  //               .add(
+  //             {
+  //               'publisherProfilePic': publisherProfilePic,
+  //               'publisherName': publishersName,
+  //               'publisherID': userId,
+  //               'searchHashtagParams': setSearchHastagParams(i!),
+  //               'videoTitle': videoTitle,
+  //               'videoTopic': videoTopic,
+  //               'videoHastags': videoHastags,
+  //               'videoTag': videoTag,
+  //               'videoDescription': videoDescription,
+  //               'brainOnFireReactions': 0,
+  //               'veryConservative': 0,
+  //               'Conservative': 0,
+  //               'Neutral': 0,
+  //               'Liberal': 0,
+  //               'veryLiberal': 0,
+  //               'videoLink': downloadURL,
+  //             },
+  //           );
+  //         }
+  //       }).then((value) {
+  //         setSearchTitlesParams(String hastag) {
+  //           List<String> caseSearchList = [];
+  //           String temp = "";
+  //           for (int i = 0; i < hastag.length; i++) {
+  //             temp = temp + hastag[i];
+  //             caseSearchList.add(temp);
+  //           }
+  //           return caseSearchList;
+  //         }
 
-          firebaseFirestore
-              .collection('titles')
-              .doc(videoTitle)
-              .collection(videoTag)
-              .add(
-            {
-              'publisherProfilePic': publisherProfilePic,
-              'publisherName': publishersName,
-              'publisherID': userId,
-              'setSearchTitlesParams': setSearchTitlesParams(videoTitle!),
-              'videoTitle': videoTitle,
-              'videoTopic': videoTopic,
-              'videoHastags': videoHastags,
-              'videoTag': videoTag,
-              'videoDescription': videoDescription,
-              'brainOnFireReactions': 0,
-              'veryConservative': 0,
-              'Conservative': 0,
-              'Neutral': 0,
-              'Liberal': 0,
-              'veryLiberal': 0,
-              'videoLink': downloadURL,
-            },
-          );
-        }).then((value) {
-          firebaseFirestore
-              .collection("users")
-              .doc(userId)
-              .collection('videos')
-              .add({
-            'publisherProfilePic': publisherProfilePic,
-            'publisherName': publishersName,
-            'publisherID': userId,
-            'videoTitle': videoTitle,
-            'videoTopic': videoTopic,
-            'videoHastags': videoHastags,
-            'videoTag': videoTag,
-            'videoDescription': videoDescription,
-            'brainOnFireReactions': 0,
-            'veryConservative': 0,
-            'Conservative': 0,
-            'Neutral': 0,
-            'Liberal': 0,
-            'veryLiberal': 0,
-            'videoLink': downloadURL,
-          }).then((value) {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (ctx) => const BNB(),
-                ),
-                (Route<dynamic> route) => false);
+  //         firebaseFirestore
+  //             .collection('titles')
+  //             .doc(videoTitle)
+  //             .collection(videoTag)
+  //             .add(
+  //           {
+  //             'publisherProfilePic': publisherProfilePic,
+  //             'publisherName': publishersName,
+  //             'publisherID': userId,
+  //             'setSearchTitlesParams': setSearchTitlesParams(videoTitle!),
+  //             'videoTitle': videoTitle,
+  //             'videoTopic': videoTopic,
+  //             'videoHastags': videoHastags,
+  //             'videoTag': videoTag,
+  //             'videoDescription': videoDescription,
+  //             'brainOnFireReactions': 0,
+  //             'veryConservative': 0,
+  //             'Conservative': 0,
+  //             'Neutral': 0,
+  //             'Liberal': 0,
+  //             'veryLiberal': 0,
+  //             'videoLink': downloadURL,
+  //           },
+  //         );
+  //       }).then((value) {
+  //         firebaseFirestore
+  //             .collection("users")
+  //             .doc(userId)
+  //             .collection('videos')
+  //             .add({
+  //           'publisherProfilePic': publisherProfilePic,
+  //           'publisherName': publishersName,
+  //           'publisherID': userId,
+  //           'videoTitle': videoTitle,
+  //           'videoTopic': videoTopic,
+  //           'videoHastags': videoHastags,
+  //           'videoTag': videoTag,
+  //           'videoDescription': videoDescription,
+  //           'brainOnFireReactions': 0,
+  //           'veryConservative': 0,
+  //           'Conservative': 0,
+  //           'Neutral': 0,
+  //           'Liberal': 0,
+  //           'veryLiberal': 0,
+  //           'videoLink': downloadURL,
+  //         }).then((value) {
+  //           Navigator.pushAndRemoveUntil(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (ctx) => const BNB(),
+  //               ),
+  //               (Route<dynamic> route) => false);
 
-            showSnackBar('Video published successfully');
-          }).onError((error, stackTrace) =>
-                  showSnackBar('Something went wrong, please try again'));
-        });
-      }
-    } else {
-      showSnackBar('Video not selected');
-    }
+  //           showSnackBar('Video published successfully');
+  //         }).onError((error, stackTrace) =>
+  //                 showSnackBar('Something went wrong, please try again'));
+  //       });
+  //     }
+  //   } else {
+  //     showSnackBar('Video not selected');
+  //   }
 
-    setState(() {
-      loading = false;
-    });
-  }
+  //   setState(() {
+  //     loading = false;
+  //   });
+  // }
 
   showSnackBar(String snackText) {
     final snackBar = SnackBar(content: Text(snackText));
@@ -423,14 +428,18 @@ class _Question4And5State extends State<Question4And5> {
                                       'Please fill out the video details first')));
                         } else {
                           final XFile? file = await _picker.pickVideo(
-                              source: ImageSource.camera,
-                              maxDuration: const Duration(minutes: 2));
+                            source: ImageSource.gallery,
+                            // maxDuration: const Duration(minutes: 2)
+                          );
 
                           if (file != null) {
                             setState(() {
                               _video = File(file.path);
+                              loading = true;
                             });
-                            await uploadContent(
+                            await uploadVideoController.uploadContent(
+                                context: context,
+                                video: _video,
                                 videoDescription: _descriptionController.text,
                                 videoHastags: hashTags,
                                 videoTag: widget.perspectiveTag!,
@@ -439,6 +448,9 @@ class _Question4And5State extends State<Question4And5> {
                                 publisherProfilePic: userProfilePic,
                                 publishersName: userName);
                           }
+                          setState(() {
+                            loading = false;
+                          });
                         }
                       },
                       child: Container(
@@ -498,7 +510,7 @@ class _Question4And5State extends State<Question4And5> {
         ),
         child: Center(
           child: txt(
-              txt: text,
+              txt: text!,
               fontSize: 11,
               fontColor:
                   topic == 0 ? Colors.black.withOpacity(0.5) : Colors.white),

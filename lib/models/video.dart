@@ -1,43 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Video {
-  String username;
-  String uid;
-  String id;
-  List likes;
-  int commentCount;
-  int shareCount;
-  String songName;
-  String caption;
-  String videoUrl;
+  String publisherName;
+  String publisherID;
+  int veryConservative;
+  int conservative;
+  int neutral;
+  int liberal;
+  int veryLiberal;
+  List brainOnFireReactions;
+  String videoLink;
+  String videoTag;
+  List videoHastags;
+  String videoDescription;
+  String videoTopic;
   String thumbnail;
-  String profilePhoto;
+  String publisherProfilePic;
 
   Video({
-    required this.username,
-    required this.uid,
-    required this.id,
-    required this.likes,
-    required this.commentCount,
-    required this.shareCount,
-    required this.songName,
-    required this.caption,
-    required this.videoUrl,
-    required this.profilePhoto,
+    required this.publisherName,
+    required this.publisherID,
+    required this.brainOnFireReactions,
+    required this.videoLink,
+    required this.publisherProfilePic,
     required this.thumbnail,
+    required this.conservative,
+    required this.liberal,
+    required this.neutral,
+    required this.veryConservative,
+    required this.veryLiberal,
+    required this.videoDescription,
+    required this.videoHastags,
+    required this.videoTag,
+    required this.videoTopic,
   });
 
   Map<String, dynamic> toJson() => {
-        "username": username,
-        "uid": uid,
-        "profilePhoto": profilePhoto,
-        "id": id,
-        "likes": likes,
-        "commentCount": commentCount,
-        "shareCount": shareCount,
-        "songName": songName,
-        "caption": caption,
-        "videoUrl": videoUrl,
+        "publisherName": publisherName,
+        "publisherProfilePic": publisherProfilePic,
+        "publisherID": publisherID,
+        "videoDescription": videoDescription,
+        "videoHastags": videoHastags,
+        "videoLink": videoLink,
+        "videoTag": videoTag,
+        "videoTopic": videoTopic,
+        "veryConservative": veryConservative,
+        "conservative": conservative,
+        "neutral": neutral,
+        "liberal": liberal,
+        "veryLiberal": veryLiberal,
+        "brainOnFireReactions": brainOnFireReactions,
         "thumbnail": thumbnail,
       };
 
@@ -45,17 +57,21 @@ class Video {
     var snapshot = snap.data() as Map<String, dynamic>;
 
     return Video(
-      username: snapshot['username'],
-      uid: snapshot['uid'],
-      id: snapshot['id'],
-      likes: snapshot['likes'],
-      commentCount: snapshot['commentCount'],
-      shareCount: snapshot['shareCount'],
-      songName: snapshot['songName'],
-      caption: snapshot['caption'],
-      videoUrl: snapshot['videoUrl'],
-      profilePhoto: snapshot['profilePhoto'],
+      publisherName: snapshot['publisherName'],
+      publisherProfilePic: snapshot['publisherProfilePic'],
+      publisherID: snapshot['publisherID'],
+      videoDescription: snapshot['videoDescription'],
+      videoHastags: snapshot['videoHastags'],
+      videoLink: snapshot['videoLink'],
+      videoTag: snapshot['videoTag'],
+      videoTopic: snapshot['videoTopic'],
+      veryConservative: snapshot['veryConservative'],
+      conservative: snapshot['conservative'],
+      neutral: snapshot['neutral'],
+      liberal: snapshot['liberal'],
+      veryLiberal: snapshot['veryLiberal'],
       thumbnail: snapshot['thumbnail'],
+      brainOnFireReactions: snapshot['brainOnFireReactions'],
     );
   }
 }

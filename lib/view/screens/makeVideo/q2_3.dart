@@ -333,7 +333,7 @@ class _Question2And3State extends State<Question2And3> {
         ),
         child: Center(
           child: txt(
-              txt: text,
+              txt: text!,
               fontSize: 11,
               fontColor:
                   topic == 0 ? Colors.black.withOpacity(0.5) : Colors.white),
