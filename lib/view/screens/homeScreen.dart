@@ -29,9 +29,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin<HomeScreen> {
-  final VideoPlayerController? _controller =
-      VideoPlayerController.asset('assets/images/placeholder.png');
-
   final VideoController videoController = getx.Get.put(VideoController());
   bool isFavourite = false;
   bool _isPlaying = false;
@@ -48,171 +45,33 @@ class _HomeScreenState extends State<HomeScreen>
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  // Future<void> getVideos() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   await FirebaseFirestore.instance
-  //       .collectionGroup(veryConservative)
-  //       .orderBy(FieldPath.documentId)
-  //       .startAt([
-  //         FirebaseFirestore.instance
-  //             .collection("videos")
-  //             .doc(howSocietyAroundMeFunctions)
-  //             .path
-  //       ])
-  //       .endAt([
-  //         FirebaseFirestore.instance
-  //                 .collection("videos")
-  //                 .doc(whatsHappeningAroundTheWorld)
-  //                 .path +
-  //             "\uf8ff"
-  //       ])
-  //       .get()
-  //       .then((QuerySnapshot querySnapshot) {
-  //         for (var doc in querySnapshot.docs) {
-  //           homeScreenVideos.add((doc));
-  //         }
-  //       });
-  //   await FirebaseFirestore.instance
-  //       .collectionGroup(conservative)
-  //       .orderBy(FieldPath.documentId)
-  //       .startAt([
-  //         FirebaseFirestore.instance
-  //             .collection("videos")
-  //             .doc(howSocietyAroundMeFunctions)
-  //             .path
-  //       ])
-  //       .endAt([
-  //         FirebaseFirestore.instance
-  //                 .collection("videos")
-  //                 .doc(whatsHappeningAroundTheWorld)
-  //                 .path +
-  //             "\uf8ff"
-  //       ])
-  //       .get()
-  //       .then((QuerySnapshot querySnapshot) {
-  //         for (var doc in querySnapshot.docs) {
-  //           homeScreenVideos.add((doc));
-  //         }
-  //       });
-  //   await FirebaseFirestore.instance
-  //       .collectionGroup(neutral)
-  //       .orderBy(FieldPath.documentId)
-  //       .startAt([
-  //         FirebaseFirestore.instance
-  //             .collection("videos")
-  //             .doc(howSocietyAroundMeFunctions)
-  //             .path
-  //       ])
-  //       .endAt([
-  //         FirebaseFirestore.instance
-  //                 .collection("videos")
-  //                 .doc(whatsHappeningAroundTheWorld)
-  //                 .path +
-  //             "\uf8ff"
-  //       ])
-  //       .get()
-  //       .then((QuerySnapshot querySnapshot) {
-  //         for (var doc in querySnapshot.docs) {
-  //           homeScreenVideos.add((doc));
-  //         }
-  //       });
-  //   await FirebaseFirestore.instance
-  //       .collectionGroup(liberal)
-  //       .orderBy(FieldPath.documentId)
-  //       .startAt([
-  //         FirebaseFirestore.instance
-  //             .collection("videos")
-  //             .doc(howSocietyAroundMeFunctions)
-  //             .path
-  //       ])
-  //       .endAt([
-  //         FirebaseFirestore.instance
-  //                 .collection("videos")
-  //                 .doc(whatsHappeningAroundTheWorld)
-  //                 .path +
-  //             "\uf8ff"
-  //       ])
-  //       .get()
-  //       .then((QuerySnapshot querySnapshot) {
-  //         for (var doc in querySnapshot.docs) {
-  //           homeScreenVideos.add((doc));
-  //         }
-  //       });
-  //   await FirebaseFirestore.instance
-  //       .collectionGroup(veryLiberal)
-  //       .orderBy(FieldPath.documentId)
-  //       .startAt([
-  //         FirebaseFirestore.instance
-  //             .collection("videos")
-  //             .doc(howSocietyAroundMeFunctions)
-  //             .path
-  //       ])
-  //       .endAt([
-  //         FirebaseFirestore.instance
-  //                 .collection("videos")
-  //                 .doc(whatsHappeningAroundTheWorld)
-  //                 .path +
-  //             "\uf8ff"
-  //       ])
-  //       .get()
-  //       .then((QuerySnapshot querySnapshot) {
-  //         for (var doc in querySnapshot.docs) {
-  //           homeScreenVideos.add((doc));
-  //         }
-  //       });
-
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    // getVideos();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller!.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: isLoading
-            ? const Center(
-                child: CircularProgress(),
-              )
-            : getx.Obx(() {
-                return PageView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: videoController.videoList.length,
-                  controller:
-                      PageController(initialPage: 0, viewportFraction: 1),
-                  // controller: PreloadPageController(initialPage: 1),
-                  // preloadPagesCount: 3,
-                  itemBuilder: ((context, index) {
-                    final data = videoController.videoList[index];
-                    return SizedBox(
-                      height: screenHeight(context) * 0.5,
-                      width: screenWidth(context),
-                      child: videosWidget(context,
-                          name: data.publisherName,
-                          publishersID: data.publisherID,
-                          description: data.videoDescription,
-                          topic: data.videoTopic,
-                          videoTag: data.videoTag,
-                          videoLink: data.videoLink,
-                          profilePic: data.publisherProfilePic,
-                          brainOnFireReactions: data.brainOnFireReactions),
-                    );
-                  }),
-                );
-              }));
+    return Scaffold(body: getx.Obx(() {
+      return PageView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: videoController.homeScreenVideosList.length,
+        controller: PageController(initialPage: 0, viewportFraction: 1),
+        // controller: PreloadPageController(initialPage: 1),
+        // preloadPagesCount: 3,
+        itemBuilder: ((context, index) {
+          final data = videoController.homeScreenVideosList[index];
+          return SizedBox(
+            height: screenHeight(context) * 0.5,
+            width: screenWidth(context),
+            child: videosWidget(context,
+                name: data.publisherName,
+                publishersID: data.publisherID,
+                description: data.videoDescription,
+                topic: data.videoTopic,
+                videoTag: data.videoTag,
+                videoLink: data.videoLink,
+                profilePic: data.publisherProfilePic,
+                brainOnFireReactions: data.brainOnFireReactions),
+          );
+        }),
+      );
+    }));
   }
 
   SizedBox videosWidget(

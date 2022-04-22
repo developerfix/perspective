@@ -10,19 +10,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:preload_page_view/preload_page_view.dart';
+import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import "dart:math" show pi;
 
+import '../../../models/video.dart';
 import '../../widgets/circularProgress.dart';
 import '../videoItem.dart';
 
 class VideoList extends StatefulWidget {
-  final String? topicName;
+  final String? headerName;
+  final String? headertag;
+
   const VideoList({
     Key? key,
-    this.topicName,
+    this.headerName,
+    this.headertag,
   }) : super(key: key);
 
   @override
@@ -32,8 +38,10 @@ class VideoList extends StatefulWidget {
 class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   final VideoPlayerController? _controller =
       VideoPlayerController.asset('assets/images/placeholder.png');
+
+  final VideoController videoController = Get.put(VideoController());
+
   bool isFavourite = false;
-  bool _isPlaying = false;
   bool seeMore = false;
   bool isbrainOnFire = false;
   List<dynamic> topicsOfInterest = [];
@@ -56,181 +64,17 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   CollectionReference videos = FirebaseFirestore.instance.collection('videos');
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-  Future<void> getVeryConservativeVideos() async {
-    setState(() {
-      isVeryConservativeVideosLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryConservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(widget.topicName)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(widget.topicName)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            veryConservativeVideos.add((doc.data()));
-          }
-        });
-
-    setState(() {
-      isVeryConservativeVideosLoading = false;
-    });
-  }
-
-  Future<void> getConservativeVideos() async {
-    setState(() {
-      isConservativeVideosLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(conservative)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(widget.topicName)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(widget.topicName)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            conservativeVideos.add((doc.data()));
-          }
-        });
-
-    setState(() {
-      isConservativeVideosLoading = false;
-    });
-  }
-
-  Future<void> getNeutralVideos() async {
-    setState(() {
-      isNeutralVideosLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(neutral)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(widget.topicName)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(widget.topicName)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            neutralVideos.add((doc.data()));
-          }
-        });
-
-    setState(() {
-      isNeutralVideosLoading = false;
-    });
-  }
-
-  Future<void> getLiberalVideos() async {
-    setState(() {
-      isLiberalVideosLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(liberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(widget.topicName)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(widget.topicName)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            liberalVideos.add((doc.data()));
-          }
-        });
-
-    setState(() {
-      isLiberalVideosLoading = false;
-    });
-  }
-
-  Future<void> getVeryLiberalVideos() async {
-    setState(() {
-      isVeryLiberalVideosLoading = true;
-    });
-    await FirebaseFirestore.instance
-        .collectionGroup(veryLiberal)
-        .orderBy(FieldPath.documentId)
-        .startAt([
-          FirebaseFirestore.instance
-              .collection("videos")
-              .doc(widget.topicName)
-              .path
-        ])
-        .endAt([
-          FirebaseFirestore.instance
-                  .collection("videos")
-                  .doc(widget.topicName)
-                  .path +
-              "\uf8ff"
-        ])
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            veryLiberalVideos.add((doc.data()));
-          }
-        });
-
-    setState(() {
-      isVeryLiberalVideosLoading = false;
-    });
-  }
-
   @override
   void initState() {
-    super.initState();
-    getVeryConservativeVideos();
-    getConservativeVideos();
-    getNeutralVideos();
-    getLiberalVideos();
-    getVeryLiberalVideos();
-  }
+    if (widget.headertag == 'topic') {
+      videoController.updateTopic(widget.headerName);
+    } else if (widget.headertag == 'title') {
+      videoController.updateTitle(widget.headerName);
+    } else if (widget.headertag == 'hashtag') {
+      videoController.updateHashtag(widget.headerName);
+    }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _controller!.dispose();
+    super.initState();
   }
 
   @override
@@ -253,7 +97,15 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (_) => const BNB()),
+                              (route) => false).then((_) {
+                            // This block runs when you have returned back to the 1st Page from 2nd.
+                            setState(() {
+                              // Call setState to refresh the page.
+                            });
+                          });
                         },
                         child:
                             const Icon(Icons.arrow_back, color: Colors.white),
@@ -261,7 +113,7 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                       SizedBox(
                         width: screenWidth(context) * 0.7,
                         child: AutoSizeText(
-                          'Perspectives on ${widget.topicName}',
+                          'Perspectives on ${widget.headerName}',
                           maxLines: 1,
                           textAlign: TextAlign.center,
                           maxFontSize: 14,
@@ -291,23 +143,74 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                   Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
                 ],
               ),
-              Expanded(
-                child: TabBarView(children: [
-                  listOfVideos(
-                      list: veryConservativeVideos,
-                      videoLoader: isVeryConservativeVideosLoading),
-                  listOfVideos(
-                      list: conservativeVideos,
-                      videoLoader: isConservativeVideosLoading),
-                  listOfVideos(
-                      list: neutralVideos, videoLoader: isNeutralVideosLoading),
-                  listOfVideos(
-                      list: liberalVideos, videoLoader: isLiberalVideosLoading),
-                  listOfVideos(
-                      list: veryLiberalVideos,
-                      videoLoader: isVeryLiberalVideosLoading),
-                ]),
-              )
+              widget.headertag == 'topic'
+                  ? Expanded(
+                      child: TabBarView(children: [
+                        listOfVideos(
+                          list:
+                              videoController.topicsVeryConservativeVideosList,
+                        ),
+                        listOfVideos(
+                          list: videoController.topicsConservativeVideoslist,
+                        ),
+                        listOfVideos(
+                          list: videoController.topicsNeutralVideosList,
+                        ),
+                        listOfVideos(
+                          list: videoController.topicsLiberalVideosList,
+                        ),
+                        listOfVideos(
+                          list: videoController.topicsVeryLiberalVideosList,
+                        ),
+                      ]),
+                    )
+                  : widget.headertag == 'hashtag'
+                      ? Expanded(
+                          child: TabBarView(children: [
+                            listOfVideos(
+                              list: videoController
+                                  .hashtagsVeryConservativeVideosList,
+                            ),
+                            listOfVideos(
+                              list: videoController
+                                  .hashtagsConservativeVideoslist,
+                            ),
+                            listOfVideos(
+                              list: videoController.hashtagsNeutralVideosList,
+                            ),
+                            listOfVideos(
+                              list: videoController.hashtagsLiberalVideosList,
+                            ),
+                            listOfVideos(
+                              list:
+                                  videoController.hashtagsVeryLiberalVideosList,
+                            ),
+                          ]),
+                        )
+                      : widget.headertag == 'title'
+                          ? Expanded(
+                              child: TabBarView(children: [
+                                listOfVideos(
+                                  list: videoController
+                                      .titlesVeryConservativeVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController
+                                      .titlesConservativeVideoslist,
+                                ),
+                                listOfVideos(
+                                  list: videoController.titlesNeutralVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController.titlesLiberalVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController
+                                      .titlesVeryLiberalVideosList,
+                                ),
+                              ]),
+                            )
+                          : Container()
             ]),
           ),
         ),
@@ -315,39 +218,35 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
     );
   }
 
-  Widget listOfVideos({List? list, String? docPath, bool? videoLoader}) {
-    return videoLoader!
-        ? const Center(
-            child: CircularProgress(),
-          )
-        : PageView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: list!.length,
-            // controller: PreloadPageController(initialPage: 1),
-            // preloadPagesCount: 3,
-            itemBuilder: ((context, index) {
-              final item = list[index];
+  Widget listOfVideos({List<Video>? list}) {
+    return PageView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: list!.length,
+      itemBuilder: ((context, index) {
+        final data = list[index];
 
-              // List<dynamic> checkerList = [];
-              // for (var i in (item['videoHashtags'])) {
-              //   checkerList.add(i);
-              // }
-              return SizedBox(
+        return list.isEmpty
+            ? Center(
+                child: txt(
+                    txt: 'Currently there is no video under this tag',
+                    fontSize: 18),
+              )
+            : SizedBox(
                 height: screenHeight(context) * 0.5,
                 width: screenWidth(context),
                 child: videosWidget(
                   context,
-                  name: item['publisherName'] ?? '',
-                  description: item['videoDescription'] ?? '',
-                  topic: item['videoTopic'] ?? '',
-                  videoTag: item['videoTag'] ?? '',
-                  videoLink: item['videoLink'] ?? '',
+                  name: data.publisherName,
+                  description: data.videoDescription,
+                  topic: data.videoTopic,
+                  videoTag: data.videoTag,
+                  videoLink: data.videoLink,
                   // hastags: hastagsList!.isEmpty ? [] : hastagsList
                   // profilePic: item['publisherProfilePic']
                 ),
               );
-            }),
-          );
+      }),
+    );
   }
 
   SizedBox videosWidget(
@@ -364,13 +263,7 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
       height: screenHeight(context),
       child: Stack(
         children: [
-          Positioned.fill(
-              child: videoLink != null
-                  ? AspectRatioVideo(videoLink, _controller!)
-                  : Image.asset(
-                      'assets/images/placeholder.png',
-                      fit: BoxFit.fitHeight,
-                    )),
+          Positioned.fill(child: VideoPlayerItem(videoUrl: videoLink!)),
           Transform.rotate(
             angle: 180.0 * pi / 180,
             child: Container(

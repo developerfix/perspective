@@ -35,16 +35,8 @@ class ViewVideo extends StatefulWidget {
 }
 
 class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
-  final VideoPlayerController? _controller =
-      VideoPlayerController.asset('assets/images/placeholder.png');
-
+  bool isbrainOnFire = false;
   bool seeMore = false;
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller!.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +96,7 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
         children: [
           Positioned.fill(
               child: (doc.data() as Map)['videoLink'] != null
-                  ? AspectRatioVideo(
-                      (doc.data() as Map)['videoLink'], _controller!)
+                  ? VideoPlayerItem(videoUrl: (doc.data() as Map)['videoLink'])
                   : Image.asset(
                       'assets/images/placeholder.png',
                       fit: BoxFit.fitHeight,
@@ -169,7 +160,17 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SvgPicture.asset('assets/svgs/brainOnFire.svg'),
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        isbrainOnFire = !isbrainOnFire;
+                                      });
+                                    },
+                                    child: isbrainOnFire
+                                        ? SvgPicture.asset(
+                                            'assets/svgs/brainOnFire.svg')
+                                        : SvgPicture.asset(
+                                            'assets/svgs/brain.svg')),
                                 txt(
                                     txt: (doc.data()
                                             as Map)['brainOnFireReactions']

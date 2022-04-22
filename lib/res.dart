@@ -34,14 +34,14 @@ showSnackBar({String? snackText, BuildContext? context}) {
 Widget txt(
     {required String txt,
     FontWeight? fontWeight,
-    double? fontSize,
+    required double fontSize,
     Color? fontColor,
     double? minFontSize,
     int? maxLines}) {
   return AutoSizeText(
     txt,
     maxLines: maxLines ?? 2,
-    maxFontSize: fontSize!,
+    maxFontSize: fontSize,
     minFontSize: minFontSize ?? fontSize - 5,
     style: TextStyle(
       fontFamily: 'OpenSans',

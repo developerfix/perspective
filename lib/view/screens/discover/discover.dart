@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/discover/videosList.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:slant/view/widgets/circularProgress.dart';
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);
@@ -14,28 +16,165 @@ class Discover extends StatefulWidget {
 
 class _DiscoverState extends State<Discover> {
   final TextEditingController _searchController = TextEditingController();
+  var parser = EmojiParser();
 
   bool isSearching = false;
+  bool isLoading = false;
+  bool titleExist = false;
+  bool hashtagExist = false;
+
   List<DocumentSnapshot> list = [];
 
-  getSearchedList(String? value) async {
-    List<DocumentSnapshot> documentList = (await FirebaseFirestore.instance
-            .collection("titles")
-            .where("setSearchTitlesParams", arrayContains: value)
-            .get())
-        .docs;
-    // List<DocumentSnapshot> documentList = (await FirebaseFirestore.instance
-    //         .collection("hashtags")
-    //         .doc('moneyTopicCheck')
-    //         // .collection(conservative)
-    //         .where("setSearchTitlesParams", arrayContains: value)
-    //         .get())
-    //     .docs;
-    print('documentList: $documentList');
+  getSearchedTitle({required String typedTitle}) async {
+    var veryConservativeTitleDocList = [];
+    var conservativeTitleDocList = [];
+    var neutralTitleDocList = [];
+    var liberalTitleDocList = [];
+    var veryLiberalTitleDocList = [];
     setState(() {
-      list = documentList;
+      isLoading = true;
+      titleExist = false;
     });
-    return documentList;
+
+    await FirebaseFirestore.instance
+        .collection('titles')
+        .doc(typedTitle)
+        .collection(veryConservative)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        veryConservativeTitleDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('titles')
+        .doc(typedTitle)
+        .collection(conservative)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        conservativeTitleDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('titles')
+        .doc(typedTitle)
+        .collection(neutral)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        neutralTitleDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('titles')
+        .doc(typedTitle)
+        .collection(liberal)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        liberalTitleDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('titles')
+        .doc(typedTitle)
+        .collection(veryLiberal)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        veryLiberalTitleDocList.add(element);
+      }
+    });
+
+    setState(() {
+      if (veryConservativeTitleDocList.isEmpty &&
+          conservativeTitleDocList.isEmpty &&
+          neutralTitleDocList.isEmpty &&
+          liberalTitleDocList.isEmpty &&
+          veryLiberalTitleDocList.isEmpty) {
+        titleExist = true;
+      } else {
+        titleExist = false;
+      }
+      isLoading = false;
+    });
+  }
+
+  getSearchedHashtag({required String typedHashtag}) async {
+    var veryConservativeHashtagDocList = [];
+    var conservativeHashtagDocList = [];
+    var neutralHashtagDocList = [];
+    var liberalHashtagDocList = [];
+    var veryLiberalHashtagDocList = [];
+    setState(() {
+      isLoading = true;
+      hashtagExist = false;
+    });
+
+    await FirebaseFirestore.instance
+        .collection('hashtags')
+        .doc(typedHashtag)
+        .collection(veryConservative)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        veryConservativeHashtagDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('hashtags')
+        .doc(typedHashtag)
+        .collection(conservative)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        conservativeHashtagDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('hashtags')
+        .doc(typedHashtag)
+        .collection(neutral)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        neutralHashtagDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('hashtags')
+        .doc(typedHashtag)
+        .collection(liberal)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        liberalHashtagDocList.add(element);
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('hashtags')
+        .doc(typedHashtag)
+        .collection(veryLiberal)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        veryLiberalHashtagDocList.add(element);
+      }
+    });
+
+    setState(() {
+      if (veryConservativeHashtagDocList.isEmpty &&
+          conservativeHashtagDocList.isEmpty &&
+          neutralHashtagDocList.isEmpty &&
+          liberalHashtagDocList.isEmpty &&
+          veryLiberalHashtagDocList.isEmpty) {
+        hashtagExist = true;
+      } else {
+        hashtagExist = false;
+      }
+      isLoading = false;
+    });
   }
 
   @override
@@ -64,30 +203,22 @@ class _DiscoverState extends State<Discover> {
                         padding: const EdgeInsets.fromLTRB(10, 15, 0, 7),
                         child: TextField(
                           controller: _searchController,
-                          onChanged: (String value) {
-                            getSearchedList(value);
+                          onChanged: (value) {
+                            if (value.isNotEmpty) {
+                              if (value[0] == '#') {
+                                getSearchedHashtag(typedHashtag: value);
+                              } else {
+                                getSearchedTitle(typedTitle: value);
+                              }
+                            }
                           },
-
-                          //   FirebaseFirestore.instance
-                          //       .collection('titles')
-                          //       .where(FirebaseFirestore.instance.namedQueryGet(name),
-                          //           isEqualTo: 'check')
-                          //       .get()
-                          //       .then((value) {
-                          //     print("value.docs");
-                          //     print("value.docs");
-                          //     print("value.docs");
-                          //     print(value.docs);
-                          //   });
-                          // },
                           autocorrect: true,
                           style: const TextStyle(
                             fontFamily: 'Open Sans',
                             fontSize: 16.0,
                             color: Colors.white,
                           ),
-                          textCapitalization: TextCapitalization.sentences,
-                          // controller: _filter,
+                          textCapitalization: TextCapitalization.none,
                           decoration: InputDecoration(
                               contentPadding:
                                   const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -147,13 +278,8 @@ class _DiscoverState extends State<Discover> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: isSearching
-                ? _searchController.text.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: list.length,
-                        itemBuilder: ((context, index) {
-                          return txt(txt: list[index]['videoTitle'] ?? '');
-                        }))
-                    : ListView(
+                ? _searchController.text.isEmpty
+                    ? ListView(
                         children: [
                           txt(txt: 'Recent Searches', fontSize: 18),
                           SizedBox(
@@ -165,63 +291,155 @@ class _DiscoverState extends State<Discover> {
                           searchitems(item: 'ukarain'),
                         ],
                       )
+                    : isLoading
+                        ? const Center(
+                            child: CircularProgress(),
+                          )
+                        : _searchController.text[0] == "#"
+                            ? hashtagExist
+                                ? Center(
+                                    child: txt(
+                                        txt: 'No video found with this hashtag',
+                                        fontSize: 18),
+                                  )
+                                : Column(
+                                    children: [
+                                      txt(txt: 'Results', fontSize: 24),
+                                      InkWell(
+                                        onTap: () => Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => VideoList(
+                                              headertag: 'hashtag',
+                                              headerName:
+                                                  _searchController.text,
+                                            ),
+                                          ),
+                                        ),
+                                        child: ListTile(
+                                          title: Text(
+                                            _searchController.text,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                            : titleExist
+                                ? Center(
+                                    child: txt(
+                                        txt: 'No video found with this title',
+                                        fontSize: 18),
+                                  )
+                                : Column(
+                                    children: [
+                                      txt(txt: 'Results', fontSize: 24),
+                                      InkWell(
+                                        onTap: () => Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => VideoList(
+                                              headertag: 'title',
+                                              headerName:
+                                                  _searchController.text,
+                                            ),
+                                          ),
+                                        ),
+                                        child: ListTile(
+                                          title: Text(
+                                            _searchController.text,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+
+                // ListView.builder(
+                //   itemCount: list.length,
+                //   itemBuilder: ((context, index) {
+                //     return txt(txt: list[index]['videoTitle'] ?? '');
+                //   }))
+
                 : GridView.count(
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     crossAxisCount: 2,
                     children: [
                       buildTopics(
+                        emojy: parser.getEmoji('🏳').code,
                         topic: whatsHappeningInMyCountry,
                         route: const VideoList(
-                          topicName: whatsHappeningInMyCountry,
+                          headertag: 'topic',
+                          headerName: whatsHappeningInMyCountry,
                         ),
                       ),
                       buildTopics(
-                        topic: whatsHappeningAroundTheWorld,
+                        emojy: parser.getEmoji('🌎').code,
+                        topic: 'What’s happening around the world',
                         route: const VideoList(
-                          topicName: whatsHappeningAroundTheWorld,
+                          headertag: 'topic',
+                          headerName: whatsHappeningAroundTheWorld,
                         ),
                       ),
                       buildTopics(
-                        topic: mySenseOfBelongingAndItsRepresentation,
+                        emojy: parser.getEmoji('🤔').code,
+                        topic: 'My sense of belonging\nand it’s representation',
                         route: const VideoList(
-                          topicName: mySenseOfBelongingAndItsRepresentation,
+                          headertag: 'topic',
+                          headerName: mySenseOfBelongingAndItsRepresentation,
                         ),
                       ),
                       buildTopics(
+                        emojy: parser.getEmoji('🏘').code,
                         topic: howSocietyAroundMeFunctions,
                         route: const VideoList(
-                          topicName: howSocietyAroundMeFunctions,
+                          headertag: 'topic',
+                          headerName: howSocietyAroundMeFunctions,
                         ),
                       ),
                       buildTopics(
-                        topic: myLifestyle,
+                        emojy: parser.getEmoji('🚶‍♀️').code,
+                        topic: 'My\nLifestyle',
                         route: const VideoList(
-                          topicName: myLifestyle,
+                          headertag: 'topic',
+                          headerName: myLifestyle,
                         ),
                       ),
                       buildTopics(
-                        topic: myReligion,
+                        emojy: parser.getEmoji('🙏').code,
+                        topic: 'My\nReligion',
                         route: const VideoList(
-                          topicName: myReligion,
+                          headertag: 'topic',
+                          headerName: myReligion,
                         ),
                       ),
                       buildTopics(
-                        topic: whatISeeOnMyTV,
+                        emojy: parser.getEmoji('📺').code,
+                        topic: 'What I see online or\non my TV',
                         route: const VideoList(
-                          topicName: whatISeeOnMyTV,
+                          headertag: 'topic',
+                          headerName: whatISeeOnMyTV,
                         ),
                       ),
                       buildTopics(
-                        topic: myIdentity,
+                        emojy: parser.getEmoji('🆔').code,
+                        topic: 'My\nIdentity',
                         route: const VideoList(
-                          topicName: myIdentity,
+                          headertag: 'topic',
+                          headerName: myIdentity,
                         ),
                       ),
                       buildTopics(
-                        topic: moneyAndFinances,
+                        emojy: parser.getEmoji('💰').code,
+                        topic: 'Money and finances',
                         route: const VideoList(
-                          topicName: moneyAndFinances,
+                          headertag: 'topic',
+                          headerName: moneyAndFinances,
                         ),
                       ),
                     ],
@@ -249,10 +467,10 @@ class _DiscoverState extends State<Discover> {
     );
   }
 
-  InkWell buildTopics({String? topic, Widget? route}) {
+  InkWell buildTopics(
+      {String? topic, Widget? route, Color? color, String? emojy}) {
     return InkWell(
       onTap: () {
-        print('pressed topic');
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -262,7 +480,7 @@ class _DiscoverState extends State<Discover> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
-          color: const Color(0xFF3B5998),
+          color: const Color(blueColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.16),
@@ -271,22 +489,33 @@ class _DiscoverState extends State<Discover> {
             ),
           ],
         ),
-        child: Center(
-            child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: AutoSizeText(
-            topic!,
-            textAlign: TextAlign.center,
-            maxFontSize: 12,
-            minFontSize: 8,
-            maxLines: 2,
-            style: const TextStyle(
-              fontFamily: 'OpenSans',
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        )),
+        child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AutoSizeText(
+                  emojy!,
+                  maxFontSize: 50,
+                  minFontSize: 45,
+                ),
+                SizedBox(
+                  height: screenHeight(context) * 0.015,
+                ),
+                AutoSizeText(
+                  topic!,
+                  textAlign: TextAlign.center,
+                  maxFontSize: 12,
+                  minFontSize: 8,
+                  maxLines: 2,
+                  style: const TextStyle(
+                    fontFamily: 'OpenSans',
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            )),
       ),
     );
   }
