@@ -66,6 +66,8 @@ class VideoController extends GetxController {
     getTitlesNeutralVideosList(videoTitle);
     getTitlesLiberalVideosList(videoTitle);
     getTitlesVeryLiberalVideosList(videoTitle);
+
+    update();
   }
 
   updateHashtag(var videoHashtag) {
@@ -76,6 +78,8 @@ class VideoController extends GetxController {
     getHastagsNeutralVideosList(videoHashtag);
     getHashtagsLiberalVideosList(videoHashtag);
     getHashtagsVeryLiberalVideosList(videoHashtag);
+
+    update();
   }
 
   updateTopic(var videoTopic) {
@@ -86,6 +90,7 @@ class VideoController extends GetxController {
     getTopicsNeutralVideosList(videoTopic);
     getTopicsLiberalVideosList(videoTopic);
     getTopicsVeryLiberalVideosList(videoTopic);
+    update();
   }
 
   Future<void> getHomeScreenVideos() async {

@@ -17,7 +17,7 @@ class ProfileController extends GetxController {
 
   getUserData() async {
     // List<String> thumbnails = [];
-    // var myVideos = await users.doc(userId).get()
+    var myVideos = await users.doc(_uid.value).collection('videos').get();
 
     // for (int i = 0; i < myVideos.docs.length; i++) {
     //   thumbnails.add((myVideos.docs[i].data() as dynamic)['thumbnail']);
@@ -26,8 +26,8 @@ class ProfileController extends GetxController {
     DocumentSnapshot userDoc = await users.doc(_uid.value).get();
     final userData = userDoc.data()! as dynamic;
     String name = userData['name'];
-    String profilePhoto = userData['profilePhoto'];
-    int videos = 0;
+    String bio = userData['bio'];
+    String profilePhoto = userData['profilePic'];
     int followers = 0;
     int following = 0;
     bool isFollowing = false;
@@ -56,6 +56,8 @@ class ProfileController extends GetxController {
 
     _user.value = {
       'followers': followers.toString(),
+      'bio': bio,
+      'vids': myVideos.docs.length.toString(),
       'following': following.toString(),
       'isFollowing': isFollowing,
       'profilePhoto': profilePhoto,

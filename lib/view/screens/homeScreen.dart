@@ -12,6 +12,7 @@ import 'package:get/get.dart' as getx;
 import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
+import 'package:slant/view/screens/profile/profile.dart';
 import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
 import 'package:slant/view/screens/videoItem.dart';
 import "dart:math" show pi;
@@ -186,11 +187,7 @@ class _HomeScreenState extends State<HomeScreen>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           navigator(
-                            function: publishersID == userId
-                                ? const BNB(
-                                    isProfile: true,
-                                  )
-                                : OtherUserProfile(publishersID: publishersID!),
+                            function: BNB(isProfile: true, uid: publishersID!),
                             child: CircleAvatar(
                               backgroundColor: Colors.transparent,
                               radius: 30,

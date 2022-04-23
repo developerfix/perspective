@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:diamond_bottom_bar/diamond_bottom_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:slant/res.dart';
@@ -11,13 +12,16 @@ import 'package:slant/view/screens/profile/profile.dart';
 
 class BNB extends StatefulWidget {
   final bool? isProfile;
-  const BNB({Key? key, this.isProfile}) : super(key: key);
+  final String? uid;
+  const BNB({Key? key, this.isProfile, this.uid}) : super(key: key);
 
   @override
   State<BNB> createState() => _BNBState();
 }
 
 class _BNBState extends State<BNB> {
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
   Widget? _scrn;
   int? _selectedIndex = 0;
 
@@ -42,7 +46,7 @@ class _BNBState extends State<BNB> {
           _scrn = const Favourites();
           break;
         case 4:
-          _scrn = const Profile();
+          _scrn = Profile(uid: userId!);
           break;
         default:
           _scrn = const HomeScreen();
@@ -56,7 +60,7 @@ class _BNBState extends State<BNB> {
     super.initState();
 
     if (widget.isProfile == true) {
-      _scrn = const Profile();
+      _scrn = Profile(uid: widget.uid!);
       _selectedIndex = 4;
       screen(4);
     } else {

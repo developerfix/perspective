@@ -1,17 +1,11 @@
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_video_player/cached_video_player.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expand_widget/expand_widget.dart';
-import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
-import 'package:preload_page_view/preload_page_view.dart';
+import 'package:get/get.dart' as getx;
 import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
@@ -36,10 +30,7 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
-  final VideoPlayerController? _controller =
-      VideoPlayerController.asset('assets/images/placeholder.png');
-
-  final VideoController videoController = Get.put(VideoController());
+  final VideoController videoController = getx.Get.put(VideoController());
 
   bool isFavourite = false;
   bool seeMore = false;
@@ -57,8 +48,6 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   bool isNeutralVideosLoading = false;
   bool isLiberalVideosLoading = false;
   bool isVeryLiberalVideosLoading = false;
-
-  final PageController _pageController = PageController(initialPage: 0);
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference videos = FirebaseFirestore.instance.collection('videos');
@@ -79,143 +68,139 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: DefaultTabController(
-        length: 5,
-        child: Scaffold(
-          body: SizedBox(
-            height: screenHeight(context),
-            width: screenWidth(context),
-            child: Column(children: [
-              Container(
-                height: screenHeight(context) * 0.08,
-                color: const Color(0xFF080808),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(builder: (_) => const BNB()),
-                              (route) => false).then((_) {
-                            // This block runs when you have returned back to the 1st Page from 2nd.
-                            setState(() {
-                              // Call setState to refresh the page.
-                            });
-                          });
-                        },
-                        child:
-                            const Icon(Icons.arrow_back, color: Colors.white),
-                      ),
-                      SizedBox(
-                        width: screenWidth(context) * 0.7,
-                        child: AutoSizeText(
-                          'Perspectives on ${widget.headerName}',
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          maxFontSize: 14,
-                          minFontSize: 8,
-                          style: const TextStyle(
-                            fontFamily: 'OpenSans',
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+    return getx.Obx(() {
+      return SafeArea(
+        child: DefaultTabController(
+          length: 5,
+          child: Scaffold(
+            body: SizedBox(
+              height: screenHeight(context),
+              width: screenWidth(context),
+              child: Column(children: [
+                Container(
+                  height: screenHeight(context) * 0.08,
+                  color: const Color(0xFF080808),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child:
+                              const Icon(Icons.arrow_back, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: screenWidth(context) * 0.7,
+                          child: AutoSizeText(
+                            'Perspectives on ${widget.headerName}',
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            maxFontSize: 14,
+                            minFontSize: 8,
+                            style: const TextStyle(
+                              fontFamily: 'OpenSans',
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        width: screenWidth(context) * 0.005,
-                      )
-                    ],
+                        Container(
+                          width: screenWidth(context) * 0.005,
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              TabBar(
-                isScrollable: true,
-                indicatorColor: const Color(blueColor).withOpacity(0.5),
-                tabs: [
-                  Tab(icon: txt(txt: veryConservative, fontSize: 14)),
-                  Tab(icon: txt(txt: conservative, fontSize: 14)),
-                  Tab(icon: txt(txt: neutral, fontSize: 14)),
-                  Tab(icon: txt(txt: liberal, fontSize: 14)),
-                  Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
-                ],
-              ),
-              widget.headertag == 'topic'
-                  ? Expanded(
-                      child: TabBarView(children: [
-                        listOfVideos(
-                          list:
-                              videoController.topicsVeryConservativeVideosList,
-                        ),
-                        listOfVideos(
-                          list: videoController.topicsConservativeVideoslist,
-                        ),
-                        listOfVideos(
-                          list: videoController.topicsNeutralVideosList,
-                        ),
-                        listOfVideos(
-                          list: videoController.topicsLiberalVideosList,
-                        ),
-                        listOfVideos(
-                          list: videoController.topicsVeryLiberalVideosList,
-                        ),
-                      ]),
-                    )
-                  : widget.headertag == 'hashtag'
-                      ? Expanded(
-                          child: TabBarView(children: [
-                            listOfVideos(
-                              list: videoController
-                                  .hashtagsVeryConservativeVideosList,
-                            ),
-                            listOfVideos(
-                              list: videoController
-                                  .hashtagsConservativeVideoslist,
-                            ),
-                            listOfVideos(
-                              list: videoController.hashtagsNeutralVideosList,
-                            ),
-                            listOfVideos(
-                              list: videoController.hashtagsLiberalVideosList,
-                            ),
-                            listOfVideos(
-                              list:
-                                  videoController.hashtagsVeryLiberalVideosList,
-                            ),
-                          ]),
-                        )
-                      : widget.headertag == 'title'
-                          ? Expanded(
-                              child: TabBarView(children: [
-                                listOfVideos(
-                                  list: videoController
-                                      .titlesVeryConservativeVideosList,
-                                ),
-                                listOfVideos(
-                                  list: videoController
-                                      .titlesConservativeVideoslist,
-                                ),
-                                listOfVideos(
-                                  list: videoController.titlesNeutralVideosList,
-                                ),
-                                listOfVideos(
-                                  list: videoController.titlesLiberalVideosList,
-                                ),
-                                listOfVideos(
-                                  list: videoController
-                                      .titlesVeryLiberalVideosList,
-                                ),
-                              ]),
-                            )
-                          : Container()
-            ]),
+                TabBar(
+                  isScrollable: true,
+                  indicatorColor: const Color(blueColor).withOpacity(0.5),
+                  tabs: [
+                    Tab(icon: txt(txt: veryConservative, fontSize: 14)),
+                    Tab(icon: txt(txt: conservative, fontSize: 14)),
+                    Tab(icon: txt(txt: neutral, fontSize: 14)),
+                    Tab(icon: txt(txt: liberal, fontSize: 14)),
+                    Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
+                  ],
+                ),
+                widget.headertag == 'topic'
+                    ? Expanded(
+                        child: TabBarView(children: [
+                          listOfVideos(
+                            list: videoController
+                                .topicsVeryConservativeVideosList,
+                          ),
+                          listOfVideos(
+                            list: videoController.topicsConservativeVideoslist,
+                          ),
+                          listOfVideos(
+                            list: videoController.topicsNeutralVideosList,
+                          ),
+                          listOfVideos(
+                            list: videoController.topicsLiberalVideosList,
+                          ),
+                          listOfVideos(
+                            list: videoController.topicsVeryLiberalVideosList,
+                          ),
+                        ]),
+                      )
+                    : widget.headertag == 'hashtag'
+                        ? Expanded(
+                            child: TabBarView(children: [
+                              listOfVideos(
+                                list: videoController
+                                    .hashtagsVeryConservativeVideosList,
+                              ),
+                              listOfVideos(
+                                list: videoController
+                                    .hashtagsConservativeVideoslist,
+                              ),
+                              listOfVideos(
+                                list: videoController.hashtagsNeutralVideosList,
+                              ),
+                              listOfVideos(
+                                list: videoController.hashtagsLiberalVideosList,
+                              ),
+                              listOfVideos(
+                                list: videoController
+                                    .hashtagsVeryLiberalVideosList,
+                              ),
+                            ]),
+                          )
+                        : widget.headertag == 'title'
+                            ? Expanded(
+                                child: TabBarView(children: [
+                                  listOfVideos(
+                                    list: videoController
+                                        .titlesVeryConservativeVideosList,
+                                  ),
+                                  listOfVideos(
+                                    list: videoController
+                                        .titlesConservativeVideoslist,
+                                  ),
+                                  listOfVideos(
+                                    list:
+                                        videoController.titlesNeutralVideosList,
+                                  ),
+                                  listOfVideos(
+                                    list:
+                                        videoController.titlesLiberalVideosList,
+                                  ),
+                                  listOfVideos(
+                                    list: videoController
+                                        .titlesVeryLiberalVideosList,
+                                  ),
+                                ]),
+                              )
+                            : Container()
+              ]),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget listOfVideos({List<Video>? list}) {
@@ -234,16 +219,15 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
             : SizedBox(
                 height: screenHeight(context) * 0.5,
                 width: screenWidth(context),
-                child: videosWidget(
-                  context,
-                  name: data.publisherName,
-                  description: data.videoDescription,
-                  topic: data.videoTopic,
-                  videoTag: data.videoTag,
-                  videoLink: data.videoLink,
-                  // hastags: hastagsList!.isEmpty ? [] : hastagsList
-                  // profilePic: item['publisherProfilePic']
-                ),
+                child: videosWidget(context,
+                    name: data.publisherName,
+                    description: data.videoDescription,
+                    topic: data.videoTopic,
+                    videoTag: data.videoTag,
+                    videoLink: data.videoLink,
+                    publisherID: data.publisherID,
+                    hastags: data.videoHastags,
+                    profilePic: data.publisherProfilePic),
               );
       }),
     );
@@ -256,6 +240,7 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
     String? description,
     String? topic,
     String? videoTag,
+    String? publisherID,
     List<dynamic>? hastags,
     String? videoLink,
   }) {
@@ -347,19 +332,39 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                           SvgPicture.asset('assets/svgs/slant.svg'),
                         ],
                       ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.02,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const CircleAvatar(
-                              maxRadius: 40,
+                          navigator(
+                            function: BNB(isProfile: true, uid: publisherID),
+                            child: CircleAvatar(
                               backgroundColor: Colors.transparent,
-                              backgroundImage:
-                                  // profilePic == null
-                                  //     ?
-                                  AssetImage('assets/images/girl.png')
-                              // : NetworkImage(profilePic) as ImageProvider,
+                              radius: 30,
+                              child: CachedNetworkImage(
+                                imageUrl: profilePic!,
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: imageProvider),
+                                placeholder: (context, url) =>
+                                    const CircularProgress(),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/placeholder.png')),
                               ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth(context) * 0.04,
+                          ),
                           SizedBox(
                             width: screenWidth(context) * 0.7,
                             child: Column(
@@ -561,6 +566,9 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                             ),
                           )
                         ],
+                      ),
+                      SizedBox(
+                        height: screenHeight(context) * 0.015,
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,

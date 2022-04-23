@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:slant/res.dart';
@@ -16,6 +17,8 @@ class Discover extends StatefulWidget {
 
 class _DiscoverState extends State<Discover> {
   final TextEditingController _searchController = TextEditingController();
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
   var parser = EmojiParser();
 
   bool isSearching = false;
@@ -279,18 +282,18 @@ class _DiscoverState extends State<Discover> {
             padding: const EdgeInsets.all(20),
             child: isSearching
                 ? _searchController.text.isEmpty
-                    ? ListView(
-                        children: [
-                          txt(txt: 'Recent Searches', fontSize: 18),
-                          SizedBox(
-                            height: screenHeight(context) * 0.02,
-                          ),
-                          searchitems(item: 'ukarain'),
-                          searchitems(item: 'ukarain'),
-                          searchitems(item: 'ukarain'),
-                          searchitems(item: 'ukarain'),
-                        ],
-                      )
+                    ? const Center(
+                        child: AutoSizeText(
+                        'Search videos with title or their hashtags and add your perspective',
+                        textAlign: TextAlign.center,
+                        maxFontSize: 20,
+                        minFontSize: 18,
+                        style: TextStyle(
+                          fontFamily: 'OpenSans',
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ))
                     : isLoading
                         ? const Center(
                             child: CircularProgress(),
@@ -306,15 +309,17 @@ class _DiscoverState extends State<Discover> {
                                     children: [
                                       txt(txt: 'Results', fontSize: 24),
                                       InkWell(
-                                        onTap: () => Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => VideoList(
-                                              headertag: 'hashtag',
-                                              headerName:
-                                                  _searchController.text,
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => VideoList(
+                                                headertag: 'hashtag',
+                                                headerName:
+                                                    _searchController.text,
+                                              ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
                                         child: ListTile(
                                           title: Text(
                                             _searchController.text,
@@ -358,13 +363,6 @@ class _DiscoverState extends State<Discover> {
                                       ),
                                     ],
                                   )
-
-                // ListView.builder(
-                //   itemCount: list.length,
-                //   itemBuilder: ((context, index) {
-                //     return txt(txt: list[index]['videoTitle'] ?? '');
-                //   }))
-
                 : GridView.count(
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,

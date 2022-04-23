@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    userchecker();
+    // userchecker();
 
     isVisible = false;
     _emailcontroller.text = '';
@@ -113,7 +113,7 @@ class _LoginState extends State<Login> {
           transition: LinkTransition.Fade,
           ease: Curves.easeOut,
           duration: 0.3,
-          pageBuilder: () => const Interested());
+          pageBuilder: () => const BNB());
     } on FirebaseAuthException catch (e) {
       String error = '';
       switch (e.code) {
@@ -433,11 +433,17 @@ class _LoginState extends State<Login> {
           email: _emailcontroller.text.trim(),
           password: _passwordcontroller.text.trim());
 
-      PageLinkInfo(
-          transition: LinkTransition.Fade,
-          ease: Curves.easeOut,
-          duration: 0.3,
-          pageBuilder: () => const Interested());
+      // PageLinkInfo(
+      //     transition: LinkTransition.Fade,
+      //     ease: Curves.easeOut,
+      //     duration: 0.3,
+      //     pageBuilder: () => const BNB());
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => const BNB()),
+          ),
+          (Route<dynamic> route) => false);
     } on FirebaseAuthException catch (e) {
       String error = '';
       switch (e.code) {
