@@ -1,101 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:slant/bnb.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/homeScreen.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
-import 'package:image_picker/image_picker.dart';
-
-class AspectRatioVideo extends StatefulWidget {
-  final String? videoUrl;
-  VideoPlayerController controller;
-
-  AspectRatioVideo(this.videoUrl, this.controller, {Key? key})
-      : super(key: key);
-
-  @override
-  AspectRatioVideoState createState() => AspectRatioVideoState();
-}
-
-class AspectRatioVideoState extends State<AspectRatioVideo> {
-  bool _isPlaying = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller = VideoPlayerController.network(widget.videoUrl!)
-      ..addListener(() {
-        if (mounted) {
-          setState(() {});
-        }
-      })
-      ..setLooping(false)
-      ..initialize().then((value) =>
-          widget.controller.play().then((value) => _isPlaying = true));
-  }
-
-  @override
-  void dispose() {
-    widget.controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.controller.value.isInitialized
-        ?
-        // Stack(
-        //     children: [
-        AspectRatio(
-            aspectRatio: widget.controller.value.aspectRatio,
-            child: VideoPlayer(widget.controller))
-        //   Align(
-        //     alignment: Alignment.center,
-        //     child: GestureDetector(
-        //         onTap: () {
-        //           if (widget.controller.value.isPlaying) {
-        //             widget.controller.pause();
-        //             // Timer(
-        //             //     const Duration(seconds: 2),
-        //             //     () => setState(() {
-        //             //           _isPlaying = false;
-        //             //         }));
-        //           } else {
-        //             widget.controller.play();
-        //             _isPlaying = true;
-        //             // setState(() {
-
-        //             // });
-        //           }
-        //         },
-        //         child: widget.controller.value.isPlaying
-        //             ? _isPlaying
-        //                 ? const Icon(
-        //                     Icons.pause_circle,
-        //                     color: Color(
-        //                       blueColor,
-        //                     ),
-        //                     size: 80,
-        //                   )
-        //                 : Container()
-        //             : const Icon(
-        //                 Icons.play_circle_rounded,
-        //                 color: Color(
-        //                   blueColor,
-        //                 ),
-        //                 size: 80,
-        //               )),
-        //   )
-        // ],
-        // )
-        : const Center(
-            child: CircularProgress(),
-          );
-  }
-}
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
@@ -110,6 +17,8 @@ class VideoPlayerItem extends StatefulWidget {
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
   late VideoPlayerController videoPlayerController;
+  bool _showIcon = true;
+  IconData icon = Icons.pause_circle;
 
   @override
   void initState() {
@@ -118,6 +27,11 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       ..initialize().then((value) {
         videoPlayerController.play();
         videoPlayerController.setVolume(1);
+        Timer(
+            const Duration(seconds: 2),
+            () => setState(() {
+                  _showIcon = false;
+                }));
       });
   }
 
@@ -131,13 +45,71 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Container(
-      width: size.width,
-      height: size.height,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-      ),
-      child: VideoPlayer(videoPlayerController),
+    return GestureDetector(
+      onTap: () {
+        if (videoPlayerController.value.isPlaying) {
+          setState(() {
+            icon = Icons.play_circle_rounded;
+            videoPlayerController.pause();
+            _showIcon = true;
+          });
+
+          Timer(
+              const Duration(seconds: 1),
+              () => setState(() {
+                    _showIcon = false;
+                  }));
+        } else {
+          if (videoPlayerController.value.position ==
+              videoPlayerController.value.duration) {
+            videoPlayerController.initialize().then((value) {
+              videoPlayerController.play();
+            });
+          } else {
+            setState(() {
+              icon = Icons.pause_circle;
+              videoPlayerController.play();
+              _showIcon = true;
+            });
+
+            Timer(
+                const Duration(seconds: 1),
+                () => setState(() {
+                      _showIcon = false;
+                    }));
+          }
+        }
+      },
+      child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: AspectRatio(
+                    aspectRatio: videoPlayerController.value.aspectRatio,
+                    child: VideoPlayer(videoPlayerController)),
+              ),
+              Positioned.fill(
+                  child: _showIcon
+                      ? videoPlayerController.value.isPlaying
+                          ? Icon(
+                              icon,
+                              color: const Color(
+                                blueColor,
+                              ),
+                              size: 80,
+                            )
+                          : Icon(
+                              icon,
+                              color: const Color(
+                                blueColor,
+                              ),
+                              size: 80,
+                            )
+                      : Container())
+            ],
+          )),
     );
   }
 }

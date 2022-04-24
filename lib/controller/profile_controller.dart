@@ -12,18 +12,18 @@ class ProfileController extends GetxController {
 
   updateUserId(String uid) {
     _uid.value = uid;
-    getUserData();
+    getUserData(uid);
   }
 
-  getUserData() async {
+  getUserData(String uid) async {
     // List<String> thumbnails = [];
-    var myVideos = await users.doc(_uid.value).collection('videos').get();
+    var myVideos = await users.doc(uid).collection('videos').get();
 
     // for (int i = 0; i < myVideos.docs.length; i++) {
     //   thumbnails.add((myVideos.docs[i].data() as dynamic)['thumbnail']);
     // }
 
-    DocumentSnapshot userDoc = await users.doc(_uid.value).get();
+    DocumentSnapshot userDoc = await users.doc(uid).get();
     final userData = userDoc.data()! as dynamic;
     String name = userData['name'];
     String bio = userData['bio'];
@@ -35,18 +35,12 @@ class ProfileController extends GetxController {
     // for (var item in myVideos.docs) {
     //   likes += (item.data()['likes'] as List).length;
     // }
-    var followerDoc = await users.doc(_uid.value).collection('followers').get();
-    var followingDoc =
-        await users.doc(_uid.value).collection('following').get();
+    var followerDoc = await users.doc(uid).collection('followers').get();
+    var followingDoc = await users.doc(uid).collection('following').get();
     followers = followerDoc.docs.length;
     following = followingDoc.docs.length;
 
-    users
-        .doc(_uid.value)
-        .collection('followers')
-        .doc(userId)
-        .get()
-        .then((value) {
+    users.doc(uid).collection('followers').doc(userId).get().then((value) {
       if (value.exists) {
         isFollowing = true;
       } else {

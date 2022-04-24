@@ -701,6 +701,7 @@ Padding favouriteItem(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ViewVideo(
+                          isFavourite: false,
                           pictureUrl: profileUrl!,
                           name: name!,
                           doc: doc!,
@@ -708,7 +709,7 @@ Padding favouriteItem(
               );
             }),
             child: DelayedDisplay(
-              delay: const Duration(seconds: 4),
+              delay: const Duration(seconds: 2),
               child: Align(
                 alignment: Alignment.center,
                 child: SvgPicture.string(
@@ -760,7 +761,7 @@ Padding favouriteItem(
                     ),
                   ),
                   SizedBox(
-                    width: screenWidth(context) * 0.35,
+                    width: screenWidth(context) * 0.4,
                     child: txt(
                       maxLines: 1,
                       txt: ' audience labelled this video as ',
@@ -770,7 +771,7 @@ Padding favouriteItem(
                     ),
                   ),
                   SizedBox(
-                    width: screenWidth(context) * 0.2,
+                    width: screenWidth(context) * 0.3,
                     child: txt(
                         maxLines: 1,
                         txt: '#very liberal',
@@ -778,25 +779,25 @@ Padding favouriteItem(
                         fontWeight: FontWeight.bold,
                         fontSize: 10),
                   ),
-                  Container(
-                    width: screenWidth(context) * 0.05,
-                  ),
-                  SizedBox(
-                    width: screenWidth(context) * 0.15,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.play_arrow,
-                            size: 18, color: Color(blueColor)),
-                        txt(
-                          maxLines: 1,
-                          txt: '21.k',
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          fontColor: const Color(blueColor),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Container(
+                  //   width: screenWidth(context) * 0.05,
+                  // ),
+                  // SizedBox(
+                  //   width: screenWidth(context) * 0.15,
+                  //   child: Row(
+                  //     children: [
+                  //       const Icon(Icons.play_arrow,
+                  //           size: 18, color: Color(blueColor)),
+                  //       txt(
+                  //         maxLines: 1,
+                  //         txt: '21.k',
+                  //         fontSize: 10,
+                  //         fontWeight: FontWeight.bold,
+                  //         fontColor: const Color(blueColor),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ),

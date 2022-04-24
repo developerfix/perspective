@@ -11,22 +11,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart' as getx;
 import 'package:preload_page_view/preload_page_view.dart';
+import 'package:slant/controller/profileVideoController.dart';
 import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import "dart:math" show pi;
 
+import '../../../bnb.dart';
 import '../../widgets/circularProgress.dart';
 import '../videoItem.dart';
 
 class ViewVideo extends StatefulWidget {
+  final bool isFavourite;
   final DocumentSnapshot doc;
-  final String name;
-  final String pictureUrl;
+  final String? name;
+  final String? pictureUrl;
+
   const ViewVideo(
       {Key? key,
-      required this.pictureUrl,
-      required this.name,
+      this.pictureUrl,
+      required this.isFavourite,
+      this.name,
       required this.doc})
       : super(key: key);
 
@@ -37,70 +43,136 @@ class ViewVideo extends StatefulWidget {
 class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
   bool isbrainOnFire = false;
   bool seeMore = false;
+  bool isLoading = true;
+  final ProfileVideoController profileVideoController =
+      getx.Get.put(ProfileVideoController());
+
+  updatingVideoUrl() async {
+    setState(() {
+      isLoading = true;
+    });
+    await profileVideoController
+        .updateVideoUrl((widget.doc.data() as Map)['videoLink']);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  updatingFavouriteVideoUrl() async {
+    setState(() {
+      isLoading = true;
+    });
+    await profileVideoController
+        .updateFavouriteVideoUrl((widget.doc.data() as Map)['videoLink']);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  getUrlUpdate() async {
+    widget.isFavourite
+        ? await updatingFavouriteVideoUrl()
+        : await updatingVideoUrl();
+  }
+
+  @override
+  void initState() {
+    getUrlUpdate();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: SizedBox(
-          height: screenHeight(context),
-          width: screenWidth(context),
-          child: Column(children: [
-            Container(
-              height: screenHeight(context) * 0.08,
-              color: const Color(0xFF080808),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
-                    ),
-                    SizedBox(
-                      width: screenWidth(context) * 0.7,
-                      child: AutoSizeText(
-                        'your Perspective on ${(widget.doc.data() as Map)['videoTitle']}',
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        maxFontSize: 14,
-                        minFontSize: 8,
-                        style: const TextStyle(
-                          fontFamily: 'OpenSans',
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: screenWidth(context) * 0.005,
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Expanded(child: videosWidget(context, widget.doc)),
-          ]),
-        ),
-      ),
+      child: isLoading
+          ? const Center(
+              child: CircularProgress(),
+            )
+          : Scaffold(
+              body: getx.GetBuilder<ProfileVideoController>(
+                  init: ProfileVideoController(),
+                  builder: (controller) {
+                    return widget.isFavourite
+                        ? PageView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount:
+                                profileVideoController.favouriteVideo.length,
+                            controller: PageController(
+                                initialPage: 0, viewportFraction: 1),
+                            // controller: PreloadPageController(initialPage: 1),
+                            // preloadPagesCount: 3,
+                            itemBuilder: ((context, index) {
+                              final data =
+                                  profileVideoController.favouriteVideo[index];
+                              return SizedBox(
+                                height: screenHeight(context) * 0.5,
+                                width: screenWidth(context),
+                                child: videosWidget(context,
+                                    name: data.publisherName,
+                                    publishersID: data.publisherID,
+                                    description: data.videoDescription,
+                                    topic: data.videoTopic,
+                                    videoTag: data.videoTag,
+                                    videoLink: data.videoLink,
+                                    profilePic: data.publisherProfilePic,
+                                    brainOnFireReactions:
+                                        data.brainOnFireReactions),
+                              );
+                            }),
+                          )
+                        : PageView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount:
+                                profileVideoController.profileVideo.length,
+                            controller: PageController(
+                                initialPage: 0, viewportFraction: 1),
+                            // controller: PreloadPageController(initialPage: 1),
+                            // preloadPagesCount: 3,
+                            itemBuilder: ((context, index) {
+                              final data =
+                                  profileVideoController.profileVideo[index];
+                              return SizedBox(
+                                height: screenHeight(context) * 0.5,
+                                width: screenWidth(context),
+                                child: videosWidget(context,
+                                    name: widget.name,
+                                    publishersID: data.publisherID,
+                                    description: data.videoDescription,
+                                    topic: data.videoTopic,
+                                    videoTag: data.videoTag,
+                                    videoLink: data.videoLink,
+                                    profilePic: widget.pictureUrl,
+                                    brainOnFireReactions:
+                                        data.brainOnFireReactions),
+                              );
+                            }),
+                          );
+                  })),
     );
   }
 
-  SizedBox videosWidget(BuildContext context, DocumentSnapshot doc) {
+  SizedBox videosWidget(
+    BuildContext context, {
+    String? name,
+    String? publishersID,
+    List? brainOnFireReactions,
+    String? profilePic,
+    String? description,
+    String? topic,
+    String? videoTag,
+    List<String>? hastags,
+    String? videoLink,
+  }) {
     return SizedBox(
       height: screenHeight(context),
+      width: screenWidth(context),
       child: Stack(
         children: [
-          Positioned.fill(
-              child: (doc.data() as Map)['videoLink'] != null
-                  ? VideoPlayerItem(videoUrl: (doc.data() as Map)['videoLink'])
-                  : Image.asset(
-                      'assets/images/placeholder.png',
-                      fit: BoxFit.fitHeight,
-                    )),
+          VideoPlayerItem(
+            videoUrl: videoLink!,
+          ),
           Transform.rotate(
             angle: 180.0 * pi / 180,
             child: Container(
@@ -124,17 +196,17 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
             child: Transform.rotate(
               angle: 180 * pi / 180,
               child: Container(
-                height: screenHeight(context) * 0.6,
-                decoration: BoxDecoration(
+                height: screenHeight(context) * 0.23,
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      const Color(0xFF8B7070),
-                      Colors.black.withOpacity(0.0),
-                      Colors.white
+                      Colors.transparent,
+                      Colors.white10,
+                      Colors.white,
                     ],
-                    stops: const [0.0, 0.0, 1.0],
+                    stops: [0, 0.2, 0.9],
                   ),
                 ),
               ),
@@ -172,12 +244,13 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                                         : SvgPicture.asset(
                                             'assets/svgs/brain.svg')),
                                 txt(
-                                    txt: (doc.data()
-                                            as Map)['brainOnFireReactions']
-                                        .toString(),
+                                    txt:
+                                        brainOnFireReactions!.length.toString(),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    fontColor: const Color(blueColor)),
+                                    fontColor: isbrainOnFire
+                                        ? const Color(blueColor)
+                                        : Colors.white)
                               ],
                             ),
                           ),
@@ -191,26 +264,27 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.transparent,
-                            radius: 30,
-                            child: CachedNetworkImage(
-                              imageUrl: widget.pictureUrl.isEmpty
-                                  ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
-                                  : widget.pictureUrl,
-                              imageBuilder: (context, imageProvider) =>
-                                  CircleAvatar(
-                                      backgroundColor: Colors.transparent,
-                                      radius: 30,
-                                      backgroundImage: imageProvider),
-                              placeholder: (context, url) =>
-                                  const CircularProgress(),
-                              errorWidget: (context, url, error) =>
-                                  const CircleAvatar(
-                                      backgroundColor: Colors.transparent,
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/placeholder.png')),
+                          navigator(
+                            function: BNB(isProfile: true, uid: publishersID!),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 30,
+                              child: CachedNetworkImage(
+                                imageUrl: profilePic!,
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: imageProvider),
+                                placeholder: (context, url) =>
+                                    const CircularProgress(),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 30,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/placeholder.png')),
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -223,7 +297,7 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                               children: [
                                 txt(
                                   maxLines: 1,
-                                  txt: '${widget.name} perspective on',
+                                  txt: '$name perspective on',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -240,76 +314,22 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                                         child: AnimatedSize(
                                           duration:
                                               const Duration(milliseconds: 500),
-                                          child:
-
-                                              // RichText(
-                                              //   text: TextSpan(children: [
-                                              //     TextSpan(
-                                              //       text: description!,
-                                              //       style: TextStyle(
-                                              //         fontSize: 8,
-                                              //         color: Colors.black,
-                                              //       ),
-                                              //     ),
-                                              //     TextSpan(
-                                              //         text: 'Login',
-                                              //         style: TextStyle(
-                                              //           fontSize: 8,
-                                              //           color: Colors.blue,
-                                              //         ),
-                                              //         recognizer:
-                                              //             TapGestureRecognizer()
-                                              //               ..onTap = () {
-                                              //                 print(
-                                              //                     'Login Text Clicked');
-                                              //               }),
-                                              //   ]),
-                                              // ),
-                                              AutoSizeText.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text:
-                                                      '${(doc.data() as Map)['videoDescription']}',
-                                                ),
-                                                TextSpan(
-                                                  text: '#hello',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(blueColor)),
-                                                ),
-                                              ],
-                                            ),
-                                            style: const TextStyle(
-                                              fontFamily: 'OpenSans',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w400,
-                                            ),
+                                          child: AutoSizeText(
+                                            description!,
                                             maxLines: seeMore ? 5 : 1,
                                             maxFontSize: 10,
                                             softWrap: true,
                                             overflow: TextOverflow.ellipsis,
                                             minFontSize: seeMore ? 5 : 8,
+                                            style: const TextStyle(
+                                              fontFamily: 'OpenSans',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w400,
+                                            ),
                                           ),
-                                          // AutoSizeText(
-                                          //   description!,
-                                          //   maxLines: seeMore ? 5 : 1,
-                                          //   maxFontSize: 10,
-                                          //   softWrap: true,
-                                          //   overflow: TextOverflow.ellipsis,
-                                          //   minFontSize: seeMore ? 5 : 8,
-                                          //   style: const TextStyle(
-                                          //     fontFamily: 'OpenSans',
-                                          //     color: Colors.black,
-                                          //     fontWeight: FontWeight.w400,
-                                          //   ),
-                                          // ),
                                         ),
                                       ),
-                                      (doc.data() as Map)['videoDescription']
-                                                  .length >
-                                              20
+                                      description.length == 20
                                           ? seeMore
                                               ? GestureDetector(
                                                   child: txt(
@@ -333,88 +353,15 @@ class _ViewVideoState extends State<ViewVideo> with TickerProviderStateMixin {
                                     ],
                                   ),
                                 ),
-                                // SizedBox(
-                                //   width: screenWidth(context) * 0.7,
-                                //   height: seeMore
-                                //       ? description!.length > 20
-                                //           ? screenHeight(context) * 0.055
-                                //           : screenHeight(context) * 0.045
-                                //       : screenHeight(context) * 0.015,
-                                //   child: Row(
-                                //     crossAxisAlignment: seeMore
-                                //         ? CrossAxisAlignment.end
-                                //         : CrossAxisAlignment.center,
-                                //     children: [
-                                //       // Expanded(
-                                //       //   child: ExpandableText(
-                                //       //     "$description $hastags",
-                                //       //     expandText: 'show more',
-                                //       //     collapseText: 'show less',
-                                //       //     style: const TextStyle(
-                                //       //       fontFamily: 'OpenSans',
-                                //       //       color: Colors.black,
-                                //       //       fontSize: 10,
-                                //       //       fontWeight: FontWeight.w400,
-                                //       //     ),
-                                //       //     linkStyle: const TextStyle(
-                                //       //       fontFamily: 'OpenSans',
-                                //       //       fontSize: 10,
-                                //       //       fontWeight: FontWeight.w400,
-                                //       //     ),
-                                //       //     maxLines: 2,
-                                //       //     linkColor: const Color(blueColor),
-                                //       //   ),
-
-                                //       AutoSizeText(
-                                //         description!,
-                                //         maxLines: seeMore ? 5 : 1,
-                                //         maxFontSize: 10,
-                                //         softWrap: true,
-                                //         overflow: TextOverflow.ellipsis,
-                                //         minFontSize: seeMore ? 5 : 8,
-                                //         style: const TextStyle(
-                                //           fontFamily: 'OpenSans',
-                                //           color: Colors.black,
-                                //           fontWeight: FontWeight.w400,
-                                //         ),
-                                //       ),
-                                //       description.length > 20
-                                //           ? seeMore
-                                //               ? GestureDetector(
-                                //                   child: txt(
-                                //                     txt: 'see less',
-                                //                     fontSize: 10,
-                                //                     fontColor:
-                                //                         const Color(blueColor),
-                                //                   ),
-                                //                   onTap: () => setState(
-                                //                       () => seeMore = false))
-                                //               : GestureDetector(
-                                //                   child: txt(
-                                //                     txt: 'see more',
-                                //                     fontSize: 10,
-                                //                     fontColor:
-                                //                         const Color(blueColor),
-                                //                   ),
-                                //                   onTap: () => setState(
-                                //                       () => seeMore = true))
-                                //           : Container(),
-                                //     ],
-                                //   ),
-                                // ),
-                                // for (var document in hastags!) Text(document),
-
                                 txt(
                                     maxLines: 1,
-                                    txt:
-                                        '#${(doc.data() as Map)['videoTopic']}',
+                                    txt: '#$topic',
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor)),
                                 txt(
                                     maxLines: 1,
-                                    txt:
-                                        '#Being ${(doc.data() as Map)['videoTag']}',
+                                    txt: '#Being $videoTag',
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: const Color(blueColor))
@@ -561,3 +508,521 @@ Row popupmenuItem(String? itemText, String? itemPercentage) {
     ],
   );
 }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         body: SizedBox(
+//           height: screenHeight(context),
+//           width: screenWidth(context),
+//           child: Column(children: [
+//             Container(
+//               height: screenHeight(context) * 0.08,
+//               color: const Color(0xFF080808),
+//               child: Padding(
+//                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     InkWell(
+//                       onTap: () {
+//                         Navigator.pop(context);
+//                       },
+//                       child: const Icon(Icons.arrow_back, color: Colors.white),
+//                     ),
+//                     SizedBox(
+//                       width: screenWidth(context) * 0.7,
+//                       child: AutoSizeText(
+//                         'your Perspective on ${(widget.doc.data() as Map)['videoTitle']}',
+//                         maxLines: 1,
+//                         textAlign: TextAlign.center,
+//                         maxFontSize: 14,
+//                         minFontSize: 8,
+//                         style: const TextStyle(
+//                           fontFamily: 'OpenSans',
+//                           color: Colors.white,
+//                           fontWeight: FontWeight.w600,
+//                         ),
+//                       ),
+//                     ),
+//                     Container(
+//                       width: screenWidth(context) * 0.005,
+//                     )
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Expanded(child: videosWidget(context, widget.doc)),
+//           ]),
+//         ),
+//       ),
+//     );
+//   }
+
+//   SizedBox videosWidget(BuildContext context, DocumentSnapshot doc) {
+//     return SizedBox(
+//       height: screenHeight(context),
+//       child: Stack(
+//         children: [
+//           VideoPlayerItem(videoUrl: (doc.data() as Map)['videoLink']),
+//           Transform.rotate(
+//             angle: 180.0 * pi / 180,
+//             child: Container(
+//               height: screenHeight(context) * 0.2,
+//               decoration: BoxDecoration(
+//                 gradient: LinearGradient(
+//                   begin: Alignment.topCenter,
+//                   end: Alignment.bottomCenter,
+//                   colors: [
+//                     const Color(0xFF8B7070),
+//                     Colors.black.withOpacity(0.0),
+//                     Colors.white
+//                   ],
+//                   stops: const [0.0, 0.0, 1.0],
+//                 ),
+//               ),
+//             ),
+//           ),
+//           Align(
+//             alignment: Alignment.bottomCenter,
+//             child: Transform.rotate(
+//               angle: 180 * pi / 180,
+//               child: Container(
+//                 height: screenHeight(context) * 0.6,
+//                 decoration: BoxDecoration(
+//                   gradient: LinearGradient(
+//                     begin: Alignment.bottomCenter,
+//                     end: Alignment.topCenter,
+//                     colors: [
+//                       const Color(0xFF8B7070),
+//                       Colors.black.withOpacity(0.0),
+//                       Colors.white
+//                     ],
+//                     stops: const [0.0, 0.0, 1.0],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//           Align(
+//             alignment: Alignment.bottomCenter,
+//             child: Padding(
+//                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+//                 child: SizedBox(
+//                   width: screenWidth(context) * 0.95,
+//                   height: seeMore
+//                       ? screenHeight(context) * 0.25
+//                       : screenHeight(context) * 0.22,
+//                   child: Column(
+//                     children: [
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           SizedBox(
+//                             width: screenWidth(context) * 0.13,
+//                             height: screenHeight(context) * 0.06,
+//                             child: Column(
+//                               mainAxisAlignment: MainAxisAlignment.center,
+//                               children: [
+//                                 InkWell(
+//                                     onTap: () {
+//                                       setState(() {
+//                                         isbrainOnFire = !isbrainOnFire;
+//                                       });
+//                                     },
+//                                     child: isbrainOnFire
+//                                         ? SvgPicture.asset(
+//                                             'assets/svgs/brainOnFire.svg')
+//                                         : SvgPicture.asset(
+//                                             'assets/svgs/brain.svg')),
+//                                 txt(
+//                                     txt: (doc.data()
+//                                             as Map)['brainOnFireReactions']
+//                                         .toString(),
+//                                     fontSize: 10,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontColor: const Color(blueColor)),
+//                               ],
+//                             ),
+//                           ),
+//                           SvgPicture.asset('assets/svgs/slant.svg'),
+//                         ],
+//                       ),
+//                       SizedBox(
+//                         height: screenHeight(context) * 0.02,
+//                       ),
+//                       Row(
+//                         crossAxisAlignment: CrossAxisAlignment.center,
+//                         mainAxisAlignment: MainAxisAlignment.start,
+//                         children: [
+//                           CircleAvatar(
+//                             backgroundColor: Colors.transparent,
+//                             radius: 30,
+//                             child: CachedNetworkImage(
+//                               imageUrl: widget.pictureUrl.isEmpty
+//                                   ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
+//                                   : widget.pictureUrl,
+//                               imageBuilder: (context, imageProvider) =>
+//                                   CircleAvatar(
+//                                       backgroundColor: Colors.transparent,
+//                                       radius: 30,
+//                                       backgroundImage: imageProvider),
+//                               placeholder: (context, url) =>
+//                                   const CircularProgress(),
+//                               errorWidget: (context, url, error) =>
+//                                   const CircleAvatar(
+//                                       backgroundColor: Colors.transparent,
+//                                       radius: 30,
+//                                       backgroundImage: AssetImage(
+//                                           'assets/images/placeholder.png')),
+//                             ),
+//                           ),
+//                           SizedBox(
+//                             width: screenWidth(context) * 0.04,
+//                           ),
+//                           SizedBox(
+//                             width: screenWidth(context) * 0.7,
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 txt(
+//                                   maxLines: 1,
+//                                   txt: '${widget.name} perspective on',
+//                                   fontSize: 12,
+//                                   fontWeight: FontWeight.bold,
+//                                 ),
+//                                 SizedBox(
+//                                   height: seeMore
+//                                       ? screenHeight(context) * 0.055
+//                                       : screenHeight(context) * 0.015,
+//                                   child: Row(
+//                                     crossAxisAlignment: seeMore
+//                                         ? CrossAxisAlignment.end
+//                                         : CrossAxisAlignment.center,
+//                                     children: [
+//                                       Expanded(
+//                                         child: AnimatedSize(
+//                                           duration:
+//                                               const Duration(milliseconds: 500),
+//                                           child:
+
+//                                               // RichText(
+//                                               //   text: TextSpan(children: [
+//                                               //     TextSpan(
+//                                               //       text: description!,
+//                                               //       style: TextStyle(
+//                                               //         fontSize: 8,
+//                                               //         color: Colors.black,
+//                                               //       ),
+//                                               //     ),
+//                                               //     TextSpan(
+//                                               //         text: 'Login',
+//                                               //         style: TextStyle(
+//                                               //           fontSize: 8,
+//                                               //           color: Colors.blue,
+//                                               //         ),
+//                                               //         recognizer:
+//                                               //             TapGestureRecognizer()
+//                                               //               ..onTap = () {
+//                                               //                 print(
+//                                               //                     'Login Text Clicked');
+//                                               //               }),
+//                                               //   ]),
+//                                               // ),
+//                                               AutoSizeText.rich(
+//                                             TextSpan(
+//                                               children: [
+//                                                 TextSpan(
+//                                                   text:
+//                                                       '${(doc.data() as Map)['videoDescription']}',
+//                                                 ),
+//                                                 TextSpan(
+//                                                   text: '#hello',
+//                                                   style: TextStyle(
+//                                                       fontWeight:
+//                                                           FontWeight.bold,
+//                                                       color: Color(blueColor)),
+//                                                 ),
+//                                               ],
+//                                             ),
+//                                             style: const TextStyle(
+//                                               fontFamily: 'OpenSans',
+//                                               color: Colors.black,
+//                                               fontWeight: FontWeight.w400,
+//                                             ),
+//                                             maxLines: seeMore ? 5 : 1,
+//                                             maxFontSize: 10,
+//                                             softWrap: true,
+//                                             overflow: TextOverflow.ellipsis,
+//                                             minFontSize: seeMore ? 5 : 8,
+//                                           ),
+//                                           // AutoSizeText(
+//                                           //   description!,
+//                                           //   maxLines: seeMore ? 5 : 1,
+//                                           //   maxFontSize: 10,
+//                                           //   softWrap: true,
+//                                           //   overflow: TextOverflow.ellipsis,
+//                                           //   minFontSize: seeMore ? 5 : 8,
+//                                           //   style: const TextStyle(
+//                                           //     fontFamily: 'OpenSans',
+//                                           //     color: Colors.black,
+//                                           //     fontWeight: FontWeight.w400,
+//                                           //   ),
+//                                           // ),
+//                                         ),
+//                                       ),
+//                                       (doc.data() as Map)['videoDescription']
+//                                                   .length >
+//                                               20
+//                                           ? seeMore
+//                                               ? GestureDetector(
+//                                                   child: txt(
+//                                                     txt: 'see less',
+//                                                     fontSize: 10,
+//                                                     fontColor:
+//                                                         const Color(blueColor),
+//                                                   ),
+//                                                   onTap: () => setState(
+//                                                       () => seeMore = false))
+//                                               : GestureDetector(
+//                                                   child: txt(
+//                                                     txt: 'see more',
+//                                                     fontSize: 10,
+//                                                     fontColor:
+//                                                         const Color(blueColor),
+//                                                   ),
+//                                                   onTap: () => setState(
+//                                                       () => seeMore = true))
+//                                           : Container(),
+//                                     ],
+//                                   ),
+//                                 ),
+//                                 // SizedBox(
+//                                 //   width: screenWidth(context) * 0.7,
+//                                 //   height: seeMore
+//                                 //       ? description!.length > 20
+//                                 //           ? screenHeight(context) * 0.055
+//                                 //           : screenHeight(context) * 0.045
+//                                 //       : screenHeight(context) * 0.015,
+//                                 //   child: Row(
+//                                 //     crossAxisAlignment: seeMore
+//                                 //         ? CrossAxisAlignment.end
+//                                 //         : CrossAxisAlignment.center,
+//                                 //     children: [
+//                                 //       // Expanded(
+//                                 //       //   child: ExpandableText(
+//                                 //       //     "$description $hastags",
+//                                 //       //     expandText: 'show more',
+//                                 //       //     collapseText: 'show less',
+//                                 //       //     style: const TextStyle(
+//                                 //       //       fontFamily: 'OpenSans',
+//                                 //       //       color: Colors.black,
+//                                 //       //       fontSize: 10,
+//                                 //       //       fontWeight: FontWeight.w400,
+//                                 //       //     ),
+//                                 //       //     linkStyle: const TextStyle(
+//                                 //       //       fontFamily: 'OpenSans',
+//                                 //       //       fontSize: 10,
+//                                 //       //       fontWeight: FontWeight.w400,
+//                                 //       //     ),
+//                                 //       //     maxLines: 2,
+//                                 //       //     linkColor: const Color(blueColor),
+//                                 //       //   ),
+
+//                                 //       AutoSizeText(
+//                                 //         description!,
+//                                 //         maxLines: seeMore ? 5 : 1,
+//                                 //         maxFontSize: 10,
+//                                 //         softWrap: true,
+//                                 //         overflow: TextOverflow.ellipsis,
+//                                 //         minFontSize: seeMore ? 5 : 8,
+//                                 //         style: const TextStyle(
+//                                 //           fontFamily: 'OpenSans',
+//                                 //           color: Colors.black,
+//                                 //           fontWeight: FontWeight.w400,
+//                                 //         ),
+//                                 //       ),
+//                                 //       description.length > 20
+//                                 //           ? seeMore
+//                                 //               ? GestureDetector(
+//                                 //                   child: txt(
+//                                 //                     txt: 'see less',
+//                                 //                     fontSize: 10,
+//                                 //                     fontColor:
+//                                 //                         const Color(blueColor),
+//                                 //                   ),
+//                                 //                   onTap: () => setState(
+//                                 //                       () => seeMore = false))
+//                                 //               : GestureDetector(
+//                                 //                   child: txt(
+//                                 //                     txt: 'see more',
+//                                 //                     fontSize: 10,
+//                                 //                     fontColor:
+//                                 //                         const Color(blueColor),
+//                                 //                   ),
+//                                 //                   onTap: () => setState(
+//                                 //                       () => seeMore = true))
+//                                 //           : Container(),
+//                                 //     ],
+//                                 //   ),
+//                                 // ),
+//                                 // for (var document in hastags!) Text(document),
+
+//                                 txt(
+//                                     maxLines: 1,
+//                                     txt:
+//                                         '#${(doc.data() as Map)['videoTopic']}',
+//                                     fontSize: 12,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontColor: const Color(blueColor)),
+//                                 txt(
+//                                     maxLines: 1,
+//                                     txt:
+//                                         '#Being ${(doc.data() as Map)['videoTag']}',
+//                                     fontSize: 10,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontColor: const Color(blueColor))
+//                               ],
+//                             ),
+//                           )
+//                         ],
+//                       ),
+//                       SizedBox(
+//                         height: screenHeight(context) * 0.015,
+//                       ),
+//                       Row(
+//                         crossAxisAlignment: CrossAxisAlignment.end,
+//                         children: [
+//                           Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             mainAxisAlignment: MainAxisAlignment.end,
+//                             children: [
+//                               Row(children: [
+//                                 txt(
+//                                   txt: '37%',
+//                                   fontColor: const Color(blueColor),
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 12,
+//                                 ),
+//                                 txt(
+//                                     txt: ' audience labelled this video as ',
+//                                     fontWeight: FontWeight.bold,
+//                                     fontColor: Colors.black45,
+//                                     fontSize: 12),
+//                                 txt(
+//                                   txt: '#very liberal',
+//                                   fontColor: const Color(blueColor),
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 12,
+//                                 ),
+//                               ]),
+//                               txt(
+//                                 txt: 'What do you think?',
+//                                 fontColor: const Color(blueColor),
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 12,
+//                               ),
+//                             ],
+//                           ),
+//                           const Spacer(),
+//                           PopupMenuButton(
+//                               // offset: const Offset(0, -250),
+//                               color: const Color(blueColor),
+//                               onSelected: (value) {
+//                                 // selectedValue(value);
+//                               },
+//                               elevation: 3.2,
+//                               shape: const RoundedRectangleBorder(
+//                                 borderRadius:
+//                                     BorderRadius.all(Radius.circular(15.0)),
+//                               ),
+//                               child: SvgPicture.asset(
+//                                   'assets/svgs/microphone.svg'),
+//                               itemBuilder: (context) => [
+//                                     PopupMenuItem(
+//                                       child: GestureDetector(
+//                                         onTap: () {},
+//                                         child: popupmenuItem(
+//                                             'Very Conservative', '3%'),
+//                                       ),
+//                                       value: 1,
+//                                     ),
+//                                     PopupMenuItem(
+//                                       child: GestureDetector(
+//                                         onTap: () {},
+//                                         child:
+//                                             popupmenuItem('Conservative', '3%'),
+//                                       ),
+//                                       value: 2,
+//                                     ),
+//                                     PopupMenuItem(
+//                                       child: GestureDetector(
+//                                         onTap: () {},
+//                                         child: popupmenuItem('Neutral', '3%'),
+//                                       ),
+//                                       value: 3,
+//                                     ),
+//                                     PopupMenuItem(
+//                                       child: GestureDetector(
+//                                         onTap: () {},
+//                                         child: popupmenuItem('Liberal', '3%'),
+//                                       ),
+//                                       value: 4,
+//                                     ),
+//                                     PopupMenuItem(
+//                                       child: GestureDetector(
+//                                         onTap: () {},
+//                                         child:
+//                                             popupmenuItem('Very Liberal', '3%'),
+//                                       ),
+//                                       value: 5,
+//                                     ),
+//                                   ]),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 )),
+//           ),
+//           Align(
+//             alignment: Alignment.topRight,
+//             child: Padding(
+//               padding: const EdgeInsets.fromLTRB(0, 20, 20, 0),
+//               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+//                 SvgPicture.asset('assets/svgs/share.svg'),
+//                 SizedBox(
+//                   width: screenWidth(context) * 0.03,
+//                 ),
+//               ]),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// Row popupmenuItem(String? itemText, String? itemPercentage) {
+//   return Row(
+//     children: [
+//       txt(txt: itemText!, fontSize: 12, fontColor: Colors.white),
+//       const Spacer(),
+//       Container(
+//         width: 24.0,
+//         height: 24.0,
+//         decoration: const BoxDecoration(
+//           shape: BoxShape.circle,
+//           color: Colors.white,
+//         ),
+//         child: Center(
+//           child: txt(
+//               txt: itemPercentage!,
+//               fontSize: 10,
+//               fontWeight: FontWeight.bold,
+//               fontColor: const Color(blueColor)),
+//         ),
+//       )
+//     ],
+//   );
+// }

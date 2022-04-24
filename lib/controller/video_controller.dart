@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:slant/models/video.dart';
@@ -7,6 +8,8 @@ import 'package:slant/view/screens/discover/videosList.dart';
 import '../res.dart';
 
 class VideoController extends GetxController {
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
   final Rx<List<Video>> _homeScreenVideosList = Rx<List<Video>>([]);
   final Rx<List<Video>> _titlesVeryConservativeVideosList = Rx<List<Video>>([]);
   final Rx<List<Video>> _titlesConservativeVideoslist = Rx<List<Video>>([]);
@@ -555,17 +558,70 @@ class VideoController extends GetxController {
     getHomeScreenVideos();
   }
 
-  // likeVideo(String id) async {
-  //   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('videos').doc(id).get();
-  //   var uid = authController.user.uid;
-  //   if ((doc.data()! as dynamic)['likes'].contains(uid)) {
-  //     await firestore.collection('videos').doc(id).update({
-  //       'likes': FieldValue.arrayRemove([uid]),
-  //     });
-  //   } else {
-  //     await firestore.collection('videos').doc(id).update({
-  //       'likes': FieldValue.arrayUnion([uid]),
-  //     });
-  //   }
-  // }
+  likeVideo(Video video, bool isFavourite) async {
+    var retVal = [];
+    isFavourite
+        ? await users
+            .doc(userId)
+            .collection('favouriteVideos')
+            .where('videoLink', isEqualTo: video.videoLink)
+            .get()
+            .then((QuerySnapshot querySnapshot) {
+            for (var doc in querySnapshot.docs) {
+              retVal.add(doc);
+            }
+          }).then((value) async {
+            retVal.isEmpty
+                ? await users
+                    .doc(userId)
+                    .collection('favouriteVideos')
+                    .add(video.toJson())
+                : Container();
+          })
+        : await users
+            .doc(userId)
+            .collection('favouriteVideos')
+            .where('videoLink', isEqualTo: video.videoLink)
+            .get()
+            .then((QuerySnapshot querySnapshot) {
+            for (var doc in querySnapshot.docs) {
+              doc.reference.delete();
+            }
+          });
+  }
+
+  removeVideoFromFavourites(
+    String videoLink,
+  ) async {
+    await users
+        .doc(userId)
+        .collection('favouriteVideos')
+        .where('videoLink', isEqualTo: videoLink)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  Future<bool> whetherVideoLikedOrNot({String? videoLink}) async {
+    bool likedOrNot = false;
+    var retVal = [];
+
+    await users
+        .doc(userId)
+        .collection('favouriteVideos')
+        .where('videoLink', isEqualTo: videoLink)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        retVal.add(doc);
+      }
+    }).then((value) async {
+      retVal.isEmpty ? likedOrNot = false : likedOrNot = true;
+    });
+
+    return likedOrNot;
+  }
 }

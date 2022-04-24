@@ -1,82 +1,92 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/cupertino.dart';
-// import 'package:get/get.dart';
-// import 'package:slant/models/video.dart';
-// import 'package:slant/view/screens/discover/videosList.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
+import 'package:slant/models/video.dart';
+import 'package:slant/view/screens/discover/videosList.dart';
 
-// import '../res.dart';
+import '../res.dart';
 
-// class ProfileVideoController extends GetxController {
-//   final Rx<List<Video>> _profileVideo = Rx<List<Video>>([]);
- 
+class ProfileVideoController extends GetxController {
+  final Rx<List<Video>> _profileVideo = Rx<List<Video>>([]);
 
+  List<Video> get profileVideo => _profileVideo.value;
 
-//   List<Video> get profileVideo => _profileVideo.value;
- 
-//   Future<void> getHomeScreenVideos() async {
-//      StreamBuilder<QuerySnapshot>(
-//                                   stream: users
-//                                       .doc(userId)
-//                                       .collection("videos")
-//                                       .snapshots(),
-//                                   builder: (context,
-//                                       AsyncSnapshot<QuerySnapshot> snapshot) {
-//                                     if (!snapshot.hasData ||
-//                                         snapshot.hasError) {
-//                                       return const Center(
-//                                         child: Text(
-//                                           'No videos...',
-//                                         ),
-//                                       );
-//                                     } else if (snapshot.data!.docs.isNotEmpty) {
-//                                       return ListView.builder(
-//                                           itemCount: snapshot.data!.docs.length,
-//                                           itemBuilder: (context, index) {
-//                                             DocumentSnapshot doc =
-//                                                 snapshot.data!.docs[index];
+  final Rx<List<Video>> _favouriteVideo = Rx<List<Video>>([]);
 
-//                                             return favouriteItem(context,
-//                                                 doc: doc,
-//                                                 name: data['name'] ?? ' ',
-//                                                 profileUrl:
-//                                                     data['profilePic'] ?? ' ',
-//                                                 title: (doc.data()
-//                                                         as Map)['videoTitle'] ??
-//                                                     ' ',
-//                                                 videoLink: (doc.data()
-//                                                         as Map)['videoLink'] ??
-//                                                     ' ',
-//                                                     thumbnail: (doc.data()
-//                                                         as Map)['videoLink'] ??
-//                                                     ' ',
-//                                                 topic: (doc.data()
-//                                                         as Map)['videoTopic'] ??
-//                                                     ' ');
-//                                           });
-//                                     } else {
-//                                       return const Center(
-//                                           child: Text('No videos...'));
-//                                     }
-//   }
+  List<Video> get favouriteVideo => _favouriteVideo.value;
 
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     getHomeScreenVideos();
-//   }
+  Rx<String> _url = "".obs;
+  Rx<String> _favouriteUrl = "".obs;
 
-//   // likeVideo(String id) async {
-//   //   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('videos').doc(id).get();
-//   //   var uid = authController.user.uid;
-//   //   if ((doc.data()! as dynamic)['likes'].contains(uid)) {
-//   //     await firestore.collection('videos').doc(id).update({
-//   //       'likes': FieldValue.arrayRemove([uid]),
-//   //     });
-//   //   } else {
-//   //     await firestore.collection('videos').doc(id).update({
-//   //       'likes': FieldValue.arrayUnion([uid]),
-//   //     });
-//   //   }
-//   // }
-// }
+  updateVideoUrl(String url) async {
+    _url.value = url;
+    await getProfileVideo(_url.value);
+  }
+
+  updateFavouriteVideoUrl(String url) async {
+    _favouriteUrl.value = url;
+    await getFavouriteVideo(_favouriteUrl.value);
+  }
+
+  Future<void> getProfileVideo(String url) async {
+    try {
+      _profileVideo.bindStream(users
+          .doc(userId)
+          .collection('videos')
+          .where('videoLink', isEqualTo: url)
+          .snapshots()
+          .map((QuerySnapshot query) {
+        List<Video> retVal = [];
+        for (var element in query.docs) {
+          retVal.add(
+            Video.fromSnap(element),
+          );
+        }
+        return retVal;
+      }));
+    } catch (e) {
+      // ignore: empty_catches
+    }
+    update();
+  }
+
+  Future<void> getFavouriteVideo(String url) async {
+    try {
+      _favouriteVideo.bindStream(users
+          .doc(userId)
+          .collection('favouriteVideos')
+          .where('videoLink', isEqualTo: url)
+          .snapshots()
+          .map((QuerySnapshot query) {
+        List<Video> retVal = [];
+        for (var element in query.docs) {
+          retVal.add(
+            Video.fromSnap(element),
+          );
+        }
+        return retVal;
+      }));
+    } catch (e) {
+      // ignore: empty_catches
+    }
+    update();
+  }
+
+  // likeVideo(String id) async {
+  //   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('videos').doc(id).get();
+  //   var uid = authController.user.uid;
+  //   if ((doc.data()! as dynamic)['likes'].contains(uid)) {
+  //     await firestore.collection('videos').doc(id).update({
+  //       'likes': FieldValue.arrayRemove([uid]),
+  //     });
+  //   } else {
+  //     await firestore.collection('videos').doc(id).update({
+  //       'likes': FieldValue.arrayUnion([uid]),
+  //     });
+  //   }
+  // }
+}

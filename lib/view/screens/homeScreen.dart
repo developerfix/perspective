@@ -17,6 +17,7 @@ import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
 import 'package:slant/view/screens/videoItem.dart';
 import "dart:math" show pi;
 
+import '../../models/video.dart';
 import '../widgets/circularProgress.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -57,10 +58,12 @@ class _HomeScreenState extends State<HomeScreen>
         // preloadPagesCount: 3,
         itemBuilder: ((context, index) {
           final data = videoController.homeScreenVideosList[index];
+
           return SizedBox(
             height: screenHeight(context) * 0.5,
             width: screenWidth(context),
             child: videosWidget(context,
+                video: data,
                 name: data.publisherName,
                 publishersID: data.publisherID,
                 description: data.videoDescription,
@@ -77,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   SizedBox videosWidget(
     BuildContext context, {
+    Video? video,
     String? name,
     String? publishersID,
     List? brainOnFireReactions,
@@ -89,12 +93,12 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     return SizedBox(
       height: screenHeight(context),
+      width: screenWidth(context),
       child: Stack(
         children: [
-          Positioned.fill(
-              child: VideoPlayerItem(
+          VideoPlayerItem(
             videoUrl: videoLink!,
-          )),
+          ),
           Transform.rotate(
             angle: 180.0 * pi / 180,
             child: Container(
@@ -118,17 +122,17 @@ class _HomeScreenState extends State<HomeScreen>
             child: Transform.rotate(
               angle: 180 * pi / 180,
               child: Container(
-                height: screenHeight(context) * 0.6,
-                decoration: BoxDecoration(
+                height: screenHeight(context) * 0.23,
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      const Color(0xFF8B7070),
-                      Colors.black.withOpacity(0.0),
-                      Colors.white
+                      Colors.transparent,
+                      Colors.white10,
+                      Colors.white,
                     ],
-                    stops: const [0.0, 0.0, 1.0],
+                    stops: [0, 0.2, 0.9],
                   ),
                 ),
               ),
@@ -399,20 +403,46 @@ class _HomeScreenState extends State<HomeScreen>
                   width: screenWidth(context) * 0.03,
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
-                      isFavourite = !isFavourite;
+                      isLoading = true;
+                    });
+                    if (isFavourite) {
+                      setState(() {
+                        isFavourite = false;
+                      });
+                      await videoController.likeVideo(video!, false);
+                    } else {
+                      setState(() {
+                        isFavourite = true;
+                      });
+                      await videoController.likeVideo(video!, true);
+                    }
+                    setState(() {
+                      isLoading = false;
                     });
                   },
                   child: SizedBox(
                     height: screenHeight(context) * 0.04,
-                    child: isFavourite
-                        ? const Icon(
-                            Icons.favorite,
-                            color: Color(redColor),
-                            size: 30,
-                          )
-                        : SvgPicture.asset('assets/svgs/heart.svg'),
+                    child: isLoading
+                        ? const Center(child: CircularProgress())
+                        : FutureBuilder<bool>(
+                            future: videoController.whetherVideoLikedOrNot(
+                                videoLink: videoLink),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.data == true) {
+                                return const Icon(
+                                  Icons.favorite,
+                                  color: Color(redColor),
+                                  size: 30,
+                                );
+                              } else {
+                                return SvgPicture.asset(
+                                    'assets/svgs/heart.svg');
+                              }
+                            },
+                          ),
                   ),
                 )
               ]),

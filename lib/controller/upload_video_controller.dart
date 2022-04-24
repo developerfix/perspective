@@ -80,8 +80,9 @@ class UploadVideoController extends GetxController {
       videoHastags: videoHastags,
       videoLink: downloadURL,
       videoTag: videoTag!,
-      videoTopic: videoTitle!,
+      videoTopic: videoTopic!,
       thumbnail: thumbnail,
+      videoTitle: videoTitle!,
     );
 
     await videosCollection
@@ -91,16 +92,6 @@ class UploadVideoController extends GetxController {
           videoo.toJson(),
         )
         .then((value) {
-      // setSearchHastagParams(String hastag) {
-      //   List<String> caseSearchList = [];
-      //   String temp = "";
-      //   for (int i = 0; i < hastag.length; i++) {
-      //     temp = temp + hastag[i];
-      //     caseSearchList.add(temp);
-      //   }
-      //   return caseSearchList;
-      // }
-
       for (var i in videoHastags) {
         firebaseFirestore
             .collection('hashtags')
@@ -111,16 +102,6 @@ class UploadVideoController extends GetxController {
             );
       }
     }).then((value) {
-      // setSearchTitlesParams(String hastag) {
-      //   List<String> caseSearchList = [];
-      //   String temp = "";
-      //   for (int i = 0; i < hastag.length; i++) {
-      //     temp = temp + hastag[i];
-      //     caseSearchList.add(temp);
-      //   }
-      //   return caseSearchList;
-      // }
-
       firebaseFirestore
           .collection('titles')
           .doc(videoTitle)

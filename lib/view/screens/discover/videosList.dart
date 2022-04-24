@@ -35,6 +35,8 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   bool isFavourite = false;
   bool seeMore = false;
   bool isbrainOnFire = false;
+  bool isLoading = false;
+  bool isLoading1 = false;
   List<dynamic> topicsOfInterest = [];
   var veryConservativeVideos = [];
   var conservativeVideos = [];
@@ -53,16 +55,28 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   CollectionReference videos = FirebaseFirestore.instance.collection('videos');
 
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
-  @override
-  void initState() {
+
+  updatingVideoHeader() async {
+    setState(() {
+      isLoading = true;
+    });
+
     if (widget.headertag == 'topic') {
-      videoController.updateTopic(widget.headerName);
+      await videoController.updateTopic(widget.headerName);
     } else if (widget.headertag == 'title') {
-      videoController.updateTitle(widget.headerName);
+      await videoController.updateTitle(widget.headerName);
     } else if (widget.headertag == 'hashtag') {
-      videoController.updateHashtag(widget.headerName);
+      await videoController.updateHashtag(widget.headerName);
     }
 
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    updatingVideoHeader();
     super.initState();
   }
 
@@ -70,135 +84,143 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return getx.Obx(() {
       return SafeArea(
-        child: DefaultTabController(
-          length: 5,
-          child: Scaffold(
-            body: SizedBox(
-              height: screenHeight(context),
-              width: screenWidth(context),
-              child: Column(children: [
-                Container(
-                  height: screenHeight(context) * 0.08,
-                  color: const Color(0xFF080808),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child:
-                              const Icon(Icons.arrow_back, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: screenWidth(context) * 0.7,
-                          child: AutoSizeText(
-                            'Perspectives on ${widget.headerName}',
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            maxFontSize: 14,
-                            minFontSize: 8,
-                            style: const TextStyle(
-                              fontFamily: 'OpenSans',
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
+        child: isLoading
+            ? const Center(
+                child: CircularProgress(),
+              )
+            : DefaultTabController(
+                length: 5,
+                child: Scaffold(
+                  body: SizedBox(
+                    height: screenHeight(context),
+                    width: screenWidth(context),
+                    child: Column(children: [
+                      Container(
+                        height: screenHeight(context) * 0.08,
+                        color: const Color(0xFF080808),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Icon(Icons.arrow_back,
+                                    color: Colors.white),
+                              ),
+                              SizedBox(
+                                width: screenWidth(context) * 0.7,
+                                child: AutoSizeText(
+                                  'Perspectives on ${widget.headerName}',
+                                  maxLines: 1,
+                                  textAlign: TextAlign.center,
+                                  maxFontSize: 14,
+                                  minFontSize: 8,
+                                  style: const TextStyle(
+                                    fontFamily: 'OpenSans',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: screenWidth(context) * 0.005,
+                              )
+                            ],
                           ),
                         ),
-                        Container(
-                          width: screenWidth(context) * 0.005,
-                        )
-                      ],
-                    ),
+                      ),
+                      TabBar(
+                        isScrollable: true,
+                        indicatorColor: const Color(blueColor).withOpacity(0.5),
+                        tabs: [
+                          Tab(icon: txt(txt: veryConservative, fontSize: 14)),
+                          Tab(icon: txt(txt: conservative, fontSize: 14)),
+                          Tab(icon: txt(txt: neutral, fontSize: 14)),
+                          Tab(icon: txt(txt: liberal, fontSize: 14)),
+                          Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
+                        ],
+                      ),
+                      widget.headertag == 'topic'
+                          ? Expanded(
+                              child: TabBarView(children: [
+                                listOfVideos(
+                                  list: videoController
+                                      .topicsVeryConservativeVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController
+                                      .topicsConservativeVideoslist,
+                                ),
+                                listOfVideos(
+                                  list: videoController.topicsNeutralVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController.topicsLiberalVideosList,
+                                ),
+                                listOfVideos(
+                                  list: videoController
+                                      .topicsVeryLiberalVideosList,
+                                ),
+                              ]),
+                            )
+                          : widget.headertag == 'hashtag'
+                              ? Expanded(
+                                  child: TabBarView(children: [
+                                    listOfVideos(
+                                      list: videoController
+                                          .hashtagsVeryConservativeVideosList,
+                                    ),
+                                    listOfVideos(
+                                      list: videoController
+                                          .hashtagsConservativeVideoslist,
+                                    ),
+                                    listOfVideos(
+                                      list: videoController
+                                          .hashtagsNeutralVideosList,
+                                    ),
+                                    listOfVideos(
+                                      list: videoController
+                                          .hashtagsLiberalVideosList,
+                                    ),
+                                    listOfVideos(
+                                      list: videoController
+                                          .hashtagsVeryLiberalVideosList,
+                                    ),
+                                  ]),
+                                )
+                              : widget.headertag == 'title'
+                                  ? Expanded(
+                                      child: TabBarView(children: [
+                                        listOfVideos(
+                                          list: videoController
+                                              .titlesVeryConservativeVideosList,
+                                        ),
+                                        listOfVideos(
+                                          list: videoController
+                                              .titlesConservativeVideoslist,
+                                        ),
+                                        listOfVideos(
+                                          list: videoController
+                                              .titlesNeutralVideosList,
+                                        ),
+                                        listOfVideos(
+                                          list: videoController
+                                              .titlesLiberalVideosList,
+                                        ),
+                                        listOfVideos(
+                                          list: videoController
+                                              .titlesVeryLiberalVideosList,
+                                        ),
+                                      ]),
+                                    )
+                                  : Container()
+                    ]),
                   ),
                 ),
-                TabBar(
-                  isScrollable: true,
-                  indicatorColor: const Color(blueColor).withOpacity(0.5),
-                  tabs: [
-                    Tab(icon: txt(txt: veryConservative, fontSize: 14)),
-                    Tab(icon: txt(txt: conservative, fontSize: 14)),
-                    Tab(icon: txt(txt: neutral, fontSize: 14)),
-                    Tab(icon: txt(txt: liberal, fontSize: 14)),
-                    Tab(icon: txt(txt: veryLiberal, fontSize: 14)),
-                  ],
-                ),
-                widget.headertag == 'topic'
-                    ? Expanded(
-                        child: TabBarView(children: [
-                          listOfVideos(
-                            list: videoController
-                                .topicsVeryConservativeVideosList,
-                          ),
-                          listOfVideos(
-                            list: videoController.topicsConservativeVideoslist,
-                          ),
-                          listOfVideos(
-                            list: videoController.topicsNeutralVideosList,
-                          ),
-                          listOfVideos(
-                            list: videoController.topicsLiberalVideosList,
-                          ),
-                          listOfVideos(
-                            list: videoController.topicsVeryLiberalVideosList,
-                          ),
-                        ]),
-                      )
-                    : widget.headertag == 'hashtag'
-                        ? Expanded(
-                            child: TabBarView(children: [
-                              listOfVideos(
-                                list: videoController
-                                    .hashtagsVeryConservativeVideosList,
-                              ),
-                              listOfVideos(
-                                list: videoController
-                                    .hashtagsConservativeVideoslist,
-                              ),
-                              listOfVideos(
-                                list: videoController.hashtagsNeutralVideosList,
-                              ),
-                              listOfVideos(
-                                list: videoController.hashtagsLiberalVideosList,
-                              ),
-                              listOfVideos(
-                                list: videoController
-                                    .hashtagsVeryLiberalVideosList,
-                              ),
-                            ]),
-                          )
-                        : widget.headertag == 'title'
-                            ? Expanded(
-                                child: TabBarView(children: [
-                                  listOfVideos(
-                                    list: videoController
-                                        .titlesVeryConservativeVideosList,
-                                  ),
-                                  listOfVideos(
-                                    list: videoController
-                                        .titlesConservativeVideoslist,
-                                  ),
-                                  listOfVideos(
-                                    list:
-                                        videoController.titlesNeutralVideosList,
-                                  ),
-                                  listOfVideos(
-                                    list:
-                                        videoController.titlesLiberalVideosList,
-                                  ),
-                                  listOfVideos(
-                                    list: videoController
-                                        .titlesVeryLiberalVideosList,
-                                  ),
-                                ]),
-                              )
-                            : Container()
-              ]),
-            ),
-          ),
-        ),
+              ),
       );
     });
   }
@@ -221,10 +243,12 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                 width: screenWidth(context),
                 child: videosWidget(context,
                     name: data.publisherName,
+                    video: data,
                     description: data.videoDescription,
                     topic: data.videoTopic,
                     videoTag: data.videoTag,
                     videoLink: data.videoLink,
+                    brainOnFireReactions: data.brainOnFireReactions,
                     publisherID: data.publisherID,
                     hastags: data.videoHastags,
                     profilePic: data.publisherProfilePic),
@@ -236,6 +260,8 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   SizedBox videosWidget(
     BuildContext context, {
     String? name,
+    List? brainOnFireReactions,
+    Video? video,
     String? profilePic,
     String? description,
     String? topic,
@@ -272,17 +298,17 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
             child: Transform.rotate(
               angle: 180 * pi / 180,
               child: Container(
-                height: screenHeight(context) * 0.6,
-                decoration: BoxDecoration(
+                height: screenHeight(context) * 0.23,
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      const Color(0xFF8B7070),
-                      Colors.black.withOpacity(0.0),
-                      Colors.white
+                      Colors.transparent,
+                      Colors.white10,
+                      Colors.white,
                     ],
-                    stops: const [0.0, 0.0, 1.0],
+                    stops: [0, 0.2, 0.9],
                   ),
                 ),
               ),
@@ -320,7 +346,8 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                                         : SvgPicture.asset(
                                             'assets/svgs/brain.svg')),
                                 txt(
-                                    txt: '26',
+                                    txt:
+                                        brainOnFireReactions!.length.toString(),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     fontColor: isbrainOnFire
@@ -674,20 +701,46 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
                   width: screenWidth(context) * 0.03,
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
-                      isFavourite = !isFavourite;
+                      isLoading1 = true;
+                    });
+                    if (isFavourite) {
+                      setState(() {
+                        isFavourite = false;
+                      });
+                      await videoController.likeVideo(video!, false);
+                    } else {
+                      setState(() {
+                        isFavourite = true;
+                      });
+                      await videoController.likeVideo(video!, true);
+                    }
+                    setState(() {
+                      isLoading1 = false;
                     });
                   },
                   child: SizedBox(
                     height: screenHeight(context) * 0.04,
-                    child: isFavourite
-                        ? const Icon(
-                            Icons.favorite,
-                            color: Color(redColor),
-                            size: 30,
-                          )
-                        : SvgPicture.asset('assets/svgs/heart.svg'),
+                    child: isLoading1
+                        ? const CircularProgress()
+                        : FutureBuilder<bool>(
+                            future: videoController.whetherVideoLikedOrNot(
+                                videoLink: videoLink),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.data == true) {
+                                return const Icon(
+                                  Icons.favorite,
+                                  color: Color(redColor),
+                                  size: 30,
+                                );
+                              } else {
+                                return SvgPicture.asset(
+                                    'assets/svgs/heart.svg');
+                              }
+                            },
+                          ),
                   ),
                 )
               ]),

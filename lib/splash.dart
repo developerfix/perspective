@@ -20,7 +20,7 @@ class _SplashState extends State<Splash> {
         const Duration(seconds: 3),
         () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const Login()),
+              MaterialPageRoute(builder: (context) => const BNB()),
             ));
   }
 

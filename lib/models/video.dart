@@ -16,10 +16,12 @@ class Video {
   String videoTopic;
   String thumbnail;
   String publisherProfilePic;
+  String videoTitle;
 
   Video({
     required this.publisherName,
     required this.publisherID,
+    required this.videoTitle,
     required this.brainOnFireReactions,
     required this.videoLink,
     required this.publisherProfilePic,
@@ -43,6 +45,7 @@ class Video {
         "videoHastags": videoHastags,
         "videoLink": videoLink,
         "videoTag": videoTag,
+        "videoTitle": videoTitle,
         "videoTopic": videoTopic,
         "veryConservative": veryConservative,
         "conservative": conservative,
@@ -64,6 +67,7 @@ class Video {
       videoHastags: snapshot['videoHastags'],
       videoLink: snapshot['videoLink'],
       videoTag: snapshot['videoTag'],
+      videoTitle: snapshot['videoTitle'],
       videoTopic: snapshot['videoTopic'],
       veryConservative: snapshot['veryConservative'],
       conservative: snapshot['conservative'],
