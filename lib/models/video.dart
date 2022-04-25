@@ -11,7 +11,7 @@ class Video {
   List brainOnFireReactions;
   String videoLink;
   String videoTag;
-  List videoHastags;
+  List? videoHastags;
   String videoDescription;
   String videoTopic;
   String thumbnail;

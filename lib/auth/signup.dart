@@ -391,7 +391,6 @@ class _SignUpState extends State<SignUp> {
           error = "Signup failed. Please try again.";
           break;
       }
-      print(e.toString());
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),

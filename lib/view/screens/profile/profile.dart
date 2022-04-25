@@ -33,10 +33,14 @@ class _ProfileState extends State<Profile> {
 
   final ProfileController profileController = Get.put(ProfileController());
 
+  updateUserId() async {
+    await profileController.updateUserId(widget.uid);
+  }
+
   @override
   void initState() {
+    updateUserId();
     super.initState();
-    profileController.updateUserId(widget.uid);
   }
 
   int noOfVids = 0;
@@ -113,7 +117,7 @@ class _ProfileState extends State<Profile> {
     return GetBuilder<ProfileController>(
         init: ProfileController(),
         builder: (controller) {
-          if (controller.user.isEmpty) {
+          if (profileController.user.isEmpty) {
             return const Center(
               child: CircularProgress(),
             );
@@ -189,12 +193,13 @@ class _ProfileState extends State<Profile> {
                         backgroundColor: Colors.transparent,
                         radius: 50,
                         child: CachedNetworkImage(
-                          imageUrl: controller.user['profilePhoto'] == null ||
-                                  controller.user['profilePhoto']
+                          imageUrl: profileController.user['profilePhoto'] ==
+                                      null ||
+                                  profileController.user['profilePhoto']
                                       .toString()
                                       .isEmpty
                               ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
-                              : controller.user['profilePhoto'],
+                              : profileController.user['profilePhoto'],
                           imageBuilder: (context, imageProvider) =>
                               CircleAvatar(
                                   backgroundColor: Colors.transparent,
@@ -214,26 +219,28 @@ class _ProfileState extends State<Profile> {
                         height: screenHeight(context) * 0.01,
                       ),
                       txt(
-                          txt: controller.user['name'],
+                          txt: profileController.user['name'],
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                       // ignore: unnecessary_null_comparison
                       // currentAddress.isNotEmpty
                       //     ? txt(txt: currentAddress, fontSize: 12)
                       //     :
-                      InkWell(
-                        onTap: () {
-                          // getCurrentLocation();
-                        },
-                        child: txt(
-                            txt: 'Click here to add your location',
-                            fontSize: 12),
-                      ),
+                      widget.uid != userId
+                          ? Container()
+                          : InkWell(
+                              onTap: () {
+                                // getCurrentLocation();
+                              },
+                              child: txt(
+                                  txt: 'Click here to add your location',
+                                  fontSize: 12),
+                            ),
                       SizedBox(
                         height: screenHeight(context) * 0.01,
                       ),
                       txt(
-                          txt: controller.user['bio'],
+                          txt: profileController.user['bio'],
                           fontSize: 12,
                           fontColor: Colors.black.withOpacity(0.5)),
                       SizedBox(
@@ -249,7 +256,7 @@ class _ProfileState extends State<Profile> {
                           Column(
                             children: [
                               txt(
-                                  txt: controller.user['following'],
+                                  txt: profileController.user['following'],
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                               txt(txt: 'FOLLOWING', fontSize: 10),
@@ -272,7 +279,7 @@ class _ProfileState extends State<Profile> {
                           Column(
                             children: [
                               txt(
-                                  txt: controller.user['followers'],
+                                  txt: profileController.user['followers'],
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                               txt(txt: 'FOLLOWERS', fontSize: 10),
@@ -295,7 +302,7 @@ class _ProfileState extends State<Profile> {
                           Column(
                             children: [
                               txt(
-                                  txt: controller.user['vids'],
+                                  txt: profileController.user['vids'],
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                               txt(txt: 'VIDS', fontSize: 10),
@@ -320,7 +327,7 @@ class _ProfileState extends State<Profile> {
                           children: [
                             InkWell(
                               onTap: () {
-                                // isFollowed ? unFollowUser() : followUser();
+                                profileController.followUser();
                               },
                               child: Container(
                                 width: screenWidth(context) * 0.5,
@@ -331,7 +338,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 child: Center(
                                   child: txt(
-                                      txt: controller.user['isFollowing']
+                                      txt: profileController.user['isFollowing']
                                           ? 'Unfollow'
                                           : 'Follow',
                                       fontSize: 13,
@@ -779,25 +786,6 @@ Padding favouriteItem(
                         fontWeight: FontWeight.bold,
                         fontSize: 10),
                   ),
-                  // Container(
-                  //   width: screenWidth(context) * 0.05,
-                  // ),
-                  // SizedBox(
-                  //   width: screenWidth(context) * 0.15,
-                  //   child: Row(
-                  //     children: [
-                  //       const Icon(Icons.play_arrow,
-                  //           size: 18, color: Color(blueColor)),
-                  //       txt(
-                  //         maxLines: 1,
-                  //         txt: '21.k',
-                  //         fontSize: 10,
-                  //         fontWeight: FontWeight.bold,
-                  //         fontColor: const Color(blueColor),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                 ],
               ),
             ),

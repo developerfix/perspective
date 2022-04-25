@@ -8,7 +8,11 @@ import 'package:slant/view/screens/makeVideo/q2_3.dart';
 import '../../../bnb.dart';
 
 class Question1 extends StatefulWidget {
-  const Question1({Key? key}) : super(key: key);
+  final List? hastags;
+  final String? title;
+  final bool? isAddingToThChain;
+  const Question1({Key? key, this.hastags, this.isAddingToThChain, this.title})
+      : super(key: key);
 
   @override
   State<Question1> createState() => _Question1State();
@@ -261,6 +265,9 @@ class _Question1State extends State<Question1> {
                                 PageTransition(
                                   type: PageTransitionType.bottomToTop,
                                   child: Question2And3(
+                                    hastags: widget.hastags,
+                                    isAddingToThChain: widget.isAddingToThChain,
+                                    title: widget.title,
                                     selectedTopic: topicSelected,
                                   ),
                                 ),

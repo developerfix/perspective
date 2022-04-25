@@ -1,8 +1,10 @@
 import 'dart:math';
 
 import 'package:adobe_xd/page_link.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -33,12 +35,40 @@ class _LoginState extends State<Login> {
     });
 
     if (userId != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: ((context) => const Interested()),
-        ),
-      );
+      SchedulerBinding.instance!.addPostFrameCallback((_) async {
+        await usersCollection
+            .doc(userId)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            print('(documentSnapshot.data() as Map)[dsds] ');
+            print('(documentSnapshot.data() as Map)[dsds] ');
+            print('(documentSnapshot.data() as Map)[dsds] ');
+            print('(documentSnapshot.data() as Map)[dsds] ');
+            print('(documentSnapshot.data() as Map)[dsds] ');
+            print((documentSnapshot.data() as Map)['topicsOfInterest']);
+            print((documentSnapshot.data() as Map)['name']);
+            print((documentSnapshot.data() as Map)['email']);
+
+            if ((documentSnapshot.data() as Map)['topicsOfInterest'] != null) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: ((context) => const BNB()),
+                  ),
+                  (Route<dynamic> route) => false);
+            } else {
+              setState(() {
+                loading1 = false;
+              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Interested()),
+              );
+            }
+          }
+        });
+      });
     } else {
       setState(() {
         loading1 = false;
@@ -50,12 +80,11 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    // userchecker();
+    userchecker();
 
     isVisible = false;
     _emailcontroller.text = '';
     _passwordcontroller.text = '';
-    setState(() {});
     // _checkIfIsLogged();
   }
 
@@ -167,17 +196,14 @@ class _LoginState extends State<Login> {
     return SafeArea(
       child: Scaffold(
         body: loading1
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [CircularProgress()],
-              )
+            ? const Center(child: CircularProgress())
             : Form(
                 key: _formKey,
                 child: StreamBuilder<User?>(
                   stream: FirebaseAuth.instance.authStateChanges(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return const Interested();
+                      return Container();
                     } else {
                       return SingleChildScrollView(
                         child: SizedBox(
@@ -433,17 +459,47 @@ class _LoginState extends State<Login> {
           email: _emailcontroller.text.trim(),
           password: _passwordcontroller.text.trim());
 
-      // PageLinkInfo(
-      //     transition: LinkTransition.Fade,
-      //     ease: Curves.easeOut,
-      //     duration: 0.3,
-      //     pageBuilder: () => const BNB());
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => const BNB()),
-          ),
-          (Route<dynamic> route) => false);
+      if (userId != null) {
+        SchedulerBinding.instance!.addPostFrameCallback((_) async {
+          await usersCollection
+              .doc(userId)
+              .get()
+              .then((DocumentSnapshot documentSnapshot) {
+            if (documentSnapshot.exists) {
+              print('(documentSnapshot.data() as Map)[login] ');
+              print('(documentSnapshot.data() as Map)[login] ');
+              print('(documentSnapshot.data() as Map)[login] ');
+              print('(documentSnapshot.data() as Map)[login] ');
+              print('(documentSnapshot.data() as Map)[login] ');
+              print(userId);
+              print('login' +
+                  (documentSnapshot.data() as Map)['topicsOfInterest']);
+
+              if ((documentSnapshot.data() as Map)['topicsOfInterest'] !=
+                  null) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => const BNB()),
+                    ),
+                    (Route<dynamic> route) => false);
+              } else {
+                print('go to interested');
+                print('go to interested');
+                print('go to interested');
+                print('go to interested');
+                setState(() {
+                  loading1 = false;
+                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Interested()),
+                );
+              }
+            }
+          });
+        });
+      }
     } on FirebaseAuthException catch (e) {
       String error = '';
       switch (e.code) {

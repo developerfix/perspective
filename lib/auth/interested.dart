@@ -36,43 +36,6 @@ class _InterestedState extends State<Interested> {
   bool loading = false;
   bool loading1 = false;
 
-  topichecker() async {
-    setState(() {
-      loading = true;
-    });
-    try {
-      await users.doc(userId).get().then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          if (documentSnapshot.data() != null) {
-            if (documentSnapshot.get(FieldPath(const ['topicsOfInterest'])) !=
-                []) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => const BNB()),
-                  ),
-                  (Route<dynamic> route) => false);
-              // Future.delayed(Duration.zero, () {
-              //   Navigator.push(context,
-              //       MaterialPageRoute(builder: ((context) => const BNB())));
-              // });
-            } else {
-              setState(() {
-                loading = false;
-              });
-            }
-          }
-        }
-      });
-    } catch (e) {
-      setState(() {
-        loading = false;
-      });
-      // print('error is  +${e.toString()}');
-      Container();
-    }
-  }
-
   Future<void> updateUser() async {
     setState(() {
       loading1 = true;
@@ -87,19 +50,12 @@ class _InterestedState extends State<Interested> {
           ),
           (Route<dynamic> route) => false);
     }).catchError((error) {
-      print('error for uploading is + ${error.toString()}');
       setState(() {
         loading1 = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('something went wrong, Please restart the app')));
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // topichecker();
   }
 
   @override

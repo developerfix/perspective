@@ -38,7 +38,11 @@ class _BNBState extends State<BNB> {
         case 2:
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (_) => const MakeVideo(),
+              builder: (_) => const MakeVideo(
+                hastags: [],
+                isAddingToThChain: false,
+                title: '',
+              ),
             ),
           );
           break;
@@ -61,10 +65,9 @@ class _BNBState extends State<BNB> {
 
     if (widget.isProfile == true) {
       _scrn = Profile(uid: widget.uid!);
-      _selectedIndex = 4;
       screen(4);
     } else {
-      const HomeScreen();
+      screen(0);
     }
   }
 
@@ -105,7 +108,7 @@ class _BNBState extends State<BNB> {
             centerIcon: Icons.add,
             selectedIndex: _selectedIndex!,
             onItemPressed: (_) {
-              _selectedIndex = _;
+              // _selectedIndex = _;
               screen(_);
             },
           ),

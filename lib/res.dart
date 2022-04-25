@@ -1,10 +1,18 @@
 import 'package:adobe_xd/page_link.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 const int blueColor = 0xff3B5998;
 const int redColor = 0xffEE6C4D;
 const int blackColor = 0xff1D1A2F;
+
+CollectionReference usersCollection =
+    FirebaseFirestore.instance.collection('users');
+CollectionReference videosCollection =
+    FirebaseFirestore.instance.collection('videos');
+final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
 const String howSocietyAroundMeFunctions = 'How society around me functions';
 const String whatsHappeningInMyCountry = 'What’s happening in my country';
@@ -79,6 +87,7 @@ Widget textField(
     Widget? suffixIcon,
     Function(String)? onChanged,
     String? Function(String?)? validator,
+    bool? isDisabled,
     int? maxlines,
     String? hinttext}) {
   return Theme(
@@ -94,6 +103,8 @@ Widget textField(
           border: Border.all(width: 1.0, color: const Color(0xffe1e1e5)),
         ),
         child: TextFormField(
+          readOnly: isDisabled! ? true : false,
+
           maxLength: maxLength,
           controller: controller,
           obscureText: isobscuretext ?? false,

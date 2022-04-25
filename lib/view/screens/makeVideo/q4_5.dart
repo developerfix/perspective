@@ -21,11 +21,21 @@ import 'package:image_picker/image_picker.dart';
 import '../../../controller/upload_video_controller.dart';
 
 class Question4And5 extends StatefulWidget {
+  final List? hastags;
+  // final String? titlee;
+  final bool? isAddingToThChain;
+
   final String? selectedTopic;
   final String? title;
   final String? perspectiveTag;
   const Question4And5(
-      {Key? key, this.perspectiveTag, this.selectedTopic, this.title})
+      {Key? key,
+      this.perspectiveTag,
+      this.selectedTopic,
+      // this.titlee,
+      this.hastags,
+      this.isAddingToThChain,
+      this.title})
       : super(key: key);
 
   @override
@@ -45,7 +55,7 @@ class _Question4And5State extends State<Question4And5> {
   bool? p5 = false;
 
   final ImagePicker _picker = ImagePicker();
-  List<String> hashTags = [];
+  List? hashTags = [];
   bool loading = false;
   String? downloadURL;
   File? _video;
@@ -85,6 +95,8 @@ class _Question4And5State extends State<Question4And5> {
   @override
   void initState() {
     super.initState();
+
+    widget.isAddingToThChain! ? hashTags = widget.hastags! : [];
 
     getUserName();
   }
@@ -134,7 +146,13 @@ class _Question4And5State extends State<Question4And5> {
                                 context,
                                 PageTransition(
                                     type: PageTransitionType.topToBottom,
-                                    child: const Question2And3()));
+                                    child: Question2And3(
+                                      hastags: widget.hastags,
+                                      isAddingToThChain:
+                                          widget.isAddingToThChain,
+                                      title: widget.title,
+                                      selectedTopic: widget.selectedTopic,
+                                    )));
                           },
                           child: Container(
                             width: screenWidth(context) * 0.08,
@@ -202,6 +220,7 @@ class _Question4And5State extends State<Question4And5> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                            isDisabled: false,
                             maxLength: 100,
                             maxlines: 5,
                             hinttext: '...',
@@ -215,6 +234,8 @@ class _Question4And5State extends State<Question4And5> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                            isDisabled:
+                                widget.isAddingToThChain! ? true : false,
                             onChanged: (value) {
                               hashTags = extractHashTags(value);
                             },
@@ -224,13 +245,13 @@ class _Question4And5State extends State<Question4And5> {
                         SizedBox(
                           height: screenHeight(context) * 0.02,
                         ),
-                        hashTags.isNotEmpty
+                        hashTags!.isNotEmpty
                             ? txt(txt: 'Selected Hastags', fontSize: 14)
                             : Container(),
                         SizedBox(
                           height: screenHeight(context) * 0.02,
                         ),
-                        hashTags.isNotEmpty
+                        hashTags!.isNotEmpty
                             ? txt(
                                 txt: hashTags.toString(),
                                 fontSize: 14,
@@ -243,7 +264,19 @@ class _Question4And5State extends State<Question4And5> {
                   if (loading) ...[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [CircularProgress()],
+                      children: [
+                        Column(
+                          children: [
+                            txt(
+                                txt: 'Please wait, video is publishing',
+                                fontSize: 18),
+                            SizedBox(
+                              height: screenHeight(context) * 0.05,
+                            ),
+                            const CircularProgress(),
+                          ],
+                        )
+                      ],
                     )
                   ],
                   if (!loading) ...[
@@ -253,7 +286,7 @@ class _Question4And5State extends State<Question4And5> {
                             widget.selectedTopic!.isEmpty ||
                             widget.title!.isEmpty ||
                             _descriptionController.text.isEmpty ||
-                            _hashtagController.text.isEmpty) {
+                            hashTags!.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text(

@@ -339,8 +339,19 @@ class _EditProfileState extends State<EditProfile> {
                             if (loading) ...[
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  CircularProgress(),
+                                children: [
+                                  Column(
+                                    children: [
+                                      txt(
+                                          txt:
+                                              'Please wait, Changes are being made',
+                                          fontSize: 18),
+                                      SizedBox(
+                                        height: screenHeight(context) * 0.05,
+                                      ),
+                                      const CircularProgress(),
+                                    ],
+                                  ),
                                 ],
                               )
                             ],

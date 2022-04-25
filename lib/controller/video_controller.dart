@@ -98,19 +98,22 @@ class VideoController extends GetxController {
 
   Future<void> getHomeScreenVideos() async {
     try {
+      // _homeScreenVideosList.bindStream(FirebaseFirestore.instance.collection('videos').doc(myLifestyle).get().then((value) {
+
+      // }))
       _homeScreenVideosList.bindStream(FirebaseFirestore.instance
           .collectionGroup(neutral)
           .orderBy(FieldPath.documentId)
           .startAt([
             FirebaseFirestore.instance
                 .collection("videos")
-                .doc(myLifestyle)
+                .doc(mySenseOfBelongingAndItsRepresentation)
                 .path
           ])
           .endAt([
             FirebaseFirestore.instance
                     .collection("videos")
-                    .doc(myLifestyle)
+                    .doc(mySenseOfBelongingAndItsRepresentation)
                     .path +
                 "\uf8ff"
           ])

@@ -44,7 +44,7 @@ class UploadVideoController extends GetxController {
     String? videoTitle,
     String? videoDescription,
     String? videoTag,
-    required List<String?> videoHastags,
+    List? videoHastags,
   }) async {
     var videosCollection = FirebaseFirestore.instance.collection('videos');
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
@@ -92,7 +92,7 @@ class UploadVideoController extends GetxController {
           videoo.toJson(),
         )
         .then((value) {
-      for (var i in videoHastags) {
+      for (var i in videoHastags!) {
         firebaseFirestore
             .collection('hashtags')
             .doc(i)
