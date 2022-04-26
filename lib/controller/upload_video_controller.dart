@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:slant/view/screens/makeVideo/Invite.dart';
 import 'package:video_compress/video_compress.dart';
 
 import '../bnb.dart';
@@ -119,7 +120,7 @@ class UploadVideoController extends GetxController {
         Navigator.pushAndRemoveUntil(
             Get.context!,
             MaterialPageRoute(
-              builder: (ctx) => const BNB(),
+              builder: (ctx) => Invite(video: videoo),
             ),
             (Route<dynamic> route) => false);
 

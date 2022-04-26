@@ -280,6 +280,7 @@ class _LoginState extends State<Login> {
                                       height: screenHeight(context) * 0.03,
                                     ),
                                     textField(
+                                      isDisabled: false,
                                       validator: EmailValidator(
                                           errorText: 'Invalid email address'),
                                       context: context,
@@ -292,6 +293,7 @@ class _LoginState extends State<Login> {
                                       height: screenHeight(context) * 0.02,
                                     ),
                                     textField(
+                                      isDisabled: false,
                                       context: context,
                                       prefixIcon: const Icon(
                                         Icons.lock_outline,

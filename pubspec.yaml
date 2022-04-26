@@ -41,7 +41,6 @@ dependencies:
   expandable_text: ^2.3.0
   expand_widget: ^2.1.0
   liquid_progress_indicator: ^0.4.0
-  checkbox_formfield: ^0.2.0
   timeago: ^3.2.2
   video_compress:
       git:

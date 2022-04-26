@@ -5,9 +5,9 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' as getx;
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/profile/viewVideo.dart';
+import 'package:slant/view/screens/profile/viewFavouriteVideo.dart';
 
 import '../../controller/video_controller.dart';
 import '../widgets/circularProgress.dart';
@@ -23,7 +23,7 @@ class Favourites extends StatefulWidget {
 class _FavouritesState extends State<Favourites> {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
-  final VideoController videoController = Get.put(VideoController());
+  final VideoController videoController = getx.Get.put(VideoController());
 
   @override
   Widget build(BuildContext context) {
@@ -153,17 +153,10 @@ class _FavouritesState extends State<Favourites> {
                 color: Colors.white.withOpacity(0.3),
               ),
             ),
-            InkWell(
-              onTap: (() {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewVideo(
-                            isFavourite: true,
-                            doc: doc!,
-                          )),
-                );
-              }),
+            navigator(
+              function: ViewFavouriteVideo(
+                doc: doc!,
+              ),
               child: DelayedDisplay(
                 delay: const Duration(seconds: 2),
                 child: Align(
@@ -189,6 +182,7 @@ class _FavouritesState extends State<Favourites> {
                         fontColor: const Color(blueColor),
                         fontSize: 14,
                         minFontSize: 8,
+                        maxLines: 1,
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -196,7 +190,8 @@ class _FavouritesState extends State<Favourites> {
                     child: AutoSizeText(
                       '#${topic!}',
                       maxFontSize: 14,
-                      maxLines: 8,
+                      minFontSize: 8,
+                      maxLines: 1,
                       style: const TextStyle(
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w600,

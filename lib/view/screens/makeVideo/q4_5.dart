@@ -283,10 +283,12 @@ class _Question4And5State extends State<Question4And5> {
                     InkWell(
                       onTap: () async {
                         if (widget.perspectiveTag!.isEmpty ||
-                            widget.selectedTopic!.isEmpty ||
-                            widget.title!.isEmpty ||
-                            _descriptionController.text.isEmpty ||
-                            hashTags!.isEmpty) {
+                                widget.selectedTopic!.isEmpty ||
+                                widget.title!.isEmpty ||
+                                _descriptionController.text.isEmpty ||
+                                widget.isAddingToThChain!
+                            ? hashTags!.isEmpty
+                            : _hashtagController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text(

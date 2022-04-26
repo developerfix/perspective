@@ -6,16 +6,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' as getx;
 // import 'package:geocoding/geocoding.dart';
 // import 'package:geolocator/geolocator.dart';
 import 'package:slant/auth/login.dart';
 import 'package:slant/controller/profile_controller.dart';
 import 'package:slant/res.dart';
 import 'package:slant/view/screens/profile/editProfile.dart';
-import 'package:slant/view/screens/profile/viewVideo.dart';
+import 'package:slant/view/screens/profile/viewByYouVideos.dart';
+import 'package:slant/view/screens/profile/viewFavouriteVideo.dart';
+import 'package:slant/view/screens/profile/viewRequestVideo.dart';
 import 'package:slant/view/widgets/circularProgress.dart';
 
+import '../../../bnb.dart';
 import '../../widgets/video-thumbnail-generator.dart';
 
 class Profile extends StatefulWidget {
@@ -28,10 +31,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-  final ProfileController profileController = Get.put(ProfileController());
+  final ProfileController profileController = getx.Get.put(ProfileController());
 
   updateUserId() async {
     await profileController.updateUserId(widget.uid);
@@ -114,7 +114,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ProfileController>(
+    return getx.GetBuilder<ProfileController>(
         init: ProfileController(),
         builder: (controller) {
           if (profileController.user.isEmpty) {
@@ -375,7 +375,7 @@ class _ProfileState extends State<Profile> {
                               child: TabBarView(
                                 children: [
                                   StreamBuilder<QuerySnapshot>(
-                                      stream: users
+                                      stream: usersCollection
                                           .doc(userId)
                                           .collection("videos")
                                           .snapshots(),
@@ -417,213 +417,57 @@ class _ProfileState extends State<Profile> {
                                           return const Center(
                                               child: Text('No videos...'));
                                         }
-
-                                        //                           if (!snapshot.hasData ||
-                                        //                               snapshot.hasError) {
-                                        //                             return const Text(
-                                        //                               'No videos...',
-                                        //                             );
-                                        //                           } else if (snapshot.data!.docs.isNotEmpty) {
-
-                                        //     return ListView.builder(
-                                        //                                 itemCount:
-                                        //                                     snapshot.data!.docs.length,
-                                        //                                 itemBuilder: (context, index) {
-                                        //                                   DocumentSnapshot doc =
-                                        //                                       snapshot.data!.docs[index];
-
-                                        //                                   return favouriteItem(context,
-                                        //                                       doc: doc,
-                                        //                                       name: data['name'],
-                                        //                                       title: (doc.data()
-                                        //                                           as Map)['videoTitle'],
-                                        //                                       videoLink: (doc.data()
-                                        //                                           as Map)['videoLink'],
-                                        //                                       topic: (doc.data()
-                                        //                                           as Map)['videoTopic']);
-                                        //                                 });
-
-                                        // } else if (snapshot.hasData &&
-                                        //                               snapshot.connectionState ==
-                                        //                                   ConnectionState.waiting) {
-                                        //                             return const Center(
-                                        //                               child: CircularProgress(),
-                                        //                             );
-                                        //                           } else {
-                                        //                             return const Text(
-                                        //                               'No videos...',
-                                        //                             );
-                                        //                           }
                                       }),
-                                  ListView(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: SizedBox(
-                                          height: screenHeight(context) * 0.2,
-                                          child: Stack(
-                                            children: [
-                                              Container(
-                                                height:
-                                                    screenHeight(context) * 0.2,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
-                                                  image: DecorationImage(
-                                                    image: const AssetImage(
-                                                        'assets/images/pic.jpeg'),
-                                                    fit: BoxFit.cover,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                            Colors
-                                                                .black
-                                                                .withOpacity(
-                                                                    0.5),
-                                                            BlendMode.dstIn),
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                height:
-                                                    screenHeight(context) * 0.2,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
-                                                  color: Colors.white
-                                                      .withOpacity(0.3),
-                                                ),
-                                              ),
-                                              Align(
-                                                  alignment: Alignment.center,
-                                                  child: Container(
-                                                    width: 56.0,
-                                                    height: 56.0,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Color(0xFF3B5998),
-                                                    ),
-                                                    child: Center(
-                                                      child: SvgPicture.asset(
-                                                          'assets/svgs/chainIcon.svg'),
-                                                    ),
-                                                  )),
-                                              Positioned(
-                                                top: 15,
-                                                left: 10,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    txt(
-                                                        txt:
-                                                            'Bidens no war policy',
-                                                        fontColor: const Color(
-                                                            blueColor),
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    const Text(
-                                                      '#Elections',
-                                                      style: TextStyle(
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Positioned(
-                                                bottom: 15,
-                                                left: 10,
-                                                child: SizedBox(
-                                                  width: screenWidth(context) *
-                                                      0.85,
-                                                  child: Row(
-                                                    children: [
-                                                      AutoSizeText.rich(
-                                                        const TextSpan(
-                                                            text: '37%'),
-                                                        maxFontSize: 12,
-                                                        style: TextStyle(
-                                                            fontSize: 20),
-                                                        minFontSize: 5,
-                                                      ),
-                                                      // txt(
-                                                      //   maxLines: 1,
-                                                      //   txt: '37%',
-                                                      //   fontColor:
-                                                      //       const Color(blueColor),
-                                                      //   fontWeight: FontWeight.bold,
-                                                      //   fontSize: 12,
-                                                      // ),
-                                                      // txt(
-                                                      //   maxLines: 1,
-                                                      //   txt:
-                                                      //       ' audience labelled this video as ',
-                                                      //   fontWeight: FontWeight.bold,
-                                                      //   fontColor: Colors.black45,
-                                                      //   fontSize: 10,
-                                                      // ),
-                                                      // txt(
-                                                      //   maxLines: 1,
-                                                      //   txt: '#very liberal',
-                                                      //   fontColor:
-                                                      //       const Color(blueColor),
-                                                      //   fontWeight: FontWeight.bold,
-                                                      //   fontSize: 10,
-                                                      // ),
-                                                      const Spacer(),
-                                                      Row(
-                                                        children: [
-                                                          const Icon(
-                                                              Icons.play_arrow,
-                                                              color: Color(
-                                                                  blueColor)),
-                                                          txt(
-                                                            txt: '21.k',
-                                                            fontSize: 12,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontColor:
-                                                                const Color(
-                                                                    blueColor),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              // Positioned(
-                                              //   bottom: 15,
-                                              //   right: 25,
-                                              //   child: Row(
-                                              //     children: [
-                                              //       const Icon(Icons.play_arrow, color: Color(blueColor)),
-                                              //       txt(
-                                              //         txt: '21.k',
-                                              //         fontSize: 12,
-                                              //         fontWeight: FontWeight.bold,
-                                              //         fontColor: const Color(blueColor),
-                                              //       ),
-                                              //     ],
-                                              //   ),
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                                  StreamBuilder<QuerySnapshot>(
+                                      stream: usersCollection
+                                          .doc(userId)
+                                          .collection("perspectiveRequests")
+                                          .snapshots(),
+                                      builder: (context,
+                                          AsyncSnapshot<QuerySnapshot>
+                                              snapshot) {
+                                        if (!snapshot.hasData ||
+                                            snapshot.hasError) {
+                                          return const Center(
+                                            child: Text(
+                                              'No perspective requests for you...',
+                                            ),
+                                          );
+                                        } else if (snapshot
+                                            .data!.docs.isNotEmpty) {
+                                          return ListView.builder(
+                                              itemCount:
+                                                  snapshot.data!.docs.length,
+                                              itemBuilder: (context, index) {
+                                                DocumentSnapshot doc =
+                                                    snapshot.data!.docs[index];
+                                                var data = (doc.data() as Map);
+                                                var videoDetails =
+                                                    data['videoDetails'] as Map;
+
+                                                String userID = data['userID'];
+                                                String userName =
+                                                    data['userName'];
+                                                String userProfileUrl =
+                                                    data['userProfileUrl'];
+
+                                                return perspectiveRequestedItem(
+                                                    context,
+                                                    title: videoDetails[
+                                                        'videoTitle'],
+                                                    topic: videoDetails[
+                                                        'videoTopic'],
+                                                    name: userName,
+                                                    videoDetails: videoDetails,
+                                                    profileUrl: userProfileUrl,
+                                                    userID: userID);
+                                              });
+                                        } else {
+                                          return const Center(
+                                              child: Text(
+                                                  'No perspective requests for you...'));
+                                        }
+                                      }),
                                 ],
                               )),
                         )
@@ -632,6 +476,170 @@ class _ProfileState extends State<Profile> {
             ),
           );
         });
+  }
+
+  Padding perspectiveRequestedItem(
+    BuildContext context, {
+    String? name,
+    Map? videoDetails,
+    String? title,
+    String? userID,
+    String? topic,
+    String? profileUrl,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SizedBox(
+        height: screenHeight(context) * 0.2,
+        child: Stack(
+          children: [
+            Container(
+              height: screenHeight(context) * 0.2,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/pic.jpeg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.5), BlendMode.dstIn),
+                ),
+              ),
+            ),
+            Container(
+              height: screenHeight(context) * 0.2,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                color: Colors.white.withOpacity(0.3),
+              ),
+            ),
+            navigator(
+              function: ViewRequestVideo(
+                videoDetail: videoDetails,
+              ),
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 56.0,
+                    height: 56.0,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF3B5998),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset('assets/svgs/chainIcon.svg'),
+                    ),
+                  )),
+            ),
+            Positioned(
+              top: 15,
+              left: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  txt(
+                      txt: title!,
+                      fontColor: const Color(blueColor),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                  Text(
+                    '#$topic',
+                    style: const TextStyle(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 35,
+              right: 20,
+              child: navigator(
+                function: BNB(isProfile: true, uid: userID!),
+                child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  radius: 20,
+                  child: CachedNetworkImage(
+                    imageUrl: profileUrl == null ||
+                            profileUrl.toString().isEmpty
+                        ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
+                        : profileUrl,
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        radius: 20,
+                        backgroundImage: imageProvider),
+                    placeholder: (context, url) => const CircularProgress(),
+                    errorWidget: (context, url, error) => const CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        radius: 20,
+                        backgroundImage:
+                            AssetImage('assets/images/placeholder.png')),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 15,
+              right: 5,
+              child: SizedBox(
+                width: screenWidth(context) * 0.2,
+                child: Center(
+                  child: txt(
+                    maxLines: 1,
+                    minFontSize: 5,
+                    txt: name!,
+                    fontSize: 10,
+                    fontColor: const Color(blueColor),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 15,
+              left: 10,
+              right: 10,
+              child: SizedBox(
+                width: screenWidth(context) * 0.85,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: screenWidth(context) * 0.065,
+                      child: txt(
+                        maxLines: 1,
+                        txt: '37%',
+                        fontColor: const Color(blueColor),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                    SizedBox(
+                      width: screenWidth(context) * 0.4,
+                      child: txt(
+                        maxLines: 1,
+                        txt: ' audience labelled this video as ',
+                        fontWeight: FontWeight.bold,
+                        fontColor: Colors.black45,
+                        fontSize: 10,
+                      ),
+                    ),
+                    SizedBox(
+                      width: screenWidth(context) * 0.3,
+                      child: txt(
+                          maxLines: 1,
+                          txt: '#very liberal',
+                          fontColor: const Color(blueColor),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -702,19 +710,12 @@ Padding favouriteItem(
               color: Colors.white.withOpacity(0.3),
             ),
           ),
-          InkWell(
-            onTap: (() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ViewVideo(
-                          isFavourite: false,
-                          pictureUrl: profileUrl!,
-                          name: name!,
-                          doc: doc!,
-                        )),
-              );
-            }),
+          navigator(
+            function: ViewByYouVideo(
+              pictureUrl: profileUrl!,
+              name: name!,
+              doc: doc!,
+            ),
             child: DelayedDisplay(
               delay: const Duration(seconds: 2),
               child: Align(

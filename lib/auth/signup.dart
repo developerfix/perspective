@@ -141,6 +141,7 @@ class _SignUpState extends State<SignUp> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                          isDisabled: false,
                           validator: (text) {
                             if (text == null || text.isEmpty) {
                               return 'Please enter the name';
@@ -158,6 +159,7 @@ class _SignUpState extends State<SignUp> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                          isDisabled: false,
                           validator: EmailValidator(
                               errorText: 'Invalid email address'),
                           context: context,
@@ -170,6 +172,7 @@ class _SignUpState extends State<SignUp> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                          isDisabled: false,
                           validator: passwordValidator,
                           context: context,
                           prefixIcon: const Icon(
@@ -195,6 +198,7 @@ class _SignUpState extends State<SignUp> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
+                          isDisabled: false,
                           validator: (val) => MatchValidator(
                                   errorText: 'passwords do not match')
                               .validateMatch(val!, _passwordcontroller.text),

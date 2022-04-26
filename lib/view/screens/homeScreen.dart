@@ -15,7 +15,6 @@ import 'package:slant/res.dart';
 import 'package:slant/view/screens/makeVideo/Invite.dart';
 import 'package:slant/view/screens/makeVideo/makeVideo.dart';
 import 'package:slant/view/screens/profile/profile.dart';
-import 'package:slant/view/screens/profile/viewOtherUsersProfile.dart';
 import 'package:slant/view/screens/videoItem.dart';
 import "dart:math" show pi;
 
@@ -193,7 +192,11 @@ class _HomeScreenState extends State<HomeScreen>
                             backgroundColor: Colors.transparent,
                             radius: 30,
                             child: CachedNetworkImage(
-                              imageUrl: profilePic!,
+                              fit: BoxFit.contain,
+                              imageUrl: profilePic == null ||
+                                      profilePic.toString().isEmpty
+                                  ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
+                                  : profilePic,
                               imageBuilder: (context, imageProvider) =>
                                   CircleAvatar(
                                       backgroundColor: Colors.transparent,
