@@ -244,7 +244,7 @@ class _FavouritesState extends State<Favourites> {
                 child: InkWell(
                   onTap: () async {
                     await videoController.removeVideoFromFavourites(
-                        (doc!.data() as Map)['videoLink']);
+                        (doc.data() as Map)['videoLink']);
                   },
                   child: const Icon(
                     Icons.favorite,

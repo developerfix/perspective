@@ -8,7 +8,7 @@ class Video {
   int neutral;
   int liberal;
   int veryLiberal;
-  List brainOnFireReactions;
+  int brainOnFireReactions;
   String videoLink;
   String videoTag;
   List? videoHastags;

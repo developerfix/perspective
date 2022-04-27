@@ -68,7 +68,7 @@ class UploadVideoController extends GetxController {
     downloadURL = await snap.ref.getDownloadURL();
 
     Video videoo = Video(
-      brainOnFireReactions: [],
+      brainOnFireReactions: 0,
       conservative: 0,
       liberal: 0,
       neutral: 0,
