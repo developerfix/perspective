@@ -5,16 +5,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:slant/controller/profileVideoController.dart';
 // import 'package:get/get.dart' as getx;
 import '../../bnb.dart';
 import '../../controller/video_controller.dart';
 import '../../models/video.dart';
 import '../../res.dart';
-import '../screens/makeVideo/Invite.dart';
-import '../screens/makeVideo/makeVideo.dart';
-import '../screens/videoItem.dart';
-import 'circularProgress.dart';
+import '../screens/makeVideo/make_video.dart';
+import '../screens/video_item.dart';
+import 'circular_progress.dart';
 
 class VideoWidget extends StatefulWidget {
   final VideoController? videoController;
@@ -70,6 +68,8 @@ class _VideoWidgetState extends State<VideoWidget> {
   var totalOfReactions = 0;
   bool isBrainReactionLoading = false;
   bool tagReactionLoading = false;
+  String largestPercentage = '';
+  int maxValue = 0;
 
   bool? vc = false;
   bool? c = false;
@@ -100,9 +100,126 @@ class _VideoWidgetState extends State<VideoWidget> {
     });
   }
 
+  updateTagReactionForCurrentuserInitially() async {
+    await usersCollection
+        .doc(userId)
+        .collection('tagReactions')
+        .where('videoLink', isEqualTo: widget.videoLink)
+        .get()
+        .then((QuerySnapshot querySnapshot) async {
+      for (var doc in querySnapshot.docs) {
+        if (doc.exists) {
+          if (doc.id == 'veryConservative') {
+            setState(() {
+              vc = true;
+              c = false;
+              n = false;
+              l = false;
+              vl = false;
+            });
+          } else if (doc.id == conservative) {
+            setState(() {
+              vc = false;
+              c = true;
+              n = false;
+              l = false;
+              vl = false;
+            });
+          } else if (doc.id == neutral) {
+            setState(() {
+              vc = false;
+              c = false;
+              n = true;
+              l = false;
+              vl = false;
+            });
+          } else if (doc.id == liberal) {
+            setState(() {
+              vc = false;
+              c = false;
+              n = false;
+              l = true;
+              vl = false;
+            });
+          } else if (doc.id == 'veryLiberal') {
+            setState(() {
+              vc = false;
+              c = false;
+              n = false;
+              l = false;
+              vl = true;
+            });
+          } else {
+            setState(() {
+              vc = false;
+              c = false;
+              n = false;
+              l = false;
+              vl = false;
+            });
+          }
+        }
+      }
+    });
+  }
+
+  updateHighestReactionPercentage() {
+    int vc = ((widget.veryConservative)! / totalOfReactions).isNaN
+        ? 0
+        : ((widget.veryConservative)! / totalOfReactions).isInfinite
+            ? 0
+            : (((widget.veryConservative)! / totalOfReactions) * 100).round();
+    int c = ((widget.conservative)! / totalOfReactions).isNaN
+        ? 0
+        : ((widget.conservative)! / totalOfReactions).isInfinite
+            ? 0
+            : (((widget.conservative)! / totalOfReactions) * 100).round();
+    int n = ((widget.neutral)! / totalOfReactions).isNaN
+        ? 0
+        : ((widget.neutral)! / totalOfReactions).isInfinite
+            ? 0
+            : (((widget.neutral)! / totalOfReactions) * 100).round();
+    int l = ((widget.liberal)! / totalOfReactions).isNaN
+        ? 0
+        : ((widget.liberal)! / totalOfReactions).isInfinite
+            ? 0
+            : (((widget.liberal)! / totalOfReactions) * 100).round();
+    int vl = ((widget.veryLiberal)! / totalOfReactions).isNaN
+        ? 0
+        : ((widget.veryLiberal)! / totalOfReactions).isInfinite
+            ? 0
+            : (((widget.veryLiberal)! / totalOfReactions) * 100).round();
+
+    List compare = [];
+
+    compare.add(vc);
+    compare.add(c);
+    compare.add(n);
+    compare.add(l);
+    compare.add(vl);
+
+    compare.sort();
+
+    maxValue = compare.last;
+
+    if (vc == maxValue) {
+      largestPercentage = 'very conservative';
+    } else if (c == maxValue) {
+      largestPercentage = 'conservative';
+    } else if (n == maxValue) {
+      largestPercentage = 'neutral';
+    } else if (l == maxValue) {
+      largestPercentage = 'liberal';
+    } else if (vl == maxValue) {
+      largestPercentage = 'very liberal';
+    }
+  }
+
   @override
   void initState() {
     updateIsBrainOnFireForCurrentuserInitially();
+    updateTagReactionForCurrentuserInitially();
+    updateHighestReactionPercentage();
     totalOfReactions = widget.veryConservative! +
         widget.conservative! +
         widget.neutral! +
@@ -169,7 +286,9 @@ class _VideoWidgetState extends State<VideoWidget> {
                   .collection(finalCollectionPaths[i])
                   .doc(finalDocPaths[i])
                   .update({
-                  "veryConservative": widget.veryConservative! - 1,
+                  "veryConservative": widget.veryConservative! == 0
+                      ? 0
+                      : widget.veryConservative! - 1,
                 });
         } else if (selectedTag == 2) {
           shouldAdd!
@@ -183,7 +302,8 @@ class _VideoWidgetState extends State<VideoWidget> {
                   .collection(finalCollectionPaths[i])
                   .doc(finalDocPaths[i])
                   .update({
-                  "conservative": widget.conservative! - 1,
+                  "conservative":
+                      widget.conservative! == 0 ? 0 : widget.conservative! - 1,
                 });
         } else if (selectedTag == 3) {
           shouldAdd!
@@ -197,7 +317,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                   .collection(finalCollectionPaths[i])
                   .doc(finalDocPaths[i])
                   .update({
-                  "neutral": widget.neutral! - 1,
+                  "neutral": widget.neutral! == 0 ? 0 : widget.neutral! - 1,
                 });
         } else if (selectedTag == 4) {
           shouldAdd!
@@ -211,7 +331,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                   .collection(finalCollectionPaths[i])
                   .doc(finalDocPaths[i])
                   .update({
-                  "liberal": widget.liberal! - 1,
+                  "liberal": widget.liberal! == 0 ? 0 : widget.liberal! - 1,
                 });
         } else if (selectedTag == 5) {
           shouldAdd!
@@ -225,7 +345,8 @@ class _VideoWidgetState extends State<VideoWidget> {
                   .collection(finalCollectionPaths[i])
                   .doc(finalDocPaths[i])
                   .update({
-                  'veryLiberal': widget.veryLiberal! - 1,
+                  'veryLiberal':
+                      widget.veryLiberal! == 0 ? 0 : widget.veryLiberal! - 1,
                 });
         }
       }
@@ -257,7 +378,7 @@ class _VideoWidgetState extends State<VideoWidget> {
           await usersCollection
               .doc(userId)
               .collection('tagReactions')
-              .doc(veryConservative)
+              .doc("veryConservative")
               .set(({'videoLink': widget.videoLink}));
           await getDocs(selectedTag: 1, tag: widget.videoTag, shouldAdd: true);
         } else {
@@ -269,20 +390,47 @@ class _VideoWidgetState extends State<VideoWidget> {
               .then((QuerySnapshot querySnapshot) async {
             for (var doc in querySnapshot.docs) {
               if (doc.exists) {
-                existingDoc.add(doc.id);
+                if (doc.id != 'veryConservative') {
+                  existingDoc.add(doc.id);
+                }
               }
             }
             if (existingDoc.isNotEmpty) {
               for (var id in existingDoc) {
-                await usersCollection
-                    .doc(userId)
-                    .collection('tagReactions')
-                    .doc(id)
-                    .delete();
-                await getDocs(
-                    selectedTag: 1, tag: widget.videoTag, shouldAdd: false);
+                if (id == conservative) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(conservative)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 2, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == neutral) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(neutral)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 3, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == liberal) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(liberal)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 4, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == 'veryLiberal') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryLiberal')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 5, tag: widget.videoTag, shouldAdd: false);
+                }
               }
-            } else {
               await usersCollection
                   .doc(userId)
                   .collection('tagReactions')
@@ -324,20 +472,47 @@ class _VideoWidgetState extends State<VideoWidget> {
               .then((QuerySnapshot querySnapshot) async {
             for (var doc in querySnapshot.docs) {
               if (doc.exists) {
-                existingDoc.add(doc.id);
+                if (doc.id != conservative) {
+                  existingDoc.add(doc.id);
+                }
               }
             }
             if (existingDoc.isNotEmpty) {
               for (var id in existingDoc) {
-                await usersCollection
-                    .doc(userId)
-                    .collection('tagReactions')
-                    .doc(id)
-                    .delete();
-                await getDocs(
-                    selectedTag: 2, tag: widget.videoTag, shouldAdd: false);
+                if (id == 'veryConservative') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryConservative')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 1, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == neutral) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(neutral)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 3, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == liberal) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(liberal)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 4, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == 'veryLiberal') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryLiberal')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 5, tag: widget.videoTag, shouldAdd: false);
+                }
               }
-            } else {
               await usersCollection
                   .doc(userId)
                   .collection('tagReactions')
@@ -379,20 +554,47 @@ class _VideoWidgetState extends State<VideoWidget> {
               .then((QuerySnapshot querySnapshot) async {
             for (var doc in querySnapshot.docs) {
               if (doc.exists) {
-                existingDoc.add(doc.id);
+                if (doc.id != neutral) {
+                  existingDoc.add(doc.id);
+                }
               }
             }
             if (existingDoc.isNotEmpty) {
               for (var id in existingDoc) {
-                await usersCollection
-                    .doc(userId)
-                    .collection('tagReactions')
-                    .doc(id)
-                    .delete();
-                await getDocs(
-                    selectedTag: 3, tag: widget.videoTag, shouldAdd: false);
+                if (id == 'veryConservative') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryConservative')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 1, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == conservative) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(conservative)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 2, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == liberal) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(liberal)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 4, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == 'veryLiberal') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryLiberal')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 5, tag: widget.videoTag, shouldAdd: false);
+                }
               }
-            } else {
               await usersCollection
                   .doc(userId)
                   .collection('tagReactions')
@@ -434,20 +636,47 @@ class _VideoWidgetState extends State<VideoWidget> {
               .then((QuerySnapshot querySnapshot) async {
             for (var doc in querySnapshot.docs) {
               if (doc.exists) {
-                existingDoc.add(doc.id);
+                if (doc.id != liberal) {
+                  existingDoc.add(doc.id);
+                }
               }
             }
             if (existingDoc.isNotEmpty) {
               for (var id in existingDoc) {
-                await usersCollection
-                    .doc(userId)
-                    .collection('tagReactions')
-                    .doc(id)
-                    .delete();
-                await getDocs(
-                    selectedTag: 4, tag: widget.videoTag, shouldAdd: false);
+                if (id == 'veryConservative') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryConservative')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 1, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == conservative) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(conservative)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 2, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == neutral) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(neutral)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 3, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == 'veryLiberal') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryLiberal')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 5, tag: widget.videoTag, shouldAdd: false);
+                }
               }
-            } else {
               await usersCollection
                   .doc(userId)
                   .collection('tagReactions')
@@ -477,7 +706,7 @@ class _VideoWidgetState extends State<VideoWidget> {
           await usersCollection
               .doc(userId)
               .collection('tagReactions')
-              .doc(veryLiberal)
+              .doc('veryLiberal')
               .set(({'videoLink': widget.videoLink}));
           await getDocs(selectedTag: 5, tag: widget.videoTag, shouldAdd: true);
         } else {
@@ -489,20 +718,47 @@ class _VideoWidgetState extends State<VideoWidget> {
               .then((QuerySnapshot querySnapshot) async {
             for (var doc in querySnapshot.docs) {
               if (doc.exists) {
-                existingDoc.add(doc.id);
+                if (doc.id != 'veryLiberal') {
+                  existingDoc.add(doc.id);
+                }
               }
             }
             if (existingDoc.isNotEmpty) {
               for (var id in existingDoc) {
-                await usersCollection
-                    .doc(userId)
-                    .collection('tagReactions')
-                    .doc(id)
-                    .delete();
-                await getDocs(
-                    selectedTag: 5, tag: widget.videoTag, shouldAdd: false);
+                if (id == 'veryConservative') {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc('veryConservative')
+                      .delete();
+                  await getDocs(
+                      selectedTag: 1, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == conservative) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(conservative)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 2, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == neutral) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(neutral)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 3, tag: widget.videoTag, shouldAdd: false);
+                } else if (id == liberal) {
+                  await usersCollection
+                      .doc(userId)
+                      .collection('tagReactions')
+                      .doc(liberal)
+                      .delete();
+                  await getDocs(
+                      selectedTag: 4, tag: widget.videoTag, shouldAdd: false);
+                }
               }
-            } else {
               await usersCollection
                   .doc(userId)
                   .collection('tagReactions')
@@ -901,25 +1157,55 @@ class _VideoWidgetState extends State<VideoWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Row(children: [
-                              txt(
-                                txt: '37%',
-                                fontColor: const Color(blueColor),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                              txt(
-                                  txt: ' audience labelled this video as ',
-                                  fontWeight: FontWeight.bold,
-                                  fontColor: Colors.black45,
-                                  fontSize: 12),
-                              txt(
-                                txt: '#very liberal',
-                                fontColor: const Color(blueColor),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ]),
+                            widget.veryConservative == 0 &&
+                                    widget.conservative == 0 &&
+                                    widget.neutral == 0 &&
+                                    widget.liberal == 0 &&
+                                    widget.veryLiberal == 0
+                                ? Row(children: [
+                                    SizedBox(
+                                      width: screenWidth(context) * 0.8,
+                                      child: txt(
+                                          maxLines: 1,
+                                          txt:
+                                              'No response from the audience on this video yet',
+                                          fontWeight: FontWeight.bold,
+                                          fontColor: Colors.black45,
+                                          fontSize: 12),
+                                    ),
+                                  ])
+                                : Row(children: [
+                                    SizedBox(
+                                      width: screenWidth(context) * 0.08,
+                                      child: txt(
+                                        maxLines: 1,
+                                        txt: '${maxValue.toString()}%',
+                                        fontColor: const Color(blueColor),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: screenWidth(context) * 0.45,
+                                      child: txt(
+                                          maxLines: 1,
+                                          txt:
+                                              ' audience labelled this video as ',
+                                          fontWeight: FontWeight.bold,
+                                          fontColor: Colors.black45,
+                                          fontSize: 12),
+                                    ),
+                                    SizedBox(
+                                      width: screenWidth(context) * 0.25,
+                                      child: txt(
+                                        maxLines: 1,
+                                        txt: '#$largestPercentage',
+                                        fontColor: const Color(blueColor),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ]),
                             txt(
                               txt: 'What do you think?',
                               fontColor: const Color(blueColor),
@@ -949,7 +1235,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Very Conservative',
-                                            '${((((widget.veryConservative)! / totalOfReactions).isNaN ? 0 : ((widget.veryConservative)! / totalOfReactions)) * 100).round()}%',
+                                            '${((((widget.veryConservative)! / totalOfReactions).isNaN ? 0 : (widget.veryConservative)! / totalOfReactions).isInfinite ? 0 : ((widget.veryConservative)! / totalOfReactions) * 100).round()}%',
                                             vc! ? true : false),
                                         value: 1,
                                       ),
@@ -957,7 +1243,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Conservative',
-                                            '${((((widget.conservative)! / totalOfReactions).isNaN ? 0 : ((widget.conservative)! / totalOfReactions)) * 100).round()}%',
+                                            '${((((widget.conservative)! / totalOfReactions).isNaN ? 0 : (widget.conservative)! / totalOfReactions).isInfinite ? 0 : ((widget.conservative)! / totalOfReactions) * 100).round()}%',
                                             c! ? true : false),
                                         value: 2,
                                       ),
@@ -965,7 +1251,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Neutral',
-                                            '${((((widget.neutral)! / totalOfReactions).isNaN ? 0 : ((widget.neutral)! / totalOfReactions)) * 100).round()}%',
+                                            '${((((widget.neutral)! / totalOfReactions).isNaN ? 0 : (widget.neutral)! / totalOfReactions).isInfinite ? 0 : ((widget.neutral)! / totalOfReactions) * 100).round()}%',
                                             n! ? true : false),
                                         value: 3,
                                       ),
@@ -973,7 +1259,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Liberal',
-                                            '${((((widget.liberal)! / totalOfReactions).isNaN ? 0 : ((widget.liberal)! / totalOfReactions)) * 100).round()}%',
+                                            '${((((widget.liberal)! / totalOfReactions).isNaN ? 0 : (widget.liberal)! / totalOfReactions).isInfinite ? 0 : ((widget.liberal)! / totalOfReactions) * 100).round()}%',
                                             l! ? true : false),
                                         value: 4,
                                       ),
@@ -981,7 +1267,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Very Liberal',
-                                            '${((((widget.veryLiberal)! / totalOfReactions).isNaN ? 0 : ((widget.veryLiberal)! / totalOfReactions)) * 100).round()}%',
+                                            '${((((widget.veryLiberal)! / totalOfReactions).isNaN ? 0 : (widget.veryLiberal)! / totalOfReactions).isInfinite ? 0 : ((widget.veryLiberal)! / totalOfReactions) * 100).round()}%',
                                             vl! ? true : false),
                                         value: 5,
                                       ),
@@ -1062,10 +1348,10 @@ Row popupmenuItem(BuildContext context, String? itemText,
       Flexible(
         child: Text(
           itemText!,
-          style: TextStyle(
+          style: const TextStyle(
             fontFamily: 'OpenSans',
             fontSize: 12,
-            color: isSelected! ? Colors.green.shade400 : Colors.white,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1078,7 +1364,7 @@ Row popupmenuItem(BuildContext context, String? itemText,
         height: screenHeight(context) * 0.04,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isSelected ? Colors.green.shade400 : Colors.white,
+          color: isSelected! ? Colors.green.shade400 : Colors.white,
         ),
         child: Center(
           child: txt(

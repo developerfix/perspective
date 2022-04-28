@@ -3,9 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:slant/models/video.dart';
-import 'package:slant/view/screens/discover/videosList.dart';
-
-import '../res.dart';
 
 class ProfileVideoController extends GetxController {
   final Rx<List<Video>> _profileVideo = Rx<List<Video>>([]);

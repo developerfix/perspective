@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' as getx;
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/profile/viewFavouriteVideo.dart';
+import 'package:slant/view/screens/profile/view_favourite_video.dart';
 
 import '../../controller/video_controller.dart';
-import '../widgets/circularProgress.dart';
-import '../widgets/video-thumbnail-generator.dart';
+import '../widgets/circular_progress.dart';
+import '../widgets/video_thumbnail_generator.dart';
 
 class Favourites extends StatefulWidget {
   const Favourites({Key? key}) : super(key: key);

@@ -1,20 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:slant/controller/video_controller.dart';
 import 'package:slant/res.dart';
 import 'dart:io';
 import 'package:hashtagable/hashtagable.dart';
-import 'package:video_compress/video_compress.dart';
 
 import 'package:slant/bnb.dart';
 import 'package:slant/view/screens/makeVideo/q2_3.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 import 'dart:math';
 import 'package:image_picker/image_picker.dart';
 
@@ -110,12 +107,7 @@ class _Question4And5State extends State<Question4And5> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => const BNB()),
-          ),
-        );
+        Get.to(const BNB());
 
         return Future<bool>(
           () => true,

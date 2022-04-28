@@ -1,15 +1,15 @@
-import 'dart:ffi';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:slant/bnb.dart';
 import 'package:slant/res.dart';
 import 'dart:math';
 
-import 'package:slant/view/widgets/circularProgress.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 
 class Interested extends StatefulWidget {
   const Interested({Key? key}) : super(key: key);
@@ -43,12 +43,7 @@ class _InterestedState extends State<Interested> {
     return await users
         .doc(userId)
         .update({'topicsOfInterest': topicsOfInterest}).then((value) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => const BNB()),
-          ),
-          (Route<dynamic> route) => false);
+      Get.offAll(const BNB());
     }).catchError((error) {
       setState(() {
         loading1 = false;
@@ -56,6 +51,36 @@ class _InterestedState extends State<Interested> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('something went wrong, Please restart the app')));
     });
+  }
+
+  topicChecker() {
+    setState(() {
+      loading = true;
+    });
+    if (userId != null) {
+      SchedulerBinding.instance!.addPostFrameCallback((_) async {
+        await usersCollection
+            .doc(userId)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            if ((documentSnapshot.data() as Map)['name'] == 'ahme') {
+              Get.offAll(const BNB());
+            } else {
+              setState(() {
+                loading = false;
+              });
+            }
+          }
+        });
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    topicChecker();
+    super.initState();
   }
 
   @override

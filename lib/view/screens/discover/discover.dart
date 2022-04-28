@@ -3,10 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/discover/videosList.dart';
+import 'package:slant/view/screens/discover/videos_list.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
+
+import '../../widgets/circular_progress.dart';
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);
@@ -469,11 +471,7 @@ class _DiscoverState extends State<Discover> {
       {String? topic, Widget? route, Color? color, String? emojy}) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => route!,
-            ));
+        Get.to(route!);
       },
       child: Container(
         decoration: BoxDecoration(

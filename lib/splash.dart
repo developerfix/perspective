@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:slant/auth/interested.dart';
+import 'package:get/get.dart';
 import 'package:slant/auth/login.dart';
-import 'package:slant/bnb.dart';
 import 'package:slant/res.dart';
 
 class Splash extends StatefulWidget {
@@ -16,12 +15,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(
-        const Duration(seconds: 3),
-        () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Login()),
-            ));
+    Future.delayed(const Duration(seconds: 3), () => Get.to(const Login()));
   }
 
   @override

@@ -5,15 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:slant/auth/login.dart';
 import 'dart:math';
 import 'package:slant/res.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
-
-import '../../../bnb.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -309,6 +305,7 @@ class _EditProfileState extends State<EditProfile> {
                                         height: screenHeight(context) * 0.05,
                                       ),
                                       textField(
+                                        isDisabled: false,
                                         context: context,
                                         hinttext: '${data['name']}',
                                         prefixIcon: const Icon(
@@ -320,6 +317,7 @@ class _EditProfileState extends State<EditProfile> {
                                         height: screenHeight(context) * 0.05,
                                       ),
                                       textField(
+                                        isDisabled: false,
                                         context: context,
                                         hinttext: '${data['bio']}',
                                         prefixIcon: const Icon(

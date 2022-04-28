@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 
 class Followers extends StatefulWidget {
   final String userID;

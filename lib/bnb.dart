@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:diamond_bottom_bar/diamond_bottom_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,7 @@ import 'package:slant/res.dart';
 import 'package:slant/view/screens/HomeScreen.dart';
 import 'package:slant/view/screens/discover/discover.dart';
 import 'package:slant/view/screens/favourites.dart';
-import 'package:slant/view/screens/makeVideo/makeVideo.dart';
+import 'package:slant/view/screens/makeVideo/make_video.dart';
 import 'package:slant/view/screens/profile/profile.dart';
 
 class BNB extends StatefulWidget {

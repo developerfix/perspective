@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:slant/view/screens/makeVideo/Invite.dart';
 import 'package:video_compress/video_compress.dart';
 
+// ignore: unused_import
 import '../bnb.dart';
 import '../models/video.dart';
 import '../res.dart';
@@ -117,12 +118,7 @@ class UploadVideoController extends GetxController {
           .collection('videos')
           .add(videoo.toJson())
           .then((value) {
-        Navigator.pushAndRemoveUntil(
-            Get.context!,
-            MaterialPageRoute(
-              builder: (ctx) => Invite(video: videoo),
-            ),
-            (Route<dynamic> route) => false);
+        Get.offAll(Invite(video: videoo));
 
         showSnackBar(
             context: context, snackText: 'Video published successfully');

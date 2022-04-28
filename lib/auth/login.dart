@@ -1,19 +1,18 @@
 import 'dart:math';
 
-import 'package:adobe_xd/page_link.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:get/get.dart' as getx;
 import 'package:slant/auth/interested.dart';
-import 'package:slant/auth/resetPass.dart';
+import 'package:slant/auth/reset_pass.dart';
 import 'package:slant/bnb.dart';
 import 'package:slant/auth/signup.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -26,7 +25,6 @@ class _LoginState extends State<Login> {
   bool? isVisible;
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
   bool loading1 = false;
 
   userchecker() {
@@ -41,30 +39,13 @@ class _LoginState extends State<Login> {
             .get()
             .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
-            print('(documentSnapshot.data() as Map)[dsds] ');
-            print('(documentSnapshot.data() as Map)[dsds] ');
-            print('(documentSnapshot.data() as Map)[dsds] ');
-            print('(documentSnapshot.data() as Map)[dsds] ');
-            print('(documentSnapshot.data() as Map)[dsds] ');
-            print((documentSnapshot.data() as Map)['topicsOfInterest']);
-            print((documentSnapshot.data() as Map)['name']);
-            print((documentSnapshot.data() as Map)['email']);
-
-            if ((documentSnapshot.data() as Map)['topicsOfInterest'] != null) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => const BNB()),
-                  ),
-                  (Route<dynamic> route) => false);
+            if ((documentSnapshot.data() as Map)['name'] != 'ahme') {
+              getx.Get.offAll(const BNB());
             } else {
               setState(() {
                 loading1 = false;
               });
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Interested()),
-              );
+              getx.Get.offAll(const Interested());
             }
           }
         });
@@ -96,97 +77,97 @@ class _LoginState extends State<Login> {
     _passwordcontroller.dispose();
   }
 
-  Map<String, dynamic>? _userData;
-  AccessToken? _accessToken;
-  bool _checking = true;
+  // Map<String, dynamic>? _userData;
+  // AccessToken? _accessToken;
+  // bool _checking = true;
 
-  Future<void> _checkIfIsLogged() async {
-    final accessToken = await FacebookAuth.instance.accessToken;
-    setState(() {
-      _checking = false;
-    });
-    if (accessToken != null) {
-      // now you can call to  FacebookAuth.instance.getUserData();
-      final userData = await FacebookAuth.instance.getUserData();
-      // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
-      _accessToken = accessToken;
-      setState(() {
-        _userData = userData;
-      });
-    }
-  }
+  // Future<void> _checkIfIsLogged() async {
+  //   final accessToken = await FacebookAuth.instance.accessToken;
+  //   setState(() {
+  //     _checking = false;
+  //   });
+  //   if (accessToken != null) {
+  //     // now you can call to  FacebookAuth.instance.getUserData();
+  //     final userData = await FacebookAuth.instance.getUserData();
+  //     // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+  //     _accessToken = accessToken;
+  //     setState(() {
+  //       _userData = userData;
+  //     });
+  //   }
+  // }
 
-  Future<void> _loginWithFb() async {
-    setState(() {
-      loading = true;
-    });
-    try {
-      final LoginResult result = await FacebookAuth.instance
-          .login(); // by default we request the email and the public profile
+  // Future<void> _loginWithFb() async {
+  //   setState(() {
+  //     loading = true;
+  //   });
+  //   try {
+  //     final LoginResult result = await FacebookAuth.instance
+  //         .login(); // by default we request the email and the public profile
 
-      if (result.status == LoginStatus.success) {
-        _accessToken = result.accessToken;
-        // get the user data
-        // by default we get the userId, email,name and picture
-        final userData = await FacebookAuth.instance.getUserData();
-        // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
-        _userData = userData;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Something went wrong, Please try again')),
-        );
-      }
+  //     if (result.status == LoginStatus.success) {
+  //       _accessToken = result.accessToken;
+  //       // get the user data
+  //       // by default we get the userId, email,name and picture
+  //       final userData = await FacebookAuth.instance.getUserData();
+  //       // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+  //       _userData = userData;
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //             content: Text('Something went wrong, Please try again')),
+  //       );
+  //     }
 
-      PageLinkInfo(
-          transition: LinkTransition.Fade,
-          ease: Curves.easeOut,
-          duration: 0.3,
-          pageBuilder: () => const BNB());
-    } on FirebaseAuthException catch (e) {
-      String error = '';
-      switch (e.code) {
-        case "ERROR_EMAIL_ALREADY_IN_USE":
-        case "account-exists-with-different-credential":
-        case "email-already-in-use":
-          error = "Email already used.";
-          break;
-        case "ERROR_WRONG_PASSWORD":
-        case "wrong-password":
-          error = "Wrong email/password combination.";
-          break;
-        case "ERROR_USER_NOT_FOUND":
-        case "user-not-found":
-          error = "No user found with this email.";
-          break;
-        case "ERROR_USER_DISABLED":
-        case "user-disabled":
-          error = "User disabled.";
-          break;
-        case "ERROR_TOO_MANY_REQUESTS":
-          error = "Too many requests to log into this account.";
-          break;
-        case "ERROR_OPERATION_NOT_ALLOWED":
-          error = "Server error, please try again later.";
-          break;
-        case "ERROR_INVALID_EMAIL":
-        case "invalid-email":
-          error = "Email address is invalid.";
-          break;
-        default:
-          error = "Login failed. Please try again.";
-          break;
-      }
+  //     // PageLinkInfo(
+  //     //     transition: LinkTransition.Fade,
+  //     //     ease: Curves.easeOut,
+  //     //     duration: 0.3,
+  //     //     pageBuilder: () => const BNB());
+  //   } on FirebaseAuthException catch (e) {
+  //     String error = '';
+  //     switch (e.code) {
+  //       case "ERROR_EMAIL_ALREADY_IN_USE":
+  //       case "account-exists-with-different-credential":
+  //       case "email-already-in-use":
+  //         error = "Email already used.";
+  //         break;
+  //       case "ERROR_WRONG_PASSWORD":
+  //       case "wrong-password":
+  //         error = "Wrong email/password combination.";
+  //         break;
+  //       case "ERROR_USER_NOT_FOUND":
+  //       case "user-not-found":
+  //         error = "No user found with this email.";
+  //         break;
+  //       case "ERROR_USER_DISABLED":
+  //       case "user-disabled":
+  //         error = "User disabled.";
+  //         break;
+  //       case "ERROR_TOO_MANY_REQUESTS":
+  //         error = "Too many requests to log into this account.";
+  //         break;
+  //       case "ERROR_OPERATION_NOT_ALLOWED":
+  //         error = "Server error, please try again later.";
+  //         break;
+  //       case "ERROR_INVALID_EMAIL":
+  //       case "invalid-email":
+  //         error = "Email address is invalid.";
+  //         break;
+  //       default:
+  //         error = "Login failed. Please try again.";
+  //         break;
+  //     }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error)),
-      );
-    } finally {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text(error)),
+  //     );
+  //   } finally {
+  //     setState(() {
+  //       loading = false;
+  //     });
+  //   }
+  // }
 
   bool loading = false;
 
@@ -367,7 +348,7 @@ class _LoginState extends State<Login> {
                                     Expanded(
                                       child: InkWell(
                                         onTap: () {
-                                          _loginWithFb();
+                                          // _loginWithFb();
                                         },
                                         child: Container(
                                           height: screenHeight(context) * 0.088,
@@ -461,47 +442,10 @@ class _LoginState extends State<Login> {
           email: _emailcontroller.text.trim(),
           password: _passwordcontroller.text.trim());
 
-      if (userId != null) {
-        SchedulerBinding.instance!.addPostFrameCallback((_) async {
-          await usersCollection
-              .doc(userId)
-              .get()
-              .then((DocumentSnapshot documentSnapshot) {
-            if (documentSnapshot.exists) {
-              print('(documentSnapshot.data() as Map)[login] ');
-              print('(documentSnapshot.data() as Map)[login] ');
-              print('(documentSnapshot.data() as Map)[login] ');
-              print('(documentSnapshot.data() as Map)[login] ');
-              print('(documentSnapshot.data() as Map)[login] ');
-              print(userId);
-              print('login' +
-                  (documentSnapshot.data() as Map)['topicsOfInterest']);
-
-              if ((documentSnapshot.data() as Map)['topicsOfInterest'] !=
-                  null) {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: ((context) => const BNB()),
-                    ),
-                    (Route<dynamic> route) => false);
-              } else {
-                print('go to interested');
-                print('go to interested');
-                print('go to interested');
-                print('go to interested');
-                setState(() {
-                  loading1 = false;
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Interested()),
-                );
-              }
-            }
-          });
-        });
-      }
+      setState(() {
+        loading1 = false;
+      });
+      getx.Get.offAll(const Interested());
     } on FirebaseAuthException catch (e) {
       String error = '';
       switch (e.code) {

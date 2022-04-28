@@ -1,26 +1,10 @@
-import 'dart:async';
-
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cached_video_player/cached_video_player.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' as getx;
-import 'package:slant/bnb.dart';
 import 'package:slant/controller/video_controller.dart';
-import 'package:slant/res.dart';
-import 'package:slant/view/screens/makeVideo/Invite.dart';
-import 'package:slant/view/screens/makeVideo/makeVideo.dart';
-import 'package:slant/view/screens/profile/profile.dart';
-import 'package:slant/view/screens/videoItem.dart';
-import "dart:math" show pi;
 
-import '../../models/video.dart';
-import '../widgets/circularProgress.dart';
-import '../widgets/videoWidget.dart';
+import 'package:slant/view/widgets/video_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

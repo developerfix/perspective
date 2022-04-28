@@ -1,12 +1,13 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
-import 'dart:math';
-
 import '../../../bnb.dart';
 import '../../../models/video.dart';
+import '../../widgets/circular_progress.dart';
 
 class Invite extends StatefulWidget {
   final Video? video;
@@ -56,12 +57,7 @@ class _InviteState extends State<Invite> {
               'videoDetails': widget.video!.toJson()
             }))
             .then((value) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: ((context) => const BNB()),
-              ),
-              (Route<dynamic> route) => false);
+          Get.offAll(const BNB());
         }).onError((error, stackTrace) {
           Container();
         });
@@ -70,12 +66,7 @@ class _InviteState extends State<Invite> {
         loading = false;
       });
     } else {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => const BNB()),
-          ),
-          (Route<dynamic> route) => false);
+      Get.offAll(const BNB());
     }
   }
 

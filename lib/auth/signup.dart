@@ -5,10 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:get/get.dart';
 import 'package:slant/auth/interested.dart';
 import 'package:slant/res.dart';
 
-import '../view/widgets/circularProgress.dart';
+import '../view/widgets/circular_progress.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -368,8 +369,7 @@ class _SignUpState extends State<SignUp> {
           email: _emailcontroller.text.trim(),
           password: _passwordcontroller.text.trim());
       await addUserInfo();
-      Navigator.push(context,
-          MaterialPageRoute(builder: ((context) => const Interested())));
+      Get.to(const Interested());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Signup Successful')),
       );
@@ -397,7 +397,7 @@ class _SignUpState extends State<SignUp> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text(error.toString())),
       );
     } finally {
       setState(() {

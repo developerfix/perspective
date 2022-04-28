@@ -181,28 +181,28 @@ class ThumbnailImage extends StatelessWidget {
   final int? cacheWidth;
   final int? cacheHeight;
 
-  ThumbnailImage({
+  const ThumbnailImage({
     required this.videoUrl,
     this.width,
     this.height,
-    this.scale: 1.0,
+    this.scale = 1.0,
     this.frameBuilder,
     this.errorBuilder,
     this.semanticLabel,
-    this.excludeFromSemantics: false,
+    this.excludeFromSemantics = false,
     this.color,
     this.colorBlendMode,
     this.fit,
-    this.alignment: Alignment.center,
-    this.repeat: ImageRepeat.noRepeat,
+    this.alignment = Alignment.center,
+    this.repeat = ImageRepeat.noRepeat,
     this.centerSlice,
-    this.matchTextDirection: false,
-    this.gaplessPlayback: false,
-    this.isAntiAlias: false,
-    this.filterQuality: FilterQuality.low,
+    this.matchTextDirection = false,
+    this.gaplessPlayback = false,
+    this.isAntiAlias = false,
+    this.filterQuality = FilterQuality.low,
     this.cacheHeight,
     this.cacheWidth,
-  }) : assert(videoUrl != null);
+  });
 
   Future<String> getThumbnailFromVideo() async {
     String input = '{"videoUrl" : "$videoUrl"}';
@@ -230,12 +230,10 @@ class ThumbnailImage extends StatelessWidget {
     return FutureBuilder<String>(
       future: getThumbnailFromVideo(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        print(snapshot.connectionState);
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator());
-            break;
+            return const Center(child: CircularProgressIndicator());
           case ConnectionState.active:
           case ConnectionState.done:
             if (snapshot.data == null) {
@@ -285,7 +283,6 @@ class ThumbnailImage extends StatelessWidget {
               cacheWidth: cacheWidth,
             );
         }
-        return Container();
       },
     );
   }

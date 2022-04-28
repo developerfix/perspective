@@ -1,27 +1,11 @@
-import 'dart:async';
-
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cached_video_player/cached_video_player.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expand_widget/expand_widget.dart';
-import 'package:expandable_text/expandable_text.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' as getx;
-import 'package:preload_page_view/preload_page_view.dart';
-import 'package:slant/controller/profileVideoController.dart';
+import 'package:slant/controller/profile_video_controller.dart';
 import 'package:slant/controller/video_controller.dart';
-import 'package:slant/res.dart';
-import 'package:slant/view/widgets/videoWidget.dart';
-import "dart:math" show pi;
+import 'package:slant/view/widgets/video_widget.dart';
 
-import '../../../bnb.dart';
-import '../../widgets/circularProgress.dart';
-import '../videoItem.dart';
+import '../../widgets/circular_progress.dart';
 
 class ViewByYouVideo extends StatefulWidget {
   final DocumentSnapshot doc;

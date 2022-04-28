@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:slant/res.dart';
 import 'package:page_transition/page_transition.dart';
@@ -44,12 +45,7 @@ class _Question2And3State extends State<Question2And3> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => const BNB()),
-          ),
-        );
+        Get.to(const BNB());
 
         return Future<bool>(
           () => true,

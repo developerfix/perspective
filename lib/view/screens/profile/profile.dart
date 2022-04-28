@@ -1,10 +1,8 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' as getx;
 // import 'package:geocoding/geocoding.dart';
@@ -12,14 +10,13 @@ import 'package:get/get.dart' as getx;
 import 'package:slant/auth/login.dart';
 import 'package:slant/controller/profile_controller.dart';
 import 'package:slant/res.dart';
-import 'package:slant/view/screens/profile/editProfile.dart';
-import 'package:slant/view/screens/profile/viewByYouVideos.dart';
-import 'package:slant/view/screens/profile/viewFavouriteVideo.dart';
-import 'package:slant/view/screens/profile/viewRequestVideo.dart';
-import 'package:slant/view/widgets/circularProgress.dart';
+import 'package:slant/view/screens/profile/edit_profile.dart';
+import 'package:slant/view/screens/profile/view_by_you_videos.dart';
+import 'package:slant/view/screens/profile/view_request_video.dart';
+import 'package:slant/view/widgets/circular_progress.dart';
 
 import '../../../bnb.dart';
-import '../../widgets/video-thumbnail-generator.dart';
+import '../../widgets/video_thumbnail_generator.dart';
 
 class Profile extends StatefulWidget {
   final String uid;
@@ -147,21 +144,15 @@ class _ProfileState extends State<Profile> {
                           PopupMenuButton(
                               onSelected: (value) async {
                                 if (value == 1) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: ((context) =>
-                                              const EditProfile())));
+                                  getx.Get.to(const EditProfile());
                                 } else if (value == 2) {
-                                  await FirebaseAuth.instance.signOut();
-                                  await FacebookAuth.instance.logOut();
-                                  Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: ((context) => const Login()),
-                                      ),
-                                      (Route<dynamic> route) => false);
-                                  setState(() {});
+                                  try {
+                                    await FirebaseAuth.instance.signOut();
+                                    // await FacebookAuth.instance.logOut();
+                                    getx.Get.offAll(const Login());
+                                  } catch (e) {
+                                    // print(e);
+                                  }
                                 }
                               },
                               child: SvgPicture.asset('assets/svgs/menu.svg'),

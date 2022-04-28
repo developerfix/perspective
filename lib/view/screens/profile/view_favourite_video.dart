@@ -1,49 +1,35 @@
-import 'dart:async';
-
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cached_video_player/cached_video_player.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expand_widget/expand_widget.dart';
-import 'package:expandable_text/expandable_text.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' as getx;
-import 'package:preload_page_view/preload_page_view.dart';
-import 'package:slant/controller/profileVideoController.dart';
+import 'package:slant/controller/profile_video_controller.dart';
 import 'package:slant/controller/video_controller.dart';
-import 'package:slant/res.dart';
-import "dart:math" show pi;
+import 'package:slant/view/widgets/video_widget.dart';
 
-import '../../../bnb.dart';
-import '../../widgets/circularProgress.dart';
-import '../../widgets/videoWidget.dart';
-import '../videoItem.dart';
+import '../../widgets/circular_progress.dart';
 
-class ViewRequestVideo extends StatefulWidget {
-  final Map? videoDetail;
-  const ViewRequestVideo({Key? key, this.videoDetail}) : super(key: key);
+class ViewFavouriteVideo extends StatefulWidget {
+  final DocumentSnapshot doc;
+
+  const ViewFavouriteVideo({Key? key, required this.doc}) : super(key: key);
 
   @override
-  State<ViewRequestVideo> createState() => _ViewRequestVideoState();
+  State<ViewFavouriteVideo> createState() => _ViewFavouriteVideoState();
 }
 
-class _ViewRequestVideoState extends State<ViewRequestVideo>
+class _ViewFavouriteVideoState extends State<ViewFavouriteVideo>
     with TickerProviderStateMixin {
   bool isLoading = true;
   final ProfileVideoController profileVideoController =
       getx.Get.put(ProfileVideoController());
+
   final VideoController videoController = getx.Get.put(VideoController());
 
-  updatingRequestVideoUrl() async {
+  updatingFavouriteVideoUrl() async {
     setState(() {
       isLoading = true;
     });
     await profileVideoController
-        .updateRequestVideoUrl(widget.videoDetail!['videoLink']);
+        .updateFavouriteVideoUrl((widget.doc.data() as Map)['videoLink']);
 
     setState(() {
       isLoading = false;
@@ -52,7 +38,7 @@ class _ViewRequestVideoState extends State<ViewRequestVideo>
 
   @override
   void initState() {
-    updatingRequestVideoUrl();
+    updatingFavouriteVideoUrl();
     super.initState();
   }
 
@@ -69,13 +55,14 @@ class _ViewRequestVideoState extends State<ViewRequestVideo>
                   builder: (controller) {
                     return PageView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: profileVideoController.requestVideo.length,
+                      itemCount: profileVideoController.favouriteVideo.length,
                       controller:
                           PageController(initialPage: 0, viewportFraction: 1),
                       // controller: PreloadPageController(initialPage: 1),
                       // preloadPagesCount: 3,
                       itemBuilder: ((context, index) {
-                        final data = profileVideoController.requestVideo[index];
+                        final data =
+                            profileVideoController.favouriteVideo[index];
                         return VideoWidget(
                             videoController: videoController,
                             video: data,
