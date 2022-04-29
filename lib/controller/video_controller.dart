@@ -7,9 +7,13 @@ import 'package:slant/models/video.dart';
 import '../res.dart';
 
 class VideoController extends GetxController {
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
-  final Rx<List<Video>> _homeScreenVideosList = Rx<List<Video>>([]);
+  final Rx<List<Video>> _veryConservativeHomeScreenVideosList =
+      Rx<List<Video>>([]);
+  final Rx<List<Video>> _conservativeHomeScreenVideosList = Rx<List<Video>>([]);
+  final Rx<List<Video>> _neutralHomeScreenVideosList = Rx<List<Video>>([]);
+  final Rx<List<Video>> _liberalHomeScreenVideosList = Rx<List<Video>>([]);
+  final Rx<List<Video>> _veryLiberalHomeScreenVideosList = Rx<List<Video>>([]);
+
   final Rx<List<Video>> _titlesVeryConservativeVideosList = Rx<List<Video>>([]);
   final Rx<List<Video>> _titlesConservativeVideoslist = Rx<List<Video>>([]);
   final Rx<List<Video>> _titlesNeutralVideosList = Rx<List<Video>>([]);
@@ -29,7 +33,13 @@ class VideoController extends GetxController {
   final Rx<List<Video>> _topicsLiberalVideosList = Rx<List<Video>>([]);
   final Rx<List<Video>> _topicsVeryLiberalVideosList = Rx<List<Video>>([]);
 
-  List<Video> get homeScreenVideosList => _homeScreenVideosList.value;
+  List<Video> get homeScreenVideosList =>
+      _veryConservativeHomeScreenVideosList.value +
+      _conservativeHomeScreenVideosList.value +
+      _neutralHomeScreenVideosList.value +
+      _liberalHomeScreenVideosList.value +
+      _veryLiberalHomeScreenVideosList.value;
+
   List<Video> get titlesVeryConservativeVideosList =>
       _titlesVeryConservativeVideosList.value;
   List<Video> get titlesConservativeVideoslist =>
@@ -96,38 +106,120 @@ class VideoController extends GetxController {
   }
 
   Future<void> getHomeScreenVideos() async {
-    try {
-      // _homeScreenVideosList.bindStream(FirebaseFirestore.instance.collection('videos').doc(myLifestyle).get().then((value) {
+    var listOfInterests = [];
+    List<Video> veryConservativeList = [];
+    List<Video> conservativeList = [];
+    List<Video> neutralList = [];
+    List<Video> liberalList = [];
+    List<Video> veryLiberalList = [];
 
-      // }))
-      _homeScreenVideosList.bindStream(FirebaseFirestore.instance
-          .collectionGroup(neutral)
+    await usersCollection
+        .doc(userId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        if ((documentSnapshot.data() as Map)['topicsOfInterest'] == null) {
+        } else {
+          for (var topics
+              in ((documentSnapshot.data() as Map)['topicsOfInterest'])) {
+            listOfInterests.add(topics);
+          }
+        }
+      }
+    });
+
+    for (var topic in listOfInterests) {
+      _veryConservativeHomeScreenVideosList.bindStream(FirebaseFirestore
+          .instance
+          .collectionGroup(veryConservative)
           .orderBy(FieldPath.documentId)
-          .startAt([
-            FirebaseFirestore.instance
-                .collection("videos")
-                .doc(mySenseOfBelongingAndItsRepresentation)
-                .path
-          ])
+          .startAt(
+              [FirebaseFirestore.instance.collection("videos").doc(topic).path])
           .endAt([
-            FirebaseFirestore.instance
-                    .collection("videos")
-                    .doc(mySenseOfBelongingAndItsRepresentation)
-                    .path +
+            FirebaseFirestore.instance.collection("videos").doc(topic).path +
                 "\uf8ff"
           ])
           .snapshots()
           .map((QuerySnapshot query) {
-            List<Video> retVal = [];
             for (var element in query.docs) {
-              retVal.add(
+              veryConservativeList.add(
                 Video.fromSnap(element),
               );
             }
-            return retVal;
+            return veryConservativeList;
           }));
-    } catch (e) {
-      // ignore: empty_catches
+      _conservativeHomeScreenVideosList.bindStream(FirebaseFirestore.instance
+          .collectionGroup(conservative)
+          .orderBy(FieldPath.documentId)
+          .startAt(
+              [FirebaseFirestore.instance.collection("videos").doc(topic).path])
+          .endAt([
+            FirebaseFirestore.instance.collection("videos").doc(topic).path +
+                "\uf8ff"
+          ])
+          .snapshots()
+          .map((QuerySnapshot query) {
+            for (var element in query.docs) {
+              conservativeList.add(
+                Video.fromSnap(element),
+              );
+            }
+            return conservativeList;
+          }));
+      _neutralHomeScreenVideosList.bindStream(FirebaseFirestore.instance
+          .collectionGroup(neutral)
+          .orderBy(FieldPath.documentId)
+          .startAt(
+              [FirebaseFirestore.instance.collection("videos").doc(topic).path])
+          .endAt([
+            FirebaseFirestore.instance.collection("videos").doc(topic).path +
+                "\uf8ff"
+          ])
+          .snapshots()
+          .map((QuerySnapshot query) {
+            for (var element in query.docs) {
+              neutralList.add(
+                Video.fromSnap(element),
+              );
+            }
+            return neutralList;
+          }));
+      _liberalHomeScreenVideosList.bindStream(FirebaseFirestore.instance
+          .collectionGroup(liberal)
+          .orderBy(FieldPath.documentId)
+          .startAt(
+              [FirebaseFirestore.instance.collection("videos").doc(topic).path])
+          .endAt([
+            FirebaseFirestore.instance.collection("videos").doc(topic).path +
+                "\uf8ff"
+          ])
+          .snapshots()
+          .map((QuerySnapshot query) {
+            for (var element in query.docs) {
+              liberalList.add(
+                Video.fromSnap(element),
+              );
+            }
+            return liberalList;
+          }));
+      _veryLiberalHomeScreenVideosList.bindStream(FirebaseFirestore.instance
+          .collectionGroup(veryLiberal)
+          .orderBy(FieldPath.documentId)
+          .startAt(
+              [FirebaseFirestore.instance.collection("videos").doc(topic).path])
+          .endAt([
+            FirebaseFirestore.instance.collection("videos").doc(topic).path +
+                "\uf8ff"
+          ])
+          .snapshots()
+          .map((QuerySnapshot query) {
+            for (var element in query.docs) {
+              veryLiberalList.add(
+                Video.fromSnap(element),
+              );
+            }
+            return veryLiberalList;
+          }));
     }
   }
 
@@ -563,7 +655,7 @@ class VideoController extends GetxController {
   likeVideo(Video video, bool isFavourite) async {
     var retVal = [];
     isFavourite
-        ? await users
+        ? await usersCollection
             .doc(userId)
             .collection('favouriteVideos')
             .where('videoLink', isEqualTo: video.videoLink)
@@ -574,13 +666,13 @@ class VideoController extends GetxController {
             }
           }).then((value) async {
             retVal.isEmpty
-                ? await users
+                ? await usersCollection
                     .doc(userId)
                     .collection('favouriteVideos')
                     .add(video.toJson())
                 : Container();
           })
-        : await users
+        : await usersCollection
             .doc(userId)
             .collection('favouriteVideos')
             .where('videoLink', isEqualTo: video.videoLink)
@@ -595,7 +687,7 @@ class VideoController extends GetxController {
   removeVideoFromFavourites(
     String videoLink,
   ) async {
-    await users
+    await usersCollection
         .doc(userId)
         .collection('favouriteVideos')
         .where('videoLink', isEqualTo: videoLink)
@@ -611,7 +703,7 @@ class VideoController extends GetxController {
     bool likedOrNot = false;
     var retVal = [];
 
-    await users
+    await usersCollection
         .doc(userId)
         .collection('favouriteVideos')
         .where('videoLink', isEqualTo: videoLink)

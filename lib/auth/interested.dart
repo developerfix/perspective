@@ -43,7 +43,7 @@ class _InterestedState extends State<Interested> {
     return await users
         .doc(userId)
         .update({'topicsOfInterest': topicsOfInterest}).then((value) {
-      Get.offAll(const BNB());
+      Get.offAll(() => const BNB());
     }).catchError((error) {
       setState(() {
         loading1 = false;
@@ -64,8 +64,8 @@ class _InterestedState extends State<Interested> {
             .get()
             .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
-            if ((documentSnapshot.data() as Map)['name'] == 'ahme') {
-              Get.offAll(const BNB());
+            if ((documentSnapshot.data() as Map)['topicsOfInterest'] != null) {
+              Get.offAll(() => const BNB());
             } else {
               setState(() {
                 loading = false;

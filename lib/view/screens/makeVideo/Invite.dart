@@ -57,7 +57,7 @@ class _InviteState extends State<Invite> {
               'videoDetails': widget.video!.toJson()
             }))
             .then((value) {
-          Get.offAll(const BNB());
+          Get.offAll(() => const BNB());
         }).onError((error, stackTrace) {
           Container();
         });
@@ -66,7 +66,7 @@ class _InviteState extends State<Invite> {
         loading = false;
       });
     } else {
-      Get.offAll(const BNB());
+      Get.offAll(() => const BNB());
     }
   }
 

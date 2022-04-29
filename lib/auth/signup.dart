@@ -61,7 +61,7 @@ class _SignUpState extends State<SignUp> {
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
     return users.doc(userId).set({
       'email': _emailcontroller.text.trim(),
-      'topicsOfInterest': [0],
+      'topicsOfInterest': null,
       'name': _namecontroller.text,
       'profilePic': '',
       'bio': 'new account',
@@ -369,7 +369,7 @@ class _SignUpState extends State<SignUp> {
           email: _emailcontroller.text.trim(),
           password: _passwordcontroller.text.trim());
       await addUserInfo();
-      Get.to(const Interested());
+      Get.to(() => const Interested());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Signup Successful')),
       );

@@ -45,7 +45,7 @@ class _Question2And3State extends State<Question2And3> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Get.to(const BNB());
+        Get.to(() => const BNB());
 
         return Future<bool>(
           () => true,

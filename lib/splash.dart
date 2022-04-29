@@ -15,7 +15,11 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () => Get.to(const Login()));
+    Future.delayed(
+        const Duration(seconds: 3),
+        () => Get.to(() => const Login(
+              isLoggedout: false,
+            )));
   }
 
   @override

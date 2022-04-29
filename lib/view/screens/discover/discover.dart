@@ -471,7 +471,7 @@ class _DiscoverState extends State<Discover> {
       {String? topic, Widget? route, Color? color, String? emojy}) {
     return InkWell(
       onTap: () {
-        Get.to(route!);
+        Get.to(() => route!);
       },
       child: Container(
         decoration: BoxDecoration(

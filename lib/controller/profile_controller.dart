@@ -80,4 +80,69 @@ class ProfileController extends GetxController {
     _user.value.update('isFollowing', (value) => !value);
     update();
   }
+
+  List byYouVideoAudienceReactionPercentage(
+      {int? vc, int? c, int? n, int? l, int? vl}) {
+    int veryConservativePercentage = 0;
+    int conservativePercentage = 0;
+    int neutralPercentage = 0;
+    int liberalPercentage = 0;
+    int veryLiberalPercentage = 0;
+    var totalOfReactions = vc! + c! + n! + l! + vl!;
+
+    String largestPercentage = '';
+    int maxValue = 0;
+
+    veryConservativePercentage = ((vc) / totalOfReactions).isNaN
+        ? 0
+        : ((vc) / totalOfReactions).isInfinite
+            ? 0
+            : (((vc) / totalOfReactions) * 100).round();
+
+    conservativePercentage = ((c) / totalOfReactions).isNaN
+        ? 0
+        : ((c) / totalOfReactions).isInfinite
+            ? 0
+            : (((c / totalOfReactions) * 100).round());
+    neutralPercentage = ((n) / totalOfReactions).isNaN
+        ? 0
+        : ((n) / totalOfReactions).isInfinite
+            ? 0
+            : (((n) / totalOfReactions) * 100).round();
+    liberalPercentage = ((l) / totalOfReactions).isNaN
+        ? 0
+        : ((l) / totalOfReactions).isInfinite
+            ? 0
+            : (((l) / totalOfReactions) * 100).round();
+    veryLiberalPercentage = ((vl) / totalOfReactions).isNaN
+        ? 0
+        : ((vl) / totalOfReactions).isInfinite
+            ? 0
+            : (((vl) / totalOfReactions) * 100).round();
+
+    List compare = [];
+
+    compare.add(veryConservativePercentage);
+    compare.add(conservativePercentage);
+    compare.add(neutralPercentage);
+    compare.add(liberalPercentage);
+    compare.add(veryLiberalPercentage);
+
+    compare.sort();
+
+    maxValue = compare.last;
+
+    if (veryConservativePercentage == maxValue) {
+      largestPercentage = 'very conservative';
+    } else if (conservativePercentage == maxValue) {
+      largestPercentage = 'conservative';
+    } else if (neutralPercentage == maxValue) {
+      largestPercentage = 'neutral';
+    } else if (liberalPercentage == maxValue) {
+      largestPercentage = 'liberal';
+    } else if (veryLiberalPercentage == maxValue) {
+      largestPercentage = 'very liberal';
+    }
+    return [maxValue, largestPercentage];
+  }
 }

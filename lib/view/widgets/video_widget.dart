@@ -10,6 +10,7 @@ import '../../bnb.dart';
 import '../../controller/video_controller.dart';
 import '../../models/video.dart';
 import '../../res.dart';
+import '../screens/discover/videos_list.dart';
 import '../screens/makeVideo/make_video.dart';
 import '../screens/video_item.dart';
 import 'circular_progress.dart';
@@ -76,6 +77,12 @@ class _VideoWidgetState extends State<VideoWidget> {
   bool? n = false;
   bool? l = false;
   bool? vl = false;
+
+  int veryConservativePercentage = 0;
+  int conservativePercentage = 0;
+  int neutralPercentage = 0;
+  int liberalPercentage = 0;
+  int veryLiberalPercentage = 0;
 
   String selectedTag = '';
 
@@ -164,27 +171,34 @@ class _VideoWidgetState extends State<VideoWidget> {
   }
 
   updateHighestReactionPercentage() {
-    int vc = ((widget.veryConservative)! / totalOfReactions).isNaN
+    totalOfReactions = widget.veryConservative! +
+        widget.conservative! +
+        widget.neutral! +
+        widget.liberal! +
+        widget.veryLiberal!;
+
+    veryConservativePercentage = ((widget.veryConservative)! / totalOfReactions)
+            .isNaN
         ? 0
         : ((widget.veryConservative)! / totalOfReactions).isInfinite
             ? 0
             : (((widget.veryConservative)! / totalOfReactions) * 100).round();
-    int c = ((widget.conservative)! / totalOfReactions).isNaN
+    conservativePercentage = ((widget.conservative)! / totalOfReactions).isNaN
         ? 0
         : ((widget.conservative)! / totalOfReactions).isInfinite
             ? 0
             : (((widget.conservative)! / totalOfReactions) * 100).round();
-    int n = ((widget.neutral)! / totalOfReactions).isNaN
+    neutralPercentage = ((widget.neutral)! / totalOfReactions).isNaN
         ? 0
         : ((widget.neutral)! / totalOfReactions).isInfinite
             ? 0
             : (((widget.neutral)! / totalOfReactions) * 100).round();
-    int l = ((widget.liberal)! / totalOfReactions).isNaN
+    liberalPercentage = ((widget.liberal)! / totalOfReactions).isNaN
         ? 0
         : ((widget.liberal)! / totalOfReactions).isInfinite
             ? 0
             : (((widget.liberal)! / totalOfReactions) * 100).round();
-    int vl = ((widget.veryLiberal)! / totalOfReactions).isNaN
+    veryLiberalPercentage = ((widget.veryLiberal)! / totalOfReactions).isNaN
         ? 0
         : ((widget.veryLiberal)! / totalOfReactions).isInfinite
             ? 0
@@ -192,25 +206,25 @@ class _VideoWidgetState extends State<VideoWidget> {
 
     List compare = [];
 
-    compare.add(vc);
-    compare.add(c);
-    compare.add(n);
-    compare.add(l);
-    compare.add(vl);
+    compare.add(veryConservativePercentage);
+    compare.add(conservativePercentage);
+    compare.add(neutralPercentage);
+    compare.add(liberalPercentage);
+    compare.add(veryLiberalPercentage);
 
     compare.sort();
 
     maxValue = compare.last;
 
-    if (vc == maxValue) {
+    if (veryConservativePercentage == maxValue) {
       largestPercentage = 'very conservative';
-    } else if (c == maxValue) {
+    } else if (conservativePercentage == maxValue) {
       largestPercentage = 'conservative';
-    } else if (n == maxValue) {
+    } else if (neutralPercentage == maxValue) {
       largestPercentage = 'neutral';
-    } else if (l == maxValue) {
+    } else if (liberalPercentage == maxValue) {
       largestPercentage = 'liberal';
-    } else if (vl == maxValue) {
+    } else if (veryLiberalPercentage == maxValue) {
       largestPercentage = 'very liberal';
     }
   }
@@ -219,12 +233,8 @@ class _VideoWidgetState extends State<VideoWidget> {
   void initState() {
     updateIsBrainOnFireForCurrentuserInitially();
     updateTagReactionForCurrentuserInitially();
+
     updateHighestReactionPercentage();
-    totalOfReactions = widget.veryConservative! +
-        widget.conservative! +
-        widget.neutral! +
-        widget.liberal! +
-        widget.veryLiberal!;
 
     super.initState();
   }
@@ -956,7 +966,9 @@ class _VideoWidgetState extends State<VideoWidget> {
           child: Transform.rotate(
             angle: 180 * pi / 180,
             child: Container(
-              height: screenHeight(context) * 0.23,
+              height: seeMore
+                  ? screenHeight(context) * 0.7
+                  : screenHeight(context) * 0.23,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
@@ -979,9 +991,9 @@ class _VideoWidgetState extends State<VideoWidget> {
               child: SizedBox(
                 width: screenWidth(context) * 0.95,
                 height: seeMore
-                    ? screenHeight(context) * 0.25
+                    ? screenHeight(context) * 0.3
                     : screenHeight(context) * 0.22,
-                child: Column(
+                child: ListView(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1078,64 +1090,108 @@ class _VideoWidgetState extends State<VideoWidget> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(
-                                height: seeMore
-                                    ? screenHeight(context) * 0.055
-                                    : screenHeight(context) * 0.015,
-                                child: Row(
-                                  crossAxisAlignment: seeMore
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: AnimatedSize(
-                                        duration:
-                                            const Duration(milliseconds: 500),
-                                        child: AutoSizeText(
-                                          widget.description!,
-                                          maxLines: seeMore ? 5 : 1,
-                                          maxFontSize: 10,
-                                          softWrap: true,
-                                          overflow: TextOverflow.ellipsis,
-                                          minFontSize: seeMore ? 5 : 8,
-                                          style: const TextStyle(
-                                            fontFamily: 'OpenSans',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                              Row(
+                                crossAxisAlignment: seeMore
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      child: AutoSizeText(
+                                        widget.description!,
+                                        maxLines: seeMore ? 100 : 1,
+                                        maxFontSize: 10,
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                        minFontSize: seeMore ? 5 : 8,
+                                        style: const TextStyle(
+                                          fontFamily: 'OpenSans',
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
                                     ),
-                                    widget.description!.length == 20
-                                        ? seeMore
-                                            ? GestureDetector(
-                                                child: txt(
-                                                  txt: 'see less',
-                                                  fontSize: 10,
-                                                  fontColor:
-                                                      const Color(blueColor),
-                                                ),
-                                                onTap: () => setState(
-                                                    () => seeMore = false))
-                                            : GestureDetector(
-                                                child: txt(
-                                                  txt: 'see more',
-                                                  fontSize: 10,
-                                                  fontColor:
-                                                      const Color(blueColor),
-                                                ),
-                                                onTap: () => setState(
-                                                    () => seeMore = true))
-                                        : Container(),
-                                  ],
-                                ),
+                                  ),
+                                  seeMore
+                                      ? GestureDetector(
+                                          child: txt(
+                                            txt: 'see less',
+                                            fontSize: 10,
+                                            fontColor: const Color(blueColor),
+                                          ),
+                                          onTap: () =>
+                                              setState(() => seeMore = false))
+                                      : GestureDetector(
+                                          child: txt(
+                                            txt: 'see more',
+                                            fontSize: 10,
+                                            fontColor: const Color(blueColor),
+                                          ),
+                                          onTap: () =>
+                                              setState(() => seeMore = true))
+                                ],
                               ),
-                              txt(
-                                  maxLines: 1,
-                                  txt: '#${widget.title}',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  fontColor: const Color(blueColor)),
+                              seeMore
+                                  ? Wrap(
+                                      direction: Axis.horizontal,
+                                      children: widget.hastags!.map((item) {
+                                        return navigator(
+                                          function: VideoList(
+                                            headertag: 'hashtag',
+                                            headerName: item,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: txt(
+                                                txt: item,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                fontColor:
+                                                    const Color(blueColor)),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    )
+
+                                  //  SizedBox(
+                                  //     height: screenHeight(context) * 0.2,
+                                  //     child: ListView.builder(
+                                  //         scrollDirection: Axis.horizontal,
+                                  //         itemCount: widget.hastags!.length,
+                                  //         itemBuilder: (context, index) {
+                                  //           return navigator(
+                                  //             function: VideoList(
+                                  //               headertag: 'hashtag',
+                                  //               headerName:
+                                  //                   widget.hastags![index],
+                                  //             ),
+                                  //             child: txt(
+                                  //                 // maxLines: 1,
+                                  //                 txt:
+                                  //                     '${widget.hastags![index]}',
+                                  //                 fontSize: 12,
+                                  //                 fontWeight: FontWeight.bold,
+                                  //                 fontColor:
+                                  //                     const Color(blueColor)),
+                                  //           );
+                                  //         }),
+                                  //   )
+                                  : Container(),
+                              navigator(
+                                function: VideoList(
+                                  headertag: 'title',
+                                  headerName: widget.title,
+                                ),
+                                child: txt(
+                                    maxLines: 1,
+                                    txt: '#${widget.title}',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    fontColor: const Color(blueColor)),
+                              ),
                               txt(
                                   maxLines: 1,
                                   txt: '#Being ${widget.videoTag}',
@@ -1235,7 +1291,9 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Very Conservative',
-                                            '${((((widget.veryConservative)! / totalOfReactions).isNaN ? 0 : (widget.veryConservative)! / totalOfReactions).isInfinite ? 0 : ((widget.veryConservative)! / totalOfReactions) * 100).round()}%',
+                                            veryConservativePercentage
+                                                    .toString() +
+                                                '%',
                                             vc! ? true : false),
                                         value: 1,
                                       ),
@@ -1243,7 +1301,8 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Conservative',
-                                            '${((((widget.conservative)! / totalOfReactions).isNaN ? 0 : (widget.conservative)! / totalOfReactions).isInfinite ? 0 : ((widget.conservative)! / totalOfReactions) * 100).round()}%',
+                                            conservativePercentage.toString() +
+                                                '%',
                                             c! ? true : false),
                                         value: 2,
                                       ),
@@ -1251,7 +1310,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Neutral',
-                                            '${((((widget.neutral)! / totalOfReactions).isNaN ? 0 : (widget.neutral)! / totalOfReactions).isInfinite ? 0 : ((widget.neutral)! / totalOfReactions) * 100).round()}%',
+                                            neutralPercentage.toString() + '%',
                                             n! ? true : false),
                                         value: 3,
                                       ),
@@ -1259,7 +1318,7 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Liberal',
-                                            '${((((widget.liberal)! / totalOfReactions).isNaN ? 0 : (widget.liberal)! / totalOfReactions).isInfinite ? 0 : ((widget.liberal)! / totalOfReactions) * 100).round()}%',
+                                            liberalPercentage.toString() + '%',
                                             l! ? true : false),
                                         value: 4,
                                       ),
@@ -1267,7 +1326,8 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         child: popupmenuItem(
                                             context,
                                             'Very Liberal',
-                                            '${((((widget.veryLiberal)! / totalOfReactions).isNaN ? 0 : (widget.veryLiberal)! / totalOfReactions).isInfinite ? 0 : ((widget.veryLiberal)! / totalOfReactions) * 100).round()}%',
+                                            veryLiberalPercentage.toString() +
+                                                '%',
                                             vl! ? true : false),
                                         value: 5,
                                       ),

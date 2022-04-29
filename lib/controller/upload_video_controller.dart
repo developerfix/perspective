@@ -118,7 +118,7 @@ class UploadVideoController extends GetxController {
           .collection('videos')
           .add(videoo.toJson())
           .then((value) {
-        Get.offAll(Invite(video: videoo));
+        Get.offAll(() => Invite(video: videoo));
 
         showSnackBar(
             context: context, snackText: 'Video published successfully');

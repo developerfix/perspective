@@ -10,7 +10,10 @@ import 'package:get/get.dart' as getx;
 import 'package:slant/auth/login.dart';
 import 'package:slant/controller/profile_controller.dart';
 import 'package:slant/res.dart';
+import 'package:slant/splash.dart';
 import 'package:slant/view/screens/profile/edit_profile.dart';
+import 'package:slant/view/screens/profile/followers_screen.dart';
+import 'package:slant/view/screens/profile/following_screen.dart';
 import 'package:slant/view/screens/profile/view_by_you_videos.dart';
 import 'package:slant/view/screens/profile/view_request_video.dart';
 import 'package:slant/view/widgets/circular_progress.dart';
@@ -43,6 +46,9 @@ class _ProfileState extends State<Profile> {
   int noOfVids = 0;
   int noOfFollowers = 0;
   int noOfFollowing = 0;
+  bool loading = false;
+  bool isFollowButtonLoading = false;
+
   // final geolocator =
   //     Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
   // Position? _currentPosition;
@@ -119,364 +125,445 @@ class _ProfileState extends State<Profile> {
               child: CircularProgress(),
             );
           }
-          return DefaultTabController(
-            length: 2,
-            child: SizedBox(
-              height: screenHeight(context),
-              width: screenWidth(context),
-              child: Column(
-                children: [
-                  Container(
-                    height: screenHeight(context) * 0.08,
-                    color: const Color(0xFF080808),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            width: screenWidth(context) * 0.05,
-                          ),
-                          txt(
-                              txt: 'Profile',
-                              fontSize: 18,
-                              fontColor: Colors.white),
-                          PopupMenuButton(
-                              onSelected: (value) async {
-                                if (value == 1) {
-                                  getx.Get.to(const EditProfile());
-                                } else if (value == 2) {
-                                  try {
-                                    await FirebaseAuth.instance.signOut();
-                                    // await FacebookAuth.instance.logOut();
-                                    getx.Get.offAll(const Login());
-                                  } catch (e) {
-                                    // print(e);
-                                  }
-                                }
-                              },
-                              child: SvgPicture.asset('assets/svgs/menu.svg'),
-                              elevation: 3.2,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8.0)),
-                              ),
-                              itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      child: Text("Edit Profile"),
-                                      value: 1,
+          return loading
+              ? const Center(
+                  child: CircularProgress(),
+                )
+              : DefaultTabController(
+                  length: 2,
+                  child: SizedBox(
+                    height: screenHeight(context),
+                    width: screenWidth(context),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: screenHeight(context) * 0.08,
+                          color: const Color(0xFF080808),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: screenWidth(context) * 0.05,
+                                ),
+                                txt(
+                                    txt: 'Profile',
+                                    fontSize: 18,
+                                    fontColor: Colors.white),
+                                PopupMenuButton(
+                                    onSelected: (value) async {
+                                      if (value == 1) {
+                                        getx.Get.to(() => const EditProfile());
+                                      } else if (value == 2) {
+                                        setState(() {
+                                          loading = true;
+                                        });
+                                        await FirebaseAuth.instance
+                                            .signOut()
+                                            .then((value) {
+                                          setState(() {
+                                            loading = false;
+                                          });
+                                          getx.Get.offAll(() => const Login(
+                                                isLoggedout: true,
+                                              ));
+                                        });
+                                        setState(() {
+                                          loading = false;
+                                        });
+                                        // await FacebookAuth.instance.logOut();
+
+                                      }
+                                    },
+                                    child: SvgPicture.asset(
+                                        'assets/svgs/menu.svg'),
+                                    elevation: 3.2,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
                                     ),
-                                    const PopupMenuItem(
-                                      child: Text("Logout"),
-                                      value: 2,
-                                    )
-                                  ]),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(
-                        height: screenHeight(context) * 0.02,
-                      ),
-                      CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        radius: 50,
-                        child: CachedNetworkImage(
-                          imageUrl: profileController.user['profilePhoto'] ==
-                                      null ||
-                                  profileController.user['profilePhoto']
-                                      .toString()
-                                      .isEmpty
-                              ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
-                              : profileController.user['profilePhoto'],
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                                  backgroundColor: Colors.transparent,
-                                  radius: 50,
-                                  backgroundImage: imageProvider),
-                          placeholder: (context, url) =>
-                              const CircularProgress(),
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                                  backgroundColor: Colors.transparent,
-                                  radius: 50,
-                                  backgroundImage: AssetImage(
-                                      'assets/images/placeholder.png')),
+                                    itemBuilder: (context) => [
+                                          const PopupMenuItem(
+                                            child: Text("Edit Profile"),
+                                            value: 1,
+                                          ),
+                                          const PopupMenuItem(
+                                            child: Text("Logout"),
+                                            value: 2,
+                                          )
+                                        ]),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: screenHeight(context) * 0.01,
-                      ),
-                      txt(
-                          txt: profileController.user['name'],
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                      // ignore: unnecessary_null_comparison
-                      // currentAddress.isNotEmpty
-                      //     ? txt(txt: currentAddress, fontSize: 12)
-                      //     :
-                      widget.uid != userId
-                          ? Container()
-                          : InkWell(
-                              onTap: () {
-                                // getCurrentLocation();
-                              },
-                              child: txt(
-                                  txt: 'Click here to add your location',
-                                  fontSize: 12),
-                            ),
-                      SizedBox(
-                        height: screenHeight(context) * 0.01,
-                      ),
-                      txt(
-                          txt: profileController.user['bio'],
-                          fontSize: 12,
-                          fontColor: Colors.black.withOpacity(0.5)),
-                      SizedBox(
-                        height: screenHeight(context) * 0.015,
-                      ),
-                      Row(
-                        // crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: screenWidth(context) * 0.2,
-                          ),
-                          const Spacer(),
-                          Column(
-                            children: [
-                              txt(
-                                  txt: profileController.user['following'],
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                              txt(txt: 'FOLLOWING', fontSize: 10),
-                            ],
-                          ),
-                          const Spacer(
-                            flex: 3,
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                  height: 20,
-                                  width: 2,
-                                  color:
-                                      const Color(0xff707070).withOpacity(0.3)),
-                              txt(txt: '', fontSize: 5),
-                            ],
-                          ),
-                          const Spacer(),
-                          Column(
-                            children: [
-                              txt(
-                                  txt: profileController.user['followers'],
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                              txt(txt: 'FOLLOWERS', fontSize: 10),
-                            ],
-                          ),
-                          const Spacer(),
-                          Column(
-                            children: [
-                              Container(
-                                  height: 20,
-                                  width: 2,
-                                  color:
-                                      const Color(0xff707070).withOpacity(0.3)),
-                              txt(txt: '', fontSize: 5),
-                            ],
-                          ),
-                          const Spacer(
-                            flex: 3,
-                          ),
-                          Column(
-                            children: [
-                              txt(
-                                  txt: profileController.user['vids'],
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                              txt(txt: 'VIDS', fontSize: 10),
-                            ],
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            width: screenWidth(context) * 0.2,
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: screenHeight(context) * 0.015,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: screenHeight(context) * 0.02,
-                  ),
-                  widget.uid != userId
-                      ? Column(
+                        Column(
                           children: [
-                            InkWell(
-                              onTap: () {
-                                profileController.followUser();
-                              },
-                              child: Container(
-                                width: screenWidth(context) * 0.5,
-                                height: screenHeight(context) * 0.055,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(2.0),
-                                  color: const Color(0xFF3B5998),
-                                ),
-                                child: Center(
-                                  child: txt(
-                                      txt: profileController.user['isFollowing']
-                                          ? 'Unfollow'
-                                          : 'Follow',
-                                      fontSize: 13,
-                                      fontColor: Colors.white),
-                                ),
-                              ),
-                            ),
                             SizedBox(
                               height: screenHeight(context) * 0.02,
                             ),
+                            CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 50,
+                              child: CachedNetworkImage(
+                                imageUrl: profileController
+                                                .user['profilePhoto'] ==
+                                            null ||
+                                        profileController.user['profilePhoto']
+                                            .toString()
+                                            .isEmpty
+                                    ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png'
+                                    : profileController.user['profilePhoto'],
+                                imageBuilder: (context, imageProvider) =>
+                                    CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 50,
+                                        backgroundImage: imageProvider),
+                                placeholder: (context, url) =>
+                                    const CircularProgress(),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 50,
+                                        backgroundImage: AssetImage(
+                                            'assets/images/placeholder.png')),
+                              ),
+                            ),
+                            SizedBox(
+                              height: screenHeight(context) * 0.01,
+                            ),
                             txt(
-                                txt: 'This account is private',
+                                txt: profileController.user['name'],
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold)
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            TabBar(
-                              indicatorColor:
-                                  const Color(blueColor).withOpacity(0.5),
-                              tabs: [
-                                Tab(icon: txt(txt: "BY YOU", fontSize: 14)),
-                                Tab(icon: txt(txt: "REQUESTS", fontSize: 14)),
+                                fontWeight: FontWeight.bold),
+
+                            // widget.uid != userId
+                            //     ? Container()
+                            //     : InkWell(
+                            //         onTap: () {
+                            //           // getCurrentLocation();
+                            //         },
+                            //         child: txt(
+                            //             txt: 'Click here to add your location',
+                            //             fontSize: 12),
+                            //       ),
+                            SizedBox(
+                              height: screenHeight(context) * 0.01,
+                            ),
+                            txt(
+                                txt: profileController.user['bio'],
+                                fontSize: 12,
+                                fontColor: Colors.black.withOpacity(0.5)),
+                            SizedBox(
+                              height: screenHeight(context) * 0.015,
+                            ),
+                            Row(
+                              // crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: screenWidth(context) * 0.2,
+                                ),
+                                const Spacer(),
+                                navigator(
+                                  function: Following(userID: widget.uid),
+                                  child: Column(
+                                    children: [
+                                      txt(
+                                          txt: profileController
+                                              .user['following'],
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                      txt(txt: 'FOLLOWING', fontSize: 10),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(
+                                  flex: 3,
+                                ),
+                                Column(
+                                  children: [
+                                    Container(
+                                        height: 20,
+                                        width: 2,
+                                        color: const Color(0xff707070)
+                                            .withOpacity(0.3)),
+                                    txt(txt: '', fontSize: 5),
+                                  ],
+                                ),
+                                const Spacer(),
+                                navigator(
+                                  function: Followers(userID: widget.uid),
+                                  child: Column(
+                                    children: [
+                                      txt(
+                                          txt: profileController
+                                              .user['followers'],
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                      txt(txt: 'FOLLOWERS', fontSize: 10),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                Column(
+                                  children: [
+                                    Container(
+                                        height: 20,
+                                        width: 2,
+                                        color: const Color(0xff707070)
+                                            .withOpacity(0.3)),
+                                    txt(txt: '', fontSize: 5),
+                                  ],
+                                ),
+                                const Spacer(
+                                  flex: 3,
+                                ),
+                                Column(
+                                  children: [
+                                    txt(
+                                        txt: profileController.user['vids'],
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                    txt(txt: 'VIDS', fontSize: 10),
+                                  ],
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  width: screenWidth(context) * 0.2,
+                                ),
                               ],
+                            ),
+                            SizedBox(
+                              height: screenHeight(context) * 0.015,
                             ),
                           ],
                         ),
-                  widget.uid != userId
-                      ? Container()
-                      : Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: TabBarView(
+                        SizedBox(
+                          height: screenHeight(context) * 0.02,
+                        ),
+                        widget.uid != userId
+                            ? Column(
                                 children: [
-                                  StreamBuilder<QuerySnapshot>(
-                                      stream: usersCollection
-                                          .doc(userId)
-                                          .collection("videos")
-                                          .snapshots(),
-                                      builder: (context,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (!snapshot.hasData ||
-                                            snapshot.hasError) {
-                                          return const Center(
-                                            child: Text(
-                                              'No videos...',
+                                  InkWell(
+                                    onTap: () async {
+                                      setState(() {
+                                        isFollowButtonLoading = true;
+                                      });
+                                      await profileController.followUser();
+                                      setState(() {
+                                        isFollowButtonLoading = false;
+                                      });
+                                    },
+                                    child: isFollowButtonLoading
+                                        ? const CircularProgress()
+                                        : Container(
+                                            width: screenWidth(context) * 0.5,
+                                            height:
+                                                screenHeight(context) * 0.055,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(2.0),
+                                              color: const Color(0xFF3B5998),
                                             ),
-                                          );
-                                        } else if (snapshot
-                                            .data!.docs.isNotEmpty) {
-                                          return ListView.builder(
-                                              itemCount:
-                                                  snapshot.data!.docs.length,
-                                              itemBuilder: (context, index) {
-                                                DocumentSnapshot doc =
-                                                    snapshot.data!.docs[index];
-
-                                                return favouriteItem(context,
-                                                    doc: doc,
-                                                    name: ' ',
-                                                    profileUrl: ' ',
-                                                    title: (doc.data() as Map)[
-                                                            'videoTitle'] ??
-                                                        ' ',
-                                                    videoLink:
-                                                        (doc.data() as Map)[
-                                                                'videoLink'] ??
-                                                            ' ',
-                                                    topic: (doc.data() as Map)[
-                                                            'videoTopic'] ??
-                                                        ' ');
-                                              });
-                                        } else {
-                                          return const Center(
-                                              child: Text('No videos...'));
-                                        }
-                                      }),
-                                  StreamBuilder<QuerySnapshot>(
-                                      stream: usersCollection
-                                          .doc(userId)
-                                          .collection("perspectiveRequests")
-                                          .snapshots(),
-                                      builder: (context,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (!snapshot.hasData ||
-                                            snapshot.hasError) {
-                                          return const Center(
-                                            child: Text(
-                                              'No perspective requests for you...',
+                                            child: Center(
+                                              child: txt(
+                                                  txt: profileController
+                                                          .user['isFollowing']
+                                                      ? 'Unfollow'
+                                                      : 'Follow',
+                                                  fontSize: 13,
+                                                  fontColor: Colors.white),
                                             ),
-                                          );
-                                        } else if (snapshot
-                                            .data!.docs.isNotEmpty) {
-                                          return ListView.builder(
-                                              itemCount:
-                                                  snapshot.data!.docs.length,
-                                              itemBuilder: (context, index) {
-                                                DocumentSnapshot doc =
-                                                    snapshot.data!.docs[index];
-                                                var data = (doc.data() as Map);
-                                                var videoDetails =
-                                                    data['videoDetails'] as Map;
-
-                                                String userID = data['userID'];
-                                                String userName =
-                                                    data['userName'];
-                                                String userProfileUrl =
-                                                    data['userProfileUrl'];
-
-                                                return perspectiveRequestedItem(
-                                                    context,
-                                                    title: videoDetails[
-                                                        'videoTitle'],
-                                                    topic: videoDetails[
-                                                        'videoTopic'],
-                                                    name: userName,
-                                                    videoDetails: videoDetails,
-                                                    profileUrl: userProfileUrl,
-                                                    userID: userID);
-                                              });
-                                        } else {
-                                          return const Center(
-                                              child: Text(
-                                                  'No perspective requests for you...'));
-                                        }
-                                      }),
+                                          ),
+                                  ),
+                                  SizedBox(
+                                    height: screenHeight(context) * 0.02,
+                                  ),
+                                  txt(
+                                      txt: 'This account is private',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)
                                 ],
-                              )),
-                        )
-                ],
-              ),
-            ),
-          );
+                              )
+                            : Column(
+                                children: [
+                                  TabBar(
+                                    indicatorColor:
+                                        const Color(blueColor).withOpacity(0.5),
+                                    tabs: [
+                                      Tab(
+                                          icon:
+                                              txt(txt: "BY YOU", fontSize: 14)),
+                                      Tab(
+                                          icon: txt(
+                                              txt: "REQUESTS", fontSize: 14)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                        widget.uid != userId
+                            ? Container()
+                            : Expanded(
+                                child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: TabBarView(
+                                      children: [
+                                        StreamBuilder<QuerySnapshot>(
+                                            stream: usersCollection
+                                                .doc(userId)
+                                                .collection("videos")
+                                                .snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<QuerySnapshot>
+                                                    snapshot) {
+                                              if (!snapshot.hasData ||
+                                                  snapshot.hasError) {
+                                                return const Center(
+                                                  child: Text(
+                                                    'No videos...',
+                                                  ),
+                                                );
+                                              } else if (snapshot
+                                                  .data!.docs.isNotEmpty) {
+                                                return ListView.builder(
+                                                    itemCount: snapshot
+                                                        .data!.docs.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      DocumentSnapshot doc =
+                                                          snapshot.data!
+                                                              .docs[index];
+
+                                                      return favouriteItem(context,
+                                                          controller:
+                                                              profileController,
+                                                          vc: (doc.data() as Map)[
+                                                              'veryConservative'],
+                                                          c: (doc.data() as Map)[
+                                                              'conservative'],
+                                                          n: (doc.data() as Map)[
+                                                              'neutral'],
+                                                          l: (doc.data() as Map)[
+                                                              'liberal'],
+                                                          vl: (doc.data() as Map)[
+                                                              'veryLiberal'],
+                                                          doc: doc,
+                                                          name: ' ',
+                                                          profileUrl: ' ',
+                                                          title: (doc.data()
+                                                                      as Map)[
+                                                                  'videoTitle'] ??
+                                                              ' ',
+                                                          videoLink:
+                                                              (doc.data() as Map)['videoLink'] ??
+                                                                  ' ',
+                                                          topic: (doc.data()
+                                                                  as Map)['videoTopic'] ??
+                                                              ' ');
+                                                    });
+                                              } else {
+                                                return const Center(
+                                                    child:
+                                                        Text('No videos...'));
+                                              }
+                                            }),
+                                        StreamBuilder<QuerySnapshot>(
+                                            stream: usersCollection
+                                                .doc(userId)
+                                                .collection(
+                                                    "perspectiveRequests")
+                                                .snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<QuerySnapshot>
+                                                    snapshot) {
+                                              if (!snapshot.hasData ||
+                                                  snapshot.hasError) {
+                                                return const Center(
+                                                  child: Text(
+                                                    'No perspective requests for you...',
+                                                  ),
+                                                );
+                                              } else if (snapshot
+                                                  .data!.docs.isNotEmpty) {
+                                                return ListView.builder(
+                                                    itemCount: snapshot
+                                                        .data!.docs.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      DocumentSnapshot doc =
+                                                          snapshot.data!
+                                                              .docs[index];
+                                                      var data =
+                                                          (doc.data() as Map);
+                                                      var videoDetails =
+                                                          data['videoDetails']
+                                                              as Map;
+
+                                                      String userID =
+                                                          data['userID'];
+                                                      String userName =
+                                                          data['userName'];
+                                                      String userProfileUrl =
+                                                          data[
+                                                              'userProfileUrl'];
+
+                                                      return perspectiveRequestedItem(
+                                                          context,
+                                                          controller:
+                                                              profileController,
+                                                          vc: (doc.data() as Map)[
+                                                              'veryConservative'],
+                                                          c: (doc.data() as Map)[
+                                                              'conservative'],
+                                                          n: (doc.data() as Map)[
+                                                              'neutral'],
+                                                          l: (doc.data()
+                                                                  as Map)[
+                                                              'liberal'],
+                                                          vl: (doc.data()
+                                                                  as Map)[
+                                                              'veryLiberal'],
+                                                          title: videoDetails[
+                                                              'videoTitle'],
+                                                          topic: videoDetails[
+                                                              'videoTopic'],
+                                                          name: userName,
+                                                          videoDetails:
+                                                              videoDetails,
+                                                          profileUrl:
+                                                              userProfileUrl,
+                                                          userID: userID);
+                                                    });
+                                              } else {
+                                                return const Center(
+                                                    child: Text(
+                                                        'No perspective requests for you...'));
+                                              }
+                                            }),
+                                      ],
+                                    )),
+                              )
+                      ],
+                    ),
+                  ),
+                );
         });
   }
 
   Padding perspectiveRequestedItem(
     BuildContext context, {
+    ProfileController? controller,
     String? name,
     Map? videoDetails,
     String? title,
     String? userID,
     String? topic,
     String? profileUrl,
+    int? vc,
+    int? c,
+    int? n,
+    int? l,
+    int? vl,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -592,39 +679,72 @@ class _ProfileState extends State<Profile> {
               right: 10,
               child: SizedBox(
                 width: screenWidth(context) * 0.85,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: screenWidth(context) * 0.065,
-                      child: txt(
-                        maxLines: 1,
-                        txt: '37%',
-                        fontColor: const Color(blueColor),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                child: vc == 0 && c == 0 && n == 0 && l == 0 && vl == 0
+                    ? Row(children: [
+                        SizedBox(
+                          width: screenWidth(context) * 0.7,
+                          child: txt(
+                              maxLines: 1,
+                              txt:
+                                  'No response from the audience on this video yet',
+                              fontWeight: FontWeight.bold,
+                              fontColor: Colors.black45,
+                              fontSize: 12),
+                        ),
+                      ])
+                    : Row(
+                        children: [
+                          SizedBox(
+                            width: screenWidth(context) * 0.065,
+                            child: txt(
+                              maxLines: 1,
+                              txt: controller!
+                                      .byYouVideoAudienceReactionPercentage(
+                                        c: c,
+                                        l: l,
+                                        n: n,
+                                        vc: vc,
+                                        vl: vl,
+                                      )
+                                      .first
+                                      .toString() +
+                                  '%',
+                              fontColor: const Color(blueColor),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth(context) * 0.4,
+                            child: txt(
+                              maxLines: 1,
+                              txt: ' audience labelled this video as ',
+                              fontWeight: FontWeight.bold,
+                              fontColor: Colors.black45,
+                              fontSize: 10,
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth(context) * 0.3,
+                            child: txt(
+                                maxLines: 1,
+                                txt: '#' +
+                                    controller
+                                        .byYouVideoAudienceReactionPercentage(
+                                          c: c,
+                                          l: l,
+                                          n: n,
+                                          vc: vc,
+                                          vl: vl,
+                                        )
+                                        .last
+                                        .toString(),
+                                fontColor: const Color(blueColor),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(
-                      width: screenWidth(context) * 0.4,
-                      child: txt(
-                        maxLines: 1,
-                        txt: ' audience labelled this video as ',
-                        fontWeight: FontWeight.bold,
-                        fontColor: Colors.black45,
-                        fontSize: 10,
-                      ),
-                    ),
-                    SizedBox(
-                      width: screenWidth(context) * 0.3,
-                      child: txt(
-                          maxLines: 1,
-                          txt: '#very liberal',
-                          fontColor: const Color(blueColor),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
@@ -636,13 +756,18 @@ class _ProfileState extends State<Profile> {
 
 Padding favouriteItem(
   BuildContext context, {
+  ProfileController? controller,
   String? name,
   String? profileUrl,
   DocumentSnapshot? doc,
   String? videoLink,
   String? topic,
   String? title,
-  // String? audienceReactionLabel
+  int? vc,
+  int? c,
+  int? n,
+  int? l,
+  int? vl,
 }) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 10),
@@ -747,39 +872,72 @@ Padding favouriteItem(
             right: 10,
             child: SizedBox(
               width: screenWidth(context) * 0.85,
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: screenWidth(context) * 0.065,
-                    child: txt(
-                      maxLines: 1,
-                      txt: '37%',
-                      fontColor: const Color(blueColor),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
+              child: vc == 0 && c == 0 && n == 0 && l == 0 && vl == 0
+                  ? Row(children: [
+                      SizedBox(
+                        width: screenWidth(context) * 0.7,
+                        child: txt(
+                            maxLines: 1,
+                            txt:
+                                'No response from the audience on this video yet',
+                            fontWeight: FontWeight.bold,
+                            fontColor: Colors.black45,
+                            fontSize: 12),
+                      ),
+                    ])
+                  : Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth(context) * 0.065,
+                          child: txt(
+                            maxLines: 1,
+                            txt: controller!
+                                    .byYouVideoAudienceReactionPercentage(
+                                      c: c,
+                                      l: l,
+                                      n: n,
+                                      vc: vc,
+                                      vl: vl,
+                                    )
+                                    .first
+                                    .toString() +
+                                '%',
+                            fontColor: const Color(blueColor),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth(context) * 0.4,
+                          child: txt(
+                            maxLines: 1,
+                            txt: ' audience labelled this video as ',
+                            fontWeight: FontWeight.bold,
+                            fontColor: Colors.black45,
+                            fontSize: 10,
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth(context) * 0.3,
+                          child: txt(
+                              maxLines: 1,
+                              txt: '#' +
+                                  controller
+                                      .byYouVideoAudienceReactionPercentage(
+                                        c: c,
+                                        l: l,
+                                        n: n,
+                                        vc: vc,
+                                        vl: vl,
+                                      )
+                                      .last
+                                      .toString(),
+                              fontColor: const Color(blueColor),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(
-                    width: screenWidth(context) * 0.4,
-                    child: txt(
-                      maxLines: 1,
-                      txt: ' audience labelled this video as ',
-                      fontWeight: FontWeight.bold,
-                      fontColor: Colors.black45,
-                      fontSize: 10,
-                    ),
-                  ),
-                  SizedBox(
-                    width: screenWidth(context) * 0.3,
-                    child: txt(
-                        maxLines: 1,
-                        txt: '#very liberal',
-                        fontColor: const Color(blueColor),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10),
-                  ),
-                ],
-              ),
             ),
           ),
         ],

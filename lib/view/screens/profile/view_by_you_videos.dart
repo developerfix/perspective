@@ -61,8 +61,6 @@ class _ViewByYouVideoState extends State<ViewByYouVideo>
                       itemCount: profileVideoController.profileVideo.length,
                       controller:
                           PageController(initialPage: 0, viewportFraction: 1),
-                      // controller: PreloadPageController(initialPage: 1),
-                      // preloadPagesCount: 3,
                       itemBuilder: ((context, index) {
                         final data = profileVideoController.profileVideo[index];
                         return VideoWidget(

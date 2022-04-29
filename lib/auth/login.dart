@@ -15,7 +15,8 @@ import 'package:slant/res.dart';
 import 'package:slant/view/widgets/circular_progress.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  final bool? isLoggedout;
+  const Login({Key? key, this.isLoggedout}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
@@ -39,13 +40,13 @@ class _LoginState extends State<Login> {
             .get()
             .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
-            if ((documentSnapshot.data() as Map)['name'] != 'ahme') {
-              getx.Get.offAll(const BNB());
+            if ((documentSnapshot.data() as Map)['topicsOfInterest'] != null) {
+              getx.Get.offAll(() => const BNB());
             } else {
               setState(() {
                 loading1 = false;
               });
-              getx.Get.offAll(const Interested());
+              getx.Get.offAll(() => const Interested());
             }
           }
         });
@@ -61,7 +62,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    userchecker();
+    widget.isLoggedout! ? Container() : userchecker();
 
     isVisible = false;
     _emailcontroller.text = '';
@@ -445,7 +446,7 @@ class _LoginState extends State<Login> {
       setState(() {
         loading1 = false;
       });
-      getx.Get.offAll(const Interested());
+      getx.Get.offAll(() => const Interested());
     } on FirebaseAuthException catch (e) {
       String error = '';
       switch (e.code) {

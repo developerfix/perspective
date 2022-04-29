@@ -107,7 +107,7 @@ class _FollowingState extends State<Following> {
                       },
                       itemCount: followingList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        var follower = followingList[index];
+                        var following = followingList[index];
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -117,7 +117,7 @@ class _FollowingState extends State<Following> {
                               radius: 25,
                               child: CachedNetworkImage(
                                 imageUrl:
-                                    '${follower['profilePic'] == null || follower['profilePic'].toString().isEmpty ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png' : follower['profilePic']}',
+                                    '${following['profilePic'] == null || following['profilePic'].toString().isEmpty ? 'https://www.kindpng.com/picc/m/285-2855863_a-festival-celebrating-tractors-round-profile-picture-placeholder.png' : following['profilePic']}',
                                 imageBuilder: (context, imageProvider) =>
                                     CircleAvatar(
                                         backgroundColor: Colors.transparent,
@@ -134,9 +134,9 @@ class _FollowingState extends State<Following> {
                               ),
                             ),
                             contentPadding: const EdgeInsets.all(0),
-                            title: txt(txt: follower['name'], fontSize: 14),
+                            title: txt(txt: following['name'], fontSize: 14),
                             subtitle: txt(
-                                txt: follower['bio'],
+                                txt: following['bio'],
                                 fontSize: 12,
                                 fontColor: Colors.black45),
                           ),
