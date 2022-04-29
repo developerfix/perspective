@@ -221,37 +221,38 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
   }
 
   Widget listOfVideos({List<Video>? list}) {
-    return PageView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: list!.length,
-      itemBuilder: ((context, index) {
-        final data = list[index];
+    return list!.isEmpty
+        ? Center(
+            child: txt(
+                txt:
+                    'Currently there is no video under this tag\nPlease be the one to share your perspective',
+                fontSize: 18),
+          )
+        : PageView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: list.length,
+            itemBuilder: ((context, index) {
+              final data = list[index];
 
-        return list.isEmpty
-            ? Center(
-                child: txt(
-                    txt: 'Currently there is no video under this tag',
-                    fontSize: 18),
-              )
-            : VideoWidget(
-                videoController: videoController,
-                video: data,
-                conservative: data.conservative,
-                veryConservative: data.veryConservative,
-                liberal: data.liberal,
-                neutral: data.neutral,
-                veryLiberal: data.veryLiberal,
-                name: data.publisherName,
-                publishersID: data.publisherID,
-                description: data.videoDescription,
-                title: data.videoTitle,
-                videoTag: data.videoTag,
-                videoLink: data.videoLink,
-                profilePic: data.publisherProfilePic,
-                hastags: data.videoHastags,
-                brainOnFireReactions: data.brainOnFireReactions);
-      }),
-    );
+              return VideoWidget(
+                  videoController: videoController,
+                  video: data,
+                  conservative: data.conservative,
+                  veryConservative: data.veryConservative,
+                  liberal: data.liberal,
+                  neutral: data.neutral,
+                  veryLiberal: data.veryLiberal,
+                  name: data.publisherName,
+                  publishersID: data.publisherID,
+                  description: data.videoDescription,
+                  title: data.videoTitle,
+                  videoTag: data.videoTag,
+                  videoLink: data.videoLink,
+                  profilePic: data.publisherProfilePic,
+                  hastags: data.videoHastags,
+                  brainOnFireReactions: data.brainOnFireReactions);
+            }),
+          );
   }
 }
 

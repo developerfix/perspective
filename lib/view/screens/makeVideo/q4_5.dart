@@ -287,9 +287,8 @@ class _Question4And5State extends State<Question4And5> {
                                       'Please fill out the video details first')));
                         } else {
                           final XFile? file = await _picker.pickVideo(
-                            source: ImageSource.gallery,
-                            // maxDuration: const Duration(minutes: 2)
-                          );
+                              source: ImageSource.camera,
+                              maxDuration: const Duration(minutes: 3));
 
                           if (file != null) {
                             setState(() {
