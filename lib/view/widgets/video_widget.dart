@@ -5,20 +5,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-// import 'package:get/get.dart' as getx;
+import 'package:slant/view/screens/makeVideo/chainVideoInfo.dart';
 import '../../bnb.dart';
 import '../../controller/video_controller.dart';
 import '../../models/video.dart';
 import '../../res.dart';
 import '../screens/discover/videos_list.dart';
-import '../screens/makeVideo/make_video.dart';
 import '../screens/video_item.dart';
 import 'circular_progress.dart';
 
 class VideoWidget extends StatefulWidget {
   final VideoController? videoController;
-  // final bool? isProfileController;
-  // final ProfileVideoController? profileideoController;
+
   final Video? video;
   final String? name;
   final String? publishersID;
@@ -26,6 +24,7 @@ class VideoWidget extends StatefulWidget {
   final String? profilePic;
   final String? description;
   final String? title;
+  final String? topic;
   final String? videoTag;
   final List? hastags;
   final int? veryConservative;
@@ -38,10 +37,9 @@ class VideoWidget extends StatefulWidget {
   const VideoWidget(
       {Key? key,
       this.brainOnFireReactions,
-      // this.isProfileController,
+      this.topic,
       this.videoController,
       this.description,
-      // this.profileideoController,
       this.hastags,
       this.conservative,
       this.liberal,
@@ -1033,9 +1031,9 @@ class _VideoWidgetState extends State<VideoWidget> {
                           ),
                         ),
                         navigator(
-                            function: MakeVideo(
+                            function: ChainVideoInfo(
                               hastags: widget.hastags!,
-                              isAddingToThChain: true,
+                              topic: widget.topic,
                               title: widget.title,
                             ),
                             child: SvgPicture.asset('assets/svgs/slant.svg')),
@@ -1155,30 +1153,6 @@ class _VideoWidgetState extends State<VideoWidget> {
                                         );
                                       }).toList(),
                                     )
-
-                                  //  SizedBox(
-                                  //     height: screenHeight(context) * 0.2,
-                                  //     child: ListView.builder(
-                                  //         scrollDirection: Axis.horizontal,
-                                  //         itemCount: widget.hastags!.length,
-                                  //         itemBuilder: (context, index) {
-                                  //           return navigator(
-                                  //             function: VideoList(
-                                  //               headertag: 'hashtag',
-                                  //               headerName:
-                                  //                   widget.hastags![index],
-                                  //             ),
-                                  //             child: txt(
-                                  //                 // maxLines: 1,
-                                  //                 txt:
-                                  //                     '${widget.hastags![index]}',
-                                  //                 fontSize: 12,
-                                  //                 fontWeight: FontWeight.bold,
-                                  //                 fontColor:
-                                  //                     const Color(blueColor)),
-                                  //           );
-                                  //         }),
-                                  //   )
                                   : Container(),
                               navigator(
                                 function: VideoList(
