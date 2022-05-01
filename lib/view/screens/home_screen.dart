@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen>
               conservative: data.conservative,
               veryConservative: data.veryConservative,
               liberal: data.liberal,
+              topic: data.videoTopic,
               neutral: data.neutral,
               veryLiberal: data.veryLiberal,
               name: data.publisherName,

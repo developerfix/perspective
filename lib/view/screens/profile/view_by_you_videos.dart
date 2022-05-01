@@ -65,6 +65,7 @@ class _ViewByYouVideoState extends State<ViewByYouVideo>
                         final data = profileVideoController.profileVideo[index];
                         return VideoWidget(
                             videoController: videoController,
+                            topic: data.videoTopic,
                             video: data,
                             conservative: data.conservative,
                             veryConservative: data.veryConservative,

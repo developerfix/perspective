@@ -17,21 +17,19 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../controller/upload_video_controller.dart';
 
-class Question4And5 extends StatefulWidget {
-  final String? selectedTopic;
+class ChainVideoInfo extends StatefulWidget {
+  final List? hastags;
   final String? title;
-  final String? perspectiveTag;
-  const Question4And5(
-      {Key? key, this.perspectiveTag, this.selectedTopic, this.title})
+  final String? topic;
+  const ChainVideoInfo({Key? key, this.hastags, this.title, this.topic})
       : super(key: key);
 
   @override
-  State<Question4And5> createState() => _Question4And5State();
+  State<ChainVideoInfo> createState() => _ChainVideoInfoState();
 }
 
-class _Question4And5State extends State<Question4And5> {
+class _ChainVideoInfoState extends State<ChainVideoInfo> {
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _hashtagController = TextEditingController();
   UploadVideoController uploadVideoController =
       Get.put(UploadVideoController());
 
@@ -40,6 +38,7 @@ class _Question4And5State extends State<Question4And5> {
   bool? p3 = false;
   bool? p4 = false;
   bool? p5 = false;
+  String tagSelected = '';
 
   final ImagePicker _picker = ImagePicker();
   List? hashTags = [];
@@ -83,12 +82,9 @@ class _Question4And5State extends State<Question4And5> {
   void initState() {
     super.initState();
 
-    getUserName();
-  }
+    hashTags = widget.hastags!;
 
-  showSnackBar(String snackText) {
-    final snackBar = SnackBar(content: Text(snackText));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    getUserName();
   }
 
   @override
@@ -112,57 +108,26 @@ class _Question4And5State extends State<Question4And5> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: screenHeight(context) * 0.03,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                    type: PageTransitionType.topToBottom,
-                                    child: Question2And3(
-                                      selectedTopic: widget.selectedTopic,
-                                    )));
-                          },
-                          child: Container(
-                            width: screenWidth(context) * 0.08,
-                            height: screenHeight(context) * 0.05,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFF3B5998),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.16),
-                                  offset: const Offset(0, 3.0),
-                                  blurRadius: 6.0,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height: screenHeight(context) * 0.005,
-                                ),
-                                const RotatedBox(
-                                  quarterTurns: 1,
-                                  child: Icon(
-                                    Icons.arrow_back_ios,
-                                    color: Colors.white,
-                                    size: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
+                  Container(
+                    height: screenHeight(context) * 0.08,
+                    color: const Color(0xFF080808),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: screenWidth(context) * 0.05,
                           ),
-                        ),
-                      ],
+                          txt(
+                              txt: 'Add perspective',
+                              fontSize: 18,
+                              fontColor: Colors.white),
+                          Container(
+                            width: screenWidth(context) * 0.05,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -174,19 +139,99 @@ class _Question4And5State extends State<Question4And5> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         txt(
-                            txt: 'Almost There',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
+                            txt:
+                                'Choose the most suitable tag for your perspective',
+                            fontSize: 14),
                         SizedBox(
-                          height: screenHeight(context) * 0.005,
+                          height: screenHeight(context) * 0.02,
                         ),
-                        LinearPercentIndicator(
-                          barRadius: const Radius.circular(8),
-                          // width: screenWidth(context),
-                          lineHeight: screenHeight(context) * 0.015,
-                          percent: 1,
-                          backgroundColor: Colors.black.withOpacity(0.2),
-                          progressColor: const Color(blueColor),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p1 = true;
+                              tagSelected = veryConservative;
+                              if (p1 == true) {
+                                p2 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: veryConservative,
+                              topic: p1 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p2 = true;
+                              tagSelected = conservative;
+
+                              if (p2 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p5 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: conservative, topic: p2 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p3 = true;
+                              tagSelected = neutral;
+
+                              if (p3 == true) {
+                                p1 = false;
+                                p2 = false;
+                                p4 = false;
+                                p5 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: neutral, topic: p3 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p4 = true;
+                              tagSelected = liberal;
+
+                              if (p4 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p2 = false;
+                                p5 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: liberal, topic: p4 == true ? 1 : 0),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              p5 = true;
+                              tagSelected = veryLiberal;
+
+                              if (p5 == true) {
+                                p1 = false;
+                                p3 = false;
+                                p4 = false;
+                                p2 = false;
+                              }
+                            });
+                          },
+                          child: topicWidget(context,
+                              text: veryLiberal, topic: p5 == true ? 1 : 0),
+                        ),
+                        SizedBox(
+                          height: screenHeight(context) * 0.03,
                         ),
                         SizedBox(
                           height: screenHeight(context) * 0.05,
@@ -205,33 +250,6 @@ class _Question4And5State extends State<Question4And5> {
                         SizedBox(
                           height: screenHeight(context) * 0.05,
                         ),
-                        txt(txt: 'Hastags', fontSize: 14),
-                        SizedBox(
-                          height: screenHeight(context) * 0.02,
-                        ),
-                        textField(
-                            isDisabled: false,
-                            onChanged: (value) {
-                              hashTags = extractHashTags(value);
-                            },
-                            hinttext: '#...',
-                            controller: _hashtagController,
-                            context: context),
-                        SizedBox(
-                          height: screenHeight(context) * 0.02,
-                        ),
-                        hashTags!.isNotEmpty
-                            ? txt(txt: 'Selected Hastags', fontSize: 14)
-                            : Container(),
-                        SizedBox(
-                          height: screenHeight(context) * 0.02,
-                        ),
-                        hashTags!.isNotEmpty
-                            ? txt(
-                                txt: hashTags.toString(),
-                                fontSize: 14,
-                                fontColor: const Color(blueColor))
-                            : Container(),
                       ],
                     ),
                   ),
@@ -257,39 +275,45 @@ class _Question4And5State extends State<Question4And5> {
                   if (!loading) ...[
                     InkWell(
                       onTap: () async {
-                        if (widget.perspectiveTag!.isEmpty ||
-                            widget.selectedTopic!.isEmpty ||
-                            widget.title!.isEmpty ||
-                            _descriptionController.text.isEmpty ||
-                            _hashtagController.text.isEmpty) {
+                        if (tagSelected.isEmpty ||
+                            _descriptionController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text(
                                       'Please fill out the video details first')));
                         } else {
-                          final XFile? file = await _picker.pickVideo(
-                              source: ImageSource.camera,
-                              maxDuration: const Duration(minutes: 3));
+                          if (widget.title == null ||
+                              widget.hastags == null ||
+                              widget.topic == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Something went wrong, Please try again')));
+                          } else {
+                            final XFile? file = await _picker.pickVideo(
+                                source: ImageSource.camera,
+                                maxDuration: const Duration(minutes: 3));
 
-                          if (file != null) {
+                            if (file != null) {
+                              setState(() {
+                                _video = File(file.path);
+                                loading = true;
+                              });
+                              await uploadVideoController.uploadContent(
+                                  context: context,
+                                  video: _video,
+                                  videoDescription: _descriptionController.text,
+                                  videoHastags: hashTags,
+                                  videoTag: tagSelected,
+                                  videoTitle: widget.title!,
+                                  videoTopic: widget.topic!,
+                                  publisherProfilePic: userProfilePic,
+                                  publishersName: userName);
+                            }
                             setState(() {
-                              _video = File(file.path);
-                              loading = true;
+                              loading = false;
                             });
-                            await uploadVideoController.uploadContent(
-                                context: context,
-                                video: _video,
-                                videoDescription: _descriptionController.text,
-                                videoHastags: hashTags,
-                                videoTag: widget.perspectiveTag!,
-                                videoTitle: widget.title!,
-                                videoTopic: widget.selectedTopic,
-                                publisherProfilePic: userProfilePic,
-                                publishersName: userName);
                           }
-                          setState(() {
-                            loading = false;
-                          });
                         }
                       },
                       child: Container(

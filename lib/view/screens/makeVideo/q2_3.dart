@@ -9,17 +9,11 @@ import 'package:slant/view/screens/makeVideo/q4_5.dart';
 import '../../../bnb.dart';
 
 class Question2And3 extends StatefulWidget {
-  final List? hastags;
-  final String? title;
-  final bool? isAddingToThChain;
   final String? selectedTopic;
-  const Question2And3(
-      {Key? key,
-      this.selectedTopic,
-      this.hastags,
-      this.isAddingToThChain,
-      this.title})
-      : super(key: key);
+  const Question2And3({
+    Key? key,
+    this.selectedTopic,
+  }) : super(key: key);
 
   @override
   State<Question2And3> createState() => _Question2And3State();
@@ -37,7 +31,6 @@ class _Question2And3State extends State<Question2And3> {
 
   @override
   void initState() {
-    widget.isAddingToThChain! ? _titleController.text = widget.title! : '';
     super.initState();
   }
 
@@ -75,12 +68,7 @@ class _Question2And3State extends State<Question2And3> {
                                   context,
                                   PageTransition(
                                       type: PageTransitionType.topToBottom,
-                                      child: Question1(
-                                        hastags: widget.hastags,
-                                        isAddingToThChain:
-                                            widget.isAddingToThChain,
-                                        title: widget.title,
-                                      )));
+                                      child: const Question1()));
                             },
                             child: Container(
                               width: screenWidth(context) * 0.08,
@@ -146,8 +134,7 @@ class _Question2And3State extends State<Question2And3> {
                           height: screenHeight(context) * 0.02,
                         ),
                         textField(
-                            isDisabled:
-                                widget.isAddingToThChain! ? true : false,
+                            isDisabled: false,
                             hinttext: 'Title',
                             controller: _titleController,
                             context: context),
@@ -274,10 +261,6 @@ class _Question2And3State extends State<Question2And3> {
                                     PageTransition(
                                         type: PageTransitionType.bottomToTop,
                                         child: Question4And5(
-                                          hastags: widget.hastags,
-                                          isAddingToThChain:
-                                              widget.isAddingToThChain,
-                                          // titlee: widget.title,
                                           perspectiveTag: tagSelected,
                                           title: _titleController.text,
                                           selectedTopic: widget.selectedTopic,

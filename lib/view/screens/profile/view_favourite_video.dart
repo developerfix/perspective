@@ -63,6 +63,7 @@ class _ViewFavouriteVideoState extends State<ViewFavouriteVideo>
                             profileVideoController.favouriteVideo[index];
                         return VideoWidget(
                             videoController: videoController,
+                            topic: data.videoTopic,
                             video: data,
                             name: data.publisherName,
                             conservative: data.conservative,

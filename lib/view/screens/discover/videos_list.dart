@@ -237,6 +237,7 @@ class _VideoListState extends State<VideoList> with TickerProviderStateMixin {
               return VideoWidget(
                   videoController: videoController,
                   video: data,
+                  topic: data.videoTopic,
                   conservative: data.conservative,
                   veryConservative: data.veryConservative,
                   liberal: data.liberal,

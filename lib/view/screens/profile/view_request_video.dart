@@ -59,6 +59,7 @@ class _ViewRequestVideoState extends State<ViewRequestVideo>
                         final data = profileVideoController.requestVideo[index];
                         return VideoWidget(
                             videoController: videoController,
+                            topic: data.videoTopic,
                             video: data,
                             name: data.publisherName,
                             conservative: data.conservative,

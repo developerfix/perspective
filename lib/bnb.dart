@@ -37,11 +37,7 @@ class _BNBState extends State<BNB> {
         case 2:
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (_) => const MakeVideo(
-                hastags: [],
-                isAddingToThChain: false,
-                title: '',
-              ),
+              builder: (_) => const MakeVideo(),
             ),
           );
           break;
